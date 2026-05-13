@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1180" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.12"/>
+    </filter>
+    <marker id="flowArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e40af"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="1180" fill="url(#pageBg)"/>
+
+  <!-- Title -->
+  <text x="720" y="44" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Taxpayer · First-Time Experience</text>
+  <text x="720" y="70" text-anchor="middle" font-size="14" fill="#475569">From sign-up to verified account — what the new user sees, step by step</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 1 — Register -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(40, 110)">
+    <rect width="660" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#cardShadow)"/>
+
+    <!-- Frame label -->
+    <rect width="660" height="36" rx="12" fill="#1e40af"/>
+    <rect y="20" width="660" height="16" fill="#1e40af"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">① Register</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bfdbfe">glimmora.tax/register</text>
+
+    <!-- App brand -->
+    <text x="330" y="80" text-anchor="middle" font-size="22" font-weight="700" fill="#1e3a8a">GlimmoraTax</text>
+    <text x="330" y="100" text-anchor="middle" font-size="11" fill="#64748b">Trust &gt; Features · Rules decide · AI assists</text>
+
+    <!-- Form card -->
+    <rect x="40" y="120" width="580" height="350" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+
+    <text x="330" y="148" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Create your account</text>
+
+    <!-- Form fields -->
+    <g font-size="11" fill="#475569">
+      <!-- Name -->
+      <text x="60" y="180">Full name *</text>
+      <rect x="60" y="186" width="540" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="207" font-size="13" fill="#0f172a">Asha Verma</text>
+
+      <!-- Email + PAN row -->
+      <text x="60" y="238">Email *</text>
+      <rect x="60" y="244" width="260" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="265" font-size="13" fill="#0f172a">asha@example.com</text>
+
+      <text x="340" y="238">PAN *</text>
+      <rect x="340" y="244" width="260" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="354" y="265" font-size="13" font-family="ui-monospace, monospace" fill="#0f172a">ABCDE1234F</text>
+
+      <!-- Password + Confirm -->
+      <text x="60" y="296">Password *</text>
+      <rect x="60" y="302" width="260" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="323" font-size="13" fill="#0f172a">••••••••••••</text>
+      <rect x="60" y="338" width="180" height="3" rx="1" fill="#16a34a"/>
+      <text x="244" y="343" font-size="9" fill="#16a34a">strong</text>
+
+      <text x="340" y="296">Phone *</text>
+      <rect x="340" y="302" width="260" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="354" y="323" font-size="13" font-family="ui-monospace, monospace" fill="#0f172a">+91 99000-00000</text>
+
+      <!-- City + business income -->
+      <text x="60" y="358">City *</text>
+      <rect x="60" y="364" width="260" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="385" font-size="13" fill="#0f172a">Mumbai ▾</text>
+
+      <text x="340" y="358">Business income?</text>
+      <rect x="340" y="364" width="50" height="22" rx="11" fill="#cbd5e1"/>
+      <circle cx="354" cy="375" r="9" fill="#fff"/>
+      <text x="400" y="380" font-size="11" fill="#475569">No</text>
+      <text x="430" y="380" font-size="9" fill="#92400e">115BAC applies if yes ⓘ</text>
+    </g>
+
+    <!-- Consents block -->
+    <rect x="60" y="408" width="540" height="46" rx="6" fill="#eff6ff" stroke="#bfdbfe"/>
+    <g font-size="10">
+      <text x="74" y="424" font-weight="600" fill="#1e3a8a">Three consents required (DPDP-ready)</text>
+      <g transform="translate(74, 432)">
+        <rect width="11" height="11" rx="2" fill="#1e40af"/>
+        <path d="M 2 5.5 L 4.5 8 L 9 3.5" stroke="#fff" stroke-width="1.5" fill="none"/>
+        <text x="18" y="9" fill="#1e3a8a">Document processing</text>
+        <rect x="156" width="11" height="11" rx="2" fill="#1e40af"/>
+        <path d="M 158 5.5 L 160.5 8 L 165 3.5" stroke="#fff" stroke-width="1.5" fill="none"/>
+        <text x="174" y="9" fill="#1e3a8a">AI analysis</text>
+        <rect x="262" width="11" height="11" rx="2" fill="#1e40af"/>
+        <path d="M 264 5.5 L 266.5 8 L 271 3.5" stroke="#fff" stroke-width="1.5" fill="none"/>
+        <text x="280" y="9" fill="#1e3a8a">Data retention</text>
+      </g>
+    </g>
+
+    <!-- CTA -->
+    <rect x="60" y="462" width="540" height="38" rx="8" fill="#1e40af"/>
+    <text x="330" y="487" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Create account →</text>
+  </g>
+
+  <!-- Flow arrow 1 → 2 -->
+  <line x1="720" y1="360" x2="760" y2="360" stroke="#1e40af" stroke-width="3" marker-end="url(#flowArrow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 2 — Verify email -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(780, 110)">
+    <rect width="620" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#cardShadow)"/>
+
+    <rect width="620" height="36" rx="12" fill="#1e40af"/>
+    <rect y="20" width="620" height="16" fill="#1e40af"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">② Verify email</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bfdbfe">glimmora.tax/verify-email?token=…</text>
+
+    <!-- Email client mock at top -->
+    <rect x="40" y="68" width="540" height="84" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="56" y="88" font-size="10" font-weight="700" fill="#475569">📧 INBOX · 1 new</text>
+    <rect x="56" y="96" width="508" height="46" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="68" y="113" font-size="11" font-weight="600" fill="#0f172a">GlimmoraTax — Verify your email</text>
+    <text x="68" y="128" font-size="10" fill="#64748b">Hi Asha, click below to verify asha@example.com…</text>
+    <text x="68" y="142" font-size="10" fill="#1e40af" font-weight="600" text-decoration="underline">  Verify email →</text>
+
+    <!-- Arrow down -->
+    <line x1="310" y1="160" x2="310" y2="190" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#flowArrow)"/>
+    <text x="320" y="180" font-size="9" fill="#64748b">click</text>
+
+    <!-- Success state -->
+    <rect x="100" y="210" width="420" height="240" rx="12" fill="#f0fdf4" stroke="#86efac"/>
+    <circle cx="310" cy="270" r="34" fill="#16a34a"/>
+    <path d="M 295 270 L 305 282 L 325 260" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text x="310" y="330" text-anchor="middle" font-size="18" font-weight="700" fill="#14532d">Email verified ✓</text>
+    <text x="310" y="354" text-anchor="middle" font-size="12" fill="#15803d">asha@example.com</text>
+    <text x="310" y="378" text-anchor="middle" font-size="11" fill="#475569">users.email_verified_at = NOW()</text>
+
+    <rect x="170" y="402" width="280" height="36" rx="8" fill="#16a34a"/>
+    <text x="310" y="425" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Continue → Verify phone</text>
+    <text x="310" y="464" text-anchor="middle" font-size="10" fill="#64748b">Auto-redirecting in 2s…</text>
+  </g>
+
+  <!-- Flow arrow down from row 1 to row 2 -->
+  <line x1="1090" y1="630" x2="1090" y2="660" stroke="#1e40af" stroke-width="3"/>
+  <line x1="1090" y1="660" x2="350" y2="660" stroke="#1e40af" stroke-width="3"/>
+  <line x1="350" y1="660" x2="350" y2="690" stroke="#1e40af" stroke-width="3" marker-end="url(#flowArrow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 3 — Verify phone -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(40, 700)">
+    <rect width="660" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#cardShadow)"/>
+
+    <rect width="660" height="36" rx="12" fill="#1e40af"/>
+    <rect y="20" width="660" height="16" fill="#1e40af"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">③ Verify phone (OTP)</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bfdbfe">glimmora.tax/verify-phone</text>
+
+    <text x="330" y="78" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Verify your phone</text>
+    <text x="330" y="102" text-anchor="middle" font-size="12" fill="#475569">We sent a 6-digit code to</text>
+    <text x="330" y="124" text-anchor="middle" font-size="14" font-weight="600" font-family="ui-monospace, monospace" fill="#0f172a">+91 99000-*0000</text>
+    <text x="330" y="142" text-anchor="middle" font-size="10" fill="#1e40af" text-decoration="underline">Change number</text>
+
+    <!-- Six OTP boxes -->
+    <g transform="translate(126, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="30" y="44" text-anchor="middle" font-size="28" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">4</text>
+    </g>
+    <g transform="translate(202, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="30" y="44" text-anchor="middle" font-size="28" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">2</text>
+    </g>
+    <g transform="translate(278, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="30" y="44" text-anchor="middle" font-size="28" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">8</text>
+    </g>
+    <g transform="translate(354, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="30" y="44" text-anchor="middle" font-size="28" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">1</text>
+    </g>
+    <g transform="translate(430, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="30" y="44" text-anchor="middle" font-size="28" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">9</text>
+    </g>
+    <g transform="translate(506, 170)">
+      <rect width="60" height="64" rx="8" fill="#fff" stroke="#1e40af" stroke-width="3" stroke-dasharray="2,2"/>
+      <line x1="30" y1="20" x2="30" y2="44" stroke="#0f172a" stroke-width="2"/>
+    </g>
+
+    <!-- Resend timer -->
+    <text x="330" y="270" text-anchor="middle" font-size="11" fill="#64748b">Didn't get it? Resend in 0:42</text>
+
+    <!-- Lockout warning -->
+    <rect x="80" y="288" width="500" height="28" rx="6" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="98" y="306" font-size="11" fill="#78350f">⚠  5 attempts max · 4 remaining · 10-min TTL · OTP hashed in DB</text>
+
+    <!-- CTA -->
+    <rect x="80" y="332" width="500" height="42" rx="8" fill="#1e40af"/>
+    <text x="330" y="358" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Verify and continue →</text>
+
+    <text x="330" y="400" text-anchor="middle" font-size="10" fill="#475569">user_verifications row consumed · users.phone_verified_at = NOW()</text>
+    <text x="330" y="416" text-anchor="middle" font-size="10" fill="#475569">Notification: account_phone_verified</text>
+  </g>
+
+  <!-- Flow arrow 3 → 4 -->
+  <line x1="720" y1="930" x2="760" y2="930" stroke="#1e40af" stroke-width="3" marker-end="url(#flowArrow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 4 — Consents -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(780, 700)">
+    <rect width="620" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#cardShadow)"/>
+
+    <rect width="620" height="36" rx="12" fill="#1e40af"/>
+    <rect y="20" width="620" height="16" fill="#1e40af"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">④ Grant consents (DPDP)</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bfdbfe">glimmora.tax/onboarding/consents</text>
+
+    <text x="310" y="76" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Three consents required</text>
+    <text x="310" y="98" text-anchor="middle" font-size="11" fill="#64748b">You can revoke any of these later. Effects cascade.</text>
+
+    <!-- Consent 1 -->
+    <g transform="translate(40, 120)">
+      <rect width="540" height="80" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="20" y="22" font-size="13" font-weight="700" fill="#0f172a">📄  Document processing</text>
+      <text x="20" y="40" font-size="10" fill="#475569">Required to upload Form 16, 26AS, bank statements, salary slips.</text>
+      <text x="20" y="55" font-size="10" fill="#475569">Cascade on revoke: new uploads blocked; existing docs preserved.</text>
+      <text x="20" y="72" font-size="9" fill="#64748b">Stored: user_consents { type='document_processing', granted=true }</text>
+      <rect x="478" y="28" width="44" height="24" rx="12" fill="#1e40af"/>
+      <circle cx="510" cy="40" r="9" fill="#fff"/>
+    </g>
+
+    <!-- Consent 2 -->
+    <g transform="translate(40, 210)">
+      <rect width="540" height="80" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="20" y="22" font-size="13" font-weight="700" fill="#0f172a">🤖  AI-assisted categorization</text>
+      <text x="20" y="40" font-size="10" fill="#475569">Required for AI document extraction and the RAG assistant.</text>
+      <text x="20" y="55" font-size="10" fill="#475569">Cascade on revoke: RAG &amp; AI categorize disabled · deterministic rules continue.</text>
+      <text x="20" y="72" font-size="9" fill="#64748b">PII redacted before OpenAI · audit-logged · trust boundary B5</text>
+      <rect x="478" y="28" width="44" height="24" rx="12" fill="#1e40af"/>
+      <circle cx="510" cy="40" r="9" fill="#fff"/>
+    </g>
+
+    <!-- Consent 3 -->
+    <g transform="translate(40, 300)">
+      <rect width="540" height="80" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="20" y="22" font-size="13" font-weight="700" fill="#0f172a">🗄  Data retention</text>
+      <text x="20" y="40" font-size="10" fill="#475569">Required to keep filings beyond 1 year.</text>
+      <text x="20" y="55" font-size="10" fill="#475569">Cascade on revoke: 30-day erasure workflow triggers.</text>
+      <text x="20" y="72" font-size="9" fill="#64748b">Right-to-erasure honored · audit chain preserved</text>
+      <rect x="478" y="28" width="44" height="24" rx="12" fill="#1e40af"/>
+      <circle cx="510" cy="40" r="9" fill="#fff"/>
+    </g>
+
+    <!-- Continue CTA -->
+    <rect x="40" y="394" width="540" height="38" rx="8" fill="#16a34a"/>
+    <text x="310" y="419" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">All set — take me to my dashboard →</text>
+  </g>
+</svg>

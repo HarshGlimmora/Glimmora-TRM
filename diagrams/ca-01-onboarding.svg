@@ -1,0 +1,272 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1180" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="bgCA1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#e2e8f0"/></linearGradient>
+    <filter id="shCA1" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.12"/></filter>
+    <marker id="arCA1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/></marker>
+  </defs>
+  <rect width="1440" height="1180" fill="url(#bgCA1)"/>
+
+  <text x="720" y="44" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Consultant (CA) · Onboarding &amp; Engagement Strategy</text>
+  <text x="720" y="70" text-anchor="middle" font-size="14" fill="#475569">Register → verify → profile → choose how clients find you (directory · invite code · both)</text>
+
+  <!-- FRAME 1 — Register as CA -->
+  <g transform="translate(40, 110)">
+    <rect width="660" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA1)"/>
+    <rect width="660" height="36" rx="12" fill="#166534"/><rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">① Register as Consultant</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">glimmora.tax/register?role=consultant</text>
+
+    <text x="330" y="74" text-anchor="middle" font-size="14" font-weight="700" fill="#14532d">Tax professional sign-up</text>
+    <text x="330" y="94" text-anchor="middle" font-size="10" fill="#64748b">No client data shown until a taxpayer explicitly grants access</text>
+
+    <rect x="40" y="110" width="580" height="360" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+
+    <g font-size="11" fill="#475569">
+      <text x="60" y="138">Full name *</text>
+      <rect x="60" y="144" width="540" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="164" font-size="12" fill="#0f172a">CA Rohit Sharma</text>
+
+      <text x="60" y="194">Email *</text>
+      <rect x="60" y="200" width="260" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="220" font-size="12" fill="#0f172a">ca.sharma@example.com</text>
+
+      <text x="340" y="194">Phone *</text>
+      <rect x="340" y="200" width="260" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="354" y="220" font-size="12" font-family="ui-monospace, monospace" fill="#0f172a">+91 98xxxxxx</text>
+
+      <text x="60" y="250">Password *</text>
+      <rect x="60" y="256" width="260" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="276" font-size="12" fill="#0f172a">••••••••••••</text>
+
+      <text x="340" y="250">City (home base) *</text>
+      <rect x="340" y="256" width="260" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="354" y="276" font-size="12" fill="#0f172a">Mumbai ▾</text>
+
+      <!-- ICAI -->
+      <text x="60" y="306">ICAI membership # *</text>
+      <text x="200" y="306" font-size="9" fill="#92400e">(self-attested)</text>
+      <rect x="60" y="312" width="540" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="74" y="332" font-size="12" font-family="ui-monospace, monospace" fill="#0f172a">ICAI-123456</text>
+    </g>
+
+    <!-- Self-attest warning -->
+    <rect x="60" y="354" width="540" height="40" rx="6" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="80" y="370" font-size="10" font-weight="700" fill="#78350f">⚠  Self-attested — no admin verification in MVP</text>
+    <text x="80" y="384" font-size="10" fill="#78350f">Surfaced to taxpayers so they can verify out-of-band. ICAI registry integration is v1.1.</text>
+
+    <!-- Consents -->
+    <rect x="60" y="406" width="540" height="22" rx="4" fill="#eff6ff"/>
+    <text x="74" y="421" font-size="9" fill="#1e3a8a">☑ Document processing  ☑ AI analysis  ☑ Data retention  (same DPDP gates as taxpayers)</text>
+
+    <rect x="40" y="440" width="580" height="38" rx="8" fill="#166534"/>
+    <text x="330" y="465" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Create CA account →</text>
+  </g>
+
+  <line x1="720" y1="360" x2="760" y2="360" stroke="#166534" stroke-width="3" marker-end="url(#arCA1)"/>
+
+  <!-- FRAME 2 — Profile setup -->
+  <g transform="translate(780, 110)">
+    <rect width="620" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA1)"/>
+    <rect width="620" height="36" rx="12" fill="#166534"/><rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">② Build your CA profile</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/profile</text>
+
+    <text x="20" y="72" font-size="14" font-weight="700" fill="#0f172a">Profile</text>
+    <text x="20" y="90" font-size="10" fill="#64748b">Shown on your directory card and in the access-request notification taxpayers receive.</text>
+
+    <!-- Photo + identity -->
+    <circle cx="56" cy="138" r="28" fill="#dbeafe"/>
+    <text x="56" y="146" text-anchor="middle" font-size="18" font-weight="700" fill="#1e40af">RS</text>
+    <text x="98" y="128" font-size="11" font-weight="700" fill="#0f172a">CA Rohit Sharma · Mumbai</text>
+    <text x="98" y="144" font-size="10" fill="#475569">ICAI-123456 · 10 years experience</text>
+    <rect x="98" y="152" width="80" height="20" rx="10" fill="#fff" stroke="#cbd5e1"/>
+    <text x="138" y="166" text-anchor="middle" font-size="9" fill="#475569">📷 Replace</text>
+
+    <!-- Bio -->
+    <text x="20" y="194" font-size="11" font-weight="700" fill="#0f172a">Bio</text>
+    <rect x="20" y="202" width="580" height="48" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="36" y="222" font-size="10" fill="#0f172a">10 years salaried + capital gains. I work across Hindi, English, and</text>
+    <text x="36" y="238" font-size="10" fill="#0f172a">Marathi. Mid-tier fees. Quick turnaround on FY filings.</text>
+
+    <!-- Specializations + Languages -->
+    <text x="20" y="272" font-size="11" font-weight="700" fill="#0f172a">Specializations</text>
+    <rect x="20" y="282" width="80" height="22" rx="11" fill="#dbeafe"/>
+    <text x="60" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#1e3a8a">salaried ×</text>
+    <rect x="106" y="282" width="100" height="22" rx="11" fill="#dbeafe"/>
+    <text x="156" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#1e3a8a">capital_gains ×</text>
+    <rect x="212" y="282" width="80" height="22" rx="11" fill="#fff" stroke="#cbd5e1"/>
+    <text x="252" y="297" text-anchor="middle" font-size="9" fill="#64748b">+ add</text>
+
+    <text x="320" y="272" font-size="11" font-weight="700" fill="#0f172a">Languages</text>
+    <rect x="320" y="282" width="50" height="22" rx="11" fill="#dcfce7"/>
+    <text x="345" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#14532d">en ×</text>
+    <rect x="376" y="282" width="50" height="22" rx="11" fill="#dcfce7"/>
+    <text x="401" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#14532d">hi ×</text>
+    <rect x="432" y="282" width="50" height="22" rx="11" fill="#dcfce7"/>
+    <text x="457" y="297" text-anchor="middle" font-size="9" font-weight="600" fill="#14532d">mr ×</text>
+
+    <!-- Experience + Fee range -->
+    <text x="20" y="338" font-size="11" font-weight="700" fill="#0f172a">Years of experience</text>
+    <rect x="20" y="346" width="280" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="34" y="365" font-size="12" font-family="ui-monospace, monospace" fill="#0f172a">10</text>
+
+    <text x="320" y="338" font-size="11" font-weight="700" fill="#0f172a">Fee range indicator</text>
+    <g>
+      <rect x="320" y="346" width="80" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="360" y="365" text-anchor="middle" font-size="11" fill="#475569">budget</text>
+      <rect x="406" y="346" width="80" height="30" rx="6" fill="#166534"/>
+      <text x="446" y="365" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">mid ★</text>
+      <rect x="492" y="346" width="100" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="542" y="365" text-anchor="middle" font-size="11" fill="#475569">premium</text>
+    </g>
+
+    <text x="20" y="408" font-size="9" font-style="italic" fill="#475569">Writes to ca_profiles · bio · specializations · languages · years_experience · fee_range_indicator</text>
+
+    <rect x="20" y="424" width="580" height="38" rx="8" fill="#166534"/>
+    <text x="310" y="449" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Save profile · Continue to engagement strategy →</text>
+  </g>
+
+  <!-- Arrow row 1 → row 2 -->
+  <line x1="1090" y1="630" x2="1090" y2="660" stroke="#166534" stroke-width="3"/>
+  <line x1="1090" y1="660" x2="350" y2="660" stroke="#166534" stroke-width="3"/>
+  <line x1="350" y1="660" x2="350" y2="690" stroke="#166534" stroke-width="3" marker-end="url(#arCA1)"/>
+
+  <!-- FRAME 3 — Directory opt-in -->
+  <g transform="translate(40, 700)">
+    <rect width="660" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA1)"/>
+    <rect width="660" height="36" rx="12" fill="#166534"/><rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">③ Path A — Get listed in the city directory</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/profile · ca_profiles</text>
+
+    <!-- Gate check -->
+    <rect x="20" y="58" width="620" height="42" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+    <text x="36" y="76" font-size="11" font-weight="700" fill="#14532d">✓ Email verified · ✓ Phone verified  — listing eligibility OK</text>
+    <text x="36" y="92" font-size="9" fill="#475569">SCHEMA: users.email_verified_at + users.phone_verified_at both populated</text>
+
+    <!-- Directory toggle big card -->
+    <rect x="20" y="116" width="620" height="80" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="36" y="140" font-size="14" font-weight="700" fill="#14532d">List me in the directory</text>
+    <text x="36" y="158" font-size="11" fill="#15803d">Taxpayers in your city can find you, send access requests, and pick you.</text>
+    <text x="36" y="174" font-size="10" fill="#64748b">You receive a consultant_access_request notification with their name, PAN, and shared documents.</text>
+
+    <rect x="540" y="138" width="80" height="36" rx="18" fill="#16a34a"/>
+    <circle cx="600" cy="156" r="14" fill="#fff"/>
+    <text x="600" y="160" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">ON</text>
+
+    <!-- Accepting clients toggle -->
+    <rect x="20" y="208" width="300" height="64" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="36" y="228" font-size="11" font-weight="700" fill="#0f172a">Accepting clients</text>
+    <text x="36" y="244" font-size="10" fill="#475569">Pause this when you're at capacity. Existing</text>
+    <text x="36" y="258" font-size="10" fill="#475569">grants stay active — only new requests stop.</text>
+    <rect x="262" y="226" width="44" height="22" rx="11" fill="#16a34a"/>
+    <circle cx="294" cy="237" r="9" fill="#fff"/>
+
+    <!-- Serves cities -->
+    <rect x="340" y="208" width="300" height="64" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="356" y="228" font-size="11" font-weight="700" fill="#0f172a">Additional cities you serve</text>
+    <text x="356" y="244" font-size="10" fill="#475569">Optional. You'll also appear when</text>
+    <text x="356" y="258" font-size="10" fill="#475569">taxpayers search these cities.</text>
+    <rect x="356" y="276" width="60" height="0" rx="10"/>
+
+    <rect x="356" y="262" width="56" height="20" rx="10" fill="#dbeafe"/>
+    <text x="384" y="276" text-anchor="middle" font-size="9" fill="#1e3a8a">Pune ×</text>
+    <rect x="418" y="262" width="56" height="20" rx="10" fill="#dbeafe"/>
+    <text x="446" y="276" text-anchor="middle" font-size="9" fill="#1e3a8a">Thane ×</text>
+    <rect x="480" y="262" width="56" height="20" rx="10" fill="#fff" stroke="#cbd5e1"/>
+    <text x="508" y="276" text-anchor="middle" font-size="9" fill="#64748b">+ add</text>
+
+    <!-- Directory preview -->
+    <text x="20" y="306" font-size="11" font-weight="700" fill="#0f172a">How your card will appear in /consultants?city=Mumbai</text>
+    <rect x="20" y="316" width="300" height="116" rx="10" fill="#fff" stroke="#cbd5e1" filter="url(#shCA1)"/>
+    <circle cx="46" cy="346" r="20" fill="#dbeafe"/>
+    <text x="46" y="352" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">RS</text>
+    <text x="76" y="340" font-size="12" font-weight="700" fill="#0f172a">CA Rohit Sharma</text>
+    <text x="76" y="356" font-size="9" fill="#64748b">★ 10 years · Mumbai</text>
+
+    <text x="36" y="384" font-size="9" fill="#475569">ICAI-123456 (self-attested)</text>
+    <text x="36" y="398" font-size="9" fill="#475569">salaried · capital_gains · ₹₹ · hi/en/mr</text>
+
+    <rect x="36" y="408" width="268" height="20" rx="4" fill="#1e40af"/>
+    <text x="170" y="421" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">View profile</text>
+
+    <!-- Description -->
+    <rect x="340" y="316" width="300" height="116" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="356" y="338" font-size="11" font-weight="700" fill="#1e3a8a">What happens next</text>
+    <g font-size="10" fill="#1e3a8a">
+      <text x="356" y="358">1. Taxpayer searches their city</text>
+      <text x="356" y="376">2. Sees your card → opens profile</text>
+      <text x="356" y="394">3. Sends request (mode + tax_years)</text>
+      <text x="356" y="412">4. You accept or decline (Frame 4 below)</text>
+    </g>
+  </g>
+
+  <line x1="720" y1="930" x2="760" y2="930" stroke="#166534" stroke-width="3" marker-end="url(#arCA1)"/>
+
+  <!-- FRAME 4 — Generate invite code (Path B) -->
+  <g transform="translate(780, 700)">
+    <rect width="620" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA1)"/>
+    <rect width="620" height="36" rx="12" fill="#166534"/><rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">④ Path B — Generate an invite code</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/invite-codes</text>
+
+    <text x="20" y="64" font-size="13" font-weight="700" fill="#0f172a">For out-of-city or pre-arranged clients</text>
+    <text x="20" y="82" font-size="10" fill="#64748b">Share the code out-of-band. When the taxpayer redeems it, the grant becomes active immediately.</text>
+
+    <!-- Form -->
+    <rect x="20" y="100" width="280" height="280" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="36" y="124" font-size="11" font-weight="700" fill="#0f172a">New invite code</text>
+
+    <g font-size="10" fill="#475569">
+      <text x="36" y="148">Label</text>
+      <rect x="36" y="156" width="248" height="28" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="48" y="174" font-size="11" fill="#0f172a">Mumbai tax-fair booth</text>
+
+      <text x="36" y="200">Max uses</text>
+      <rect x="36" y="208" width="80" height="28" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="76" y="226" text-anchor="middle" font-size="11" font-family="ui-monospace, monospace" fill="#0f172a">5</text>
+      <text x="124" y="226" font-size="9" fill="#64748b">1 = single-use (default)</text>
+
+      <text x="36" y="252">Max access mode (ceiling)</text>
+      <rect x="36" y="260" width="248" height="28" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="48" y="278" font-size="11" fill="#0f172a">review_edit ▾</text>
+
+      <text x="36" y="304">Allowed FYs</text>
+      <rect x="36" y="312" width="76" height="20" rx="10" fill="#dcfce7"/>
+      <text x="74" y="326" text-anchor="middle" font-size="9" font-weight="600" fill="#14532d">FY 2024-25</text>
+
+      <text x="36" y="354">Valid for (days)</text>
+      <rect x="160" y="346" width="60" height="20" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="190" y="360" text-anchor="middle" font-size="11" font-family="ui-monospace, monospace" fill="#0f172a">14</text>
+    </g>
+
+    <!-- Generated code (right) -->
+    <rect x="320" y="100" width="280" height="280" rx="10" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+    <text x="336" y="124" font-size="11" font-weight="700" fill="#78350f">📋  Your new code</text>
+    <text x="336" y="140" font-size="9" fill="#78350f">Shown ONCE — server stores only sha256(code)</text>
+
+    <rect x="336" y="156" width="248" height="56" rx="8" fill="#fff" stroke="#fbbf24"/>
+    <text x="460" y="194" text-anchor="middle" font-size="26" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">CA-7K3PQX</text>
+
+    <rect x="336" y="224" width="60" height="22" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="366" y="240" text-anchor="middle" font-size="10" fill="#1e3a8a">📋 Copy</text>
+    <rect x="404" y="224" width="60" height="22" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="434" y="240" text-anchor="middle" font-size="10" fill="#1e3a8a">📱 WA</text>
+    <rect x="472" y="224" width="60" height="22" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="502" y="240" text-anchor="middle" font-size="10" fill="#1e3a8a">📧 Mail</text>
+
+    <text x="336" y="266" font-size="10" font-weight="700" fill="#78350f">Policy summary</text>
+    <g font-size="9" fill="#78350f">
+      <text x="336" y="284">  Max mode:     review_edit</text>
+      <text x="336" y="298">  Allowed FYs:  FY 2024-25</text>
+      <text x="336" y="312">  Max uses:     5</text>
+      <text x="336" y="326">  Expires:      27 May 2026</text>
+    </g>
+
+    <text x="336" y="356" font-size="9" font-style="italic" fill="#92400e">When redeemed → grant.origin = 'invite_code' → status = 'active' immediately</text>
+
+    <!-- Bottom hint -->
+    <text x="310" y="408" text-anchor="middle" font-size="10" fill="#64748b">Both paths can be active at the same time. The directory is best for new clients; codes are best for relationships you already have.</text>
+    <rect x="20" y="418" width="580" height="22" rx="4" fill="#eff6ff"/>
+    <text x="310" y="432" text-anchor="middle" font-size="10" fill="#1e3a8a">Hyperedge: Hybrid CA Selection (directory + invite-code + grant activation)</text>
+  </g>
+</svg>

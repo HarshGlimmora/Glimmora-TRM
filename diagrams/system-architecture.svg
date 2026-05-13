@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 820" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e40af"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991b1b"/>
+    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafafa"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="820" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="640" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">GlimmoraTax — System Architecture</text>
+  <text x="640" y="65" text-anchor="middle" font-size="13" fill="#475569">Three-layer trust model: Rules decide · AI assists · RAG explains</text>
+
+  <!-- Client Layer -->
+  <rect x="80" y="100" width="1120" height="70" rx="10" fill="#dbeafe" stroke="#1e40af" stroke-width="2"/>
+  <text x="640" y="130" text-anchor="middle" font-size="16" font-weight="600" fill="#1e3a8a">CLIENT LAYER</text>
+  <text x="640" y="152" text-anchor="middle" font-size="13" fill="#1e3a8a">Next.js 14 · App Router · TailwindCSS · TypeScript</text>
+
+  <!-- Arrow client -> gateway -->
+  <line x1="640" y1="170" x2="640" y2="200" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="660" y="190" font-size="11" fill="#475569">HTTPS / JSON</text>
+
+  <!-- API Gateway -->
+  <rect x="80" y="200" width="1120" height="70" rx="10" fill="#e9d5ff" stroke="#6b21a8" stroke-width="2"/>
+  <text x="640" y="230" text-anchor="middle" font-size="16" font-weight="600" fill="#581c87">API GATEWAY (FastAPI)</text>
+  <text x="640" y="252" text-anchor="middle" font-size="13" fill="#581c87">CORS · Rate limit · JWT verify · RBAC · Consent gate · Audit emit</text>
+
+  <!-- Service row -->
+  <g font-size="11" font-weight="600">
+    <!-- Auth -->
+    <rect x="40" y="320" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="102" y="345" text-anchor="middle" fill="#0f172a">Auth</text>
+    <text x="102" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">JWT · bcrypt</text>
+    <text x="102" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Email + OTP</text>
+    <text x="102" y="388" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">verification</text>
+
+    <!-- Docs -->
+    <rect x="180" y="320" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="242" y="345" text-anchor="middle" fill="#0f172a">Documents</text>
+    <text x="242" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Upload · Store</text>
+    <text x="242" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">SHA dedup</text>
+
+    <!-- FY Router -->
+    <rect x="320" y="320" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="382" y="345" text-anchor="middle" fill="#0f172a">FY Router</text>
+    <text x="382" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Auto-route by</text>
+    <text x="382" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">document dates</text>
+
+    <!-- AI/OCR -->
+    <rect x="460" y="320" width="125" height="80" rx="8" fill="#fef3c7" stroke="#92400e" stroke-width="2"/>
+    <text x="522" y="345" text-anchor="middle" fill="#78350f">AI / OCR</text>
+    <text x="522" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#78350f">L2 · suggests only</text>
+    <text x="522" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#78350f">PaddleOCR + LLM</text>
+
+    <!-- Taxation -->
+    <rect x="600" y="320" width="125" height="80" rx="8" fill="#dcfce7" stroke="#166534" stroke-width="2"/>
+    <text x="662" y="345" text-anchor="middle" fill="#14532d">Taxation</text>
+    <text x="662" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#14532d">L1 · decides</text>
+    <text x="662" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#14532d">Rule engine + trace</text>
+
+    <!-- Rules -->
+    <rect x="740" y="320" width="125" height="80" rx="8" fill="#dcfce7" stroke="#166534" stroke-width="2"/>
+    <text x="802" y="345" text-anchor="middle" fill="#14532d">Rules</text>
+    <text x="802" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#14532d">Versioned · dual</text>
+    <text x="802" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#14532d">admin approval</text>
+
+    <!-- RAG -->
+    <rect x="880" y="320" width="125" height="80" rx="8" fill="#fef3c7" stroke="#92400e" stroke-width="2"/>
+    <text x="942" y="345" text-anchor="middle" fill="#78350f">RAG</text>
+    <text x="942" y="362" text-anchor="middle" font-size="9" font-weight="400" fill="#78350f">L3 · explains only</text>
+    <text x="942" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#78350f">Read-only</text>
+
+    <!-- Consultant Access -->
+    <rect x="1020" y="320" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="1082" y="345" text-anchor="middle" fill="#0f172a">Consultant</text>
+    <text x="1082" y="358" text-anchor="middle" fill="#0f172a">Access</text>
+    <text x="1082" y="375" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Directory + invite</text>
+
+    <!-- Fraud (2nd row) -->
+    <rect x="320" y="420" width="125" height="80" rx="8" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+    <text x="382" y="445" text-anchor="middle" fill="#7f1d1d">Fraud Cases</text>
+    <text x="382" y="462" text-anchor="middle" font-size="9" font-weight="400" fill="#7f1d1d">Officer → Judicial</text>
+    <text x="382" y="475" text-anchor="middle" font-size="9" font-weight="400" fill="#7f1d1d">→ Enforcement</text>
+
+    <!-- Compliance -->
+    <rect x="460" y="420" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="522" y="445" text-anchor="middle" fill="#0f172a">Compliance</text>
+    <text x="522" y="462" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Consent cascade</text>
+    <text x="522" y="475" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Retention</text>
+
+    <!-- Notifications -->
+    <rect x="600" y="420" width="125" height="80" rx="8" fill="#ffffff" stroke="#475569" stroke-width="2"/>
+    <text x="662" y="445" text-anchor="middle" fill="#0f172a">Notifications</text>
+    <text x="662" y="462" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">In-app inbox</text>
+    <text x="662" y="475" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">role-typed</text>
+
+    <!-- Audit -->
+    <rect x="740" y="420" width="125" height="80" rx="8" fill="#f1f5f9" stroke="#0f172a" stroke-width="2"/>
+    <text x="802" y="445" text-anchor="middle" fill="#0f172a">Audit Emitter</text>
+    <text x="802" y="462" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">Append-only</text>
+    <text x="802" y="475" text-anchor="middle" font-size="9" font-weight="400" fill="#475569">shared by all</text>
+  </g>
+
+  <!-- Gateway to services bracket -->
+  <line x1="640" y1="270" x2="640" y2="295" stroke="#475569" stroke-width="2"/>
+  <line x1="102" y1="295" x2="1082" y2="295" stroke="#475569" stroke-width="2"/>
+  <line x1="102" y1="295" x2="102" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="242" y1="295" x2="242" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="382" y1="295" x2="382" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="522" y1="295" x2="522" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="662" y1="295" x2="662" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="802" y1="295" x2="802" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="942" y1="295" x2="942" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="1082" y1="295" x2="1082" y2="320" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Services -> DB lines -->
+  <line x1="640" y1="500" x2="640" y2="540" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Data Stores -->
+  <g>
+    <!-- PostgreSQL -->
+    <ellipse cx="350" cy="610" rx="180" ry="20" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <rect x="170" y="610" width="360" height="80" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <ellipse cx="350" cy="690" rx="180" ry="20" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <text x="350" y="640" text-anchor="middle" font-size="15" font-weight="600" fill="#0f172a">PostgreSQL 16 + pgvector</text>
+    <text x="350" y="660" text-anchor="middle" font-size="11" fill="#475569">users · tax_returns · documents · transactions · rules</text>
+    <text x="350" y="676" text-anchor="middle" font-size="11" fill="#475569">audit_logs · notifications · fraud_cases · ca_profiles</text>
+
+    <!-- File Storage -->
+    <ellipse cx="800" cy="610" rx="120" ry="20" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <rect x="680" y="610" width="240" height="80" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <ellipse cx="800" cy="690" rx="120" ry="20" fill="#fff" stroke="#0f172a" stroke-width="2"/>
+    <text x="800" y="645" text-anchor="middle" font-size="15" font-weight="600" fill="#0f172a">Local Filesystem</text>
+    <text x="800" y="668" text-anchor="middle" font-size="11" fill="#475569">PDFs · CSVs (S3-ready)</text>
+  </g>
+
+  <!-- External -->
+  <rect x="1050" y="600" width="180" height="100" rx="10" fill="#fff" stroke="#475569" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="1140" y="630" text-anchor="middle" font-size="14" font-weight="600" fill="#0f172a">OpenAI API</text>
+  <text x="1140" y="652" text-anchor="middle" font-size="11" fill="#475569">gpt-4o-mini</text>
+  <text x="1140" y="670" text-anchor="middle" font-size="11" fill="#475569">text-embedding-3-small</text>
+  <text x="1140" y="690" text-anchor="middle" font-size="10" fill="#991b1b" font-weight="600">PII redacted</text>
+
+  <line x1="942" y1="500" x2="1100" y2="600" stroke="#991b1b" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-red)"/>
+  <line x1="522" y1="500" x2="1080" y2="600" stroke="#991b1b" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrow-red)"/>
+
+  <!-- Legend -->
+  <g transform="translate(40, 740)" font-size="11">
+    <text x="0" y="0" font-weight="700" fill="#0f172a">Trust Layers:</text>
+    <rect x="100" y="-12" width="14" height="14" fill="#dcfce7" stroke="#166534"/>
+    <text x="120" y="0" fill="#0f172a">L1 — Deterministic (decides)</text>
+    <rect x="290" y="-12" width="14" height="14" fill="#fef3c7" stroke="#92400e"/>
+    <text x="310" y="0" fill="#0f172a">L2/L3 — AI assist / RAG (suggests · explains)</text>
+    <rect x="600" y="-12" width="14" height="14" fill="#fee2e2" stroke="#991b1b"/>
+    <text x="620" y="0" fill="#0f172a">Enforcement</text>
+    <rect x="730" y="-12" width="14" height="14" fill="#dbeafe" stroke="#1e40af"/>
+    <text x="750" y="0" fill="#0f172a">Client</text>
+    <rect x="820" y="-12" width="14" height="14" fill="#e9d5ff" stroke="#6b21a8"/>
+    <text x="840" y="0" fill="#0f172a">Gateway / Admin</text>
+  </g>
+
+  <text x="40" y="790" font-size="10" fill="#475569">Boundary B5 (red dashed) — no user data leaves to OpenAI without ai_analysis consent + PII redaction.</text>
+</svg>

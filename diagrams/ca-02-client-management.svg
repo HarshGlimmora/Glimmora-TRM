@@ -1,0 +1,397 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1820" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="bgCA2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#e2e8f0"/></linearGradient>
+    <filter id="shCA2" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.12"/></filter>
+    <marker id="arCA2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/></marker>
+  </defs>
+  <rect width="1440" height="1820" fill="url(#bgCA2)"/>
+
+  <text x="720" y="44" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Consultant (CA) · Client Management</text>
+  <text x="720" y="70" text-anchor="middle" font-size="14" fill="#475569">Incoming requests → client list → client detail → edit → return or submit</text>
+
+  <!-- FRAME 1 — Pending requests + client list -->
+  <g transform="translate(40, 110)">
+    <rect width="660" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA2)"/>
+    <rect width="660" height="36" rx="12" fill="#166534"/><rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">① Pending requests + active client list</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/dashboard</text>
+
+    <!-- Top bar -->
+    <rect x="0" y="36" width="660" height="38" fill="#f1f5f9"/>
+    <text x="20" y="61" font-size="13" font-weight="700" fill="#1e3a8a">GlimmoraTax</text>
+    <rect x="200" y="44" width="14" height="14" rx="3" fill="#dcfce7"/>
+    <text x="218" y="58" font-size="10" fill="#14532d">Consultant · ICAI-123456</text>
+    <rect x="450" y="44" width="100" height="22" rx="11" fill="#fff" stroke="#cbd5e1"/>
+    <text x="500" y="60" text-anchor="middle" font-size="11" fill="#0f172a">All FYs ▾</text>
+    <text x="590" y="60" font-size="14" fill="#16a34a">🔔</text>
+    <circle cx="598" cy="50" r="6" fill="#dc2626"/>
+    <text x="598" y="53" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">3</text>
+    <text x="618" y="60" font-size="14" fill="#475569">👤</text>
+
+    <!-- KPI strip -->
+    <rect x="20" y="90" width="620" height="60" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+    <g font-size="10">
+      <text x="60" y="118" font-weight="700" fill="#14532d">7</text>
+      <text x="36" y="118" font-size="20" font-weight="700" fill="#14532d">7</text>
+      <text x="36" y="134" fill="#15803d">Active clients</text>
+
+      <text x="170" y="118" font-size="20" font-weight="700" fill="#14532d">2</text>
+      <text x="170" y="134" fill="#15803d">Pending requests</text>
+
+      <text x="300" y="118" font-size="20" font-weight="700" fill="#14532d">4</text>
+      <text x="300" y="134" fill="#15803d">In review (review_edit)</text>
+
+      <text x="450" y="118" font-size="20" font-weight="700" fill="#14532d">1</text>
+      <text x="450" y="134" fill="#15803d">Needs my attention</text>
+
+      <text x="600" y="118" font-size="20" font-weight="700" fill="#14532d">21</text>
+      <text x="600" y="134" fill="#15803d">Filed this FY</text>
+    </g>
+
+    <!-- Pending tab -->
+    <text x="20" y="178" font-size="13" font-weight="700" fill="#0f172a">Pending requests <tspan font-size="10" font-weight="400" fill="#dc2626">(2 new)</tspan></text>
+
+    <!-- Pending request 1 -->
+    <rect x="20" y="190" width="620" height="74" rx="8" fill="#fef3c7" stroke="#fbbf24"/>
+    <circle cx="50" cy="227" r="22" fill="#dbeafe"/>
+    <text x="50" y="234" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">AV</text>
+    <text x="82" y="214" font-size="12" font-weight="700" fill="#0f172a">Asha Verma · PAN ABCDE1234F</text>
+    <text x="82" y="232" font-size="10" fill="#475569">Wants: review_edit on FY 2024-25</text>
+    <text x="82" y="248" font-size="9" font-style="italic" fill="#78350f">"Hi Rohit, please review my FY 2024-25 filing. I have a few questions about Section 80C…"</text>
+    <text x="82" y="262" font-size="9" fill="#64748b">via Directory · received 2h ago</text>
+
+    <rect x="460" y="206" width="80" height="28" rx="6" fill="#fff" stroke="#dc2626"/>
+    <text x="500" y="224" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">Decline</text>
+    <rect x="548" y="206" width="80" height="28" rx="6" fill="#16a34a"/>
+    <text x="588" y="224" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Accept</text>
+
+    <text x="588" y="252" text-anchor="end" font-size="9" fill="#475569">POST /consultant-access/grants/{id}/respond</text>
+
+    <!-- Pending request 2 (invite-code, auto-active) -->
+    <rect x="20" y="272" width="620" height="60" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+    <circle cx="50" cy="302" r="22" fill="#fce7f3"/>
+    <text x="50" y="308" text-anchor="middle" font-size="13" font-weight="700" fill="#9d174d">PI</text>
+    <text x="82" y="290" font-size="12" font-weight="700" fill="#0f172a">Priya Iyer · PAN PQRSE6789K  ✓ active</text>
+    <text x="82" y="306" font-size="10" fill="#475569">Mode: full_access · FY 2024-25 + FY 2023-24</text>
+    <text x="82" y="320" font-size="9" fill="#15803d">Used your invite code CA-7K3PQX · 30 min ago</text>
+
+    <rect x="548" y="294" width="80" height="22" rx="11" fill="#16a34a"/>
+    <text x="588" y="309" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">View client</text>
+
+    <!-- Active clients -->
+    <text x="20" y="358" font-size="13" font-weight="700" fill="#0f172a">My clients · 7</text>
+
+    <rect x="20" y="370" width="620" height="34" fill="#f8fafc"/>
+    <g font-size="10" font-weight="700" fill="#475569">
+      <text x="36" y="390">Client</text>
+      <text x="226" y="390">FYs</text>
+      <text x="296" y="390">Mode</text>
+      <text x="376" y="390">Status</text>
+      <text x="500" y="390">Last activity</text>
+      <text x="600" y="390">→</text>
+    </g>
+
+    <rect x="20" y="404" width="620" height="34" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="424" font-size="11" fill="#0f172a">Asha Verma · ABCDE1234F</text>
+    <text x="226" y="424" font-size="10" fill="#475569">FY24-25</text>
+    <rect x="296" y="412" width="70" height="18" rx="9" fill="#dcfce7"/>
+    <text x="331" y="425" text-anchor="middle" font-size="9" font-weight="700" fill="#14532d">review_edit</text>
+    <rect x="376" y="412" width="100" height="18" rx="9" fill="#fef3c7"/>
+    <text x="426" y="425" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">in_review_by_ca</text>
+    <text x="500" y="424" font-size="10" fill="#475569">10 min ago</text>
+    <text x="608" y="424" font-size="14" fill="#1e40af">▸</text>
+
+    <rect x="20" y="438" width="620" height="34" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="458" font-size="11" fill="#0f172a">Rajesh Patel · LMNOP1234C</text>
+    <text x="226" y="458" font-size="10" fill="#475569">FY24-25</text>
+    <rect x="296" y="446" width="70" height="18" rx="9" fill="#fee2e2"/>
+    <text x="331" y="459" text-anchor="middle" font-size="9" font-weight="700" fill="#7f1d1d">full_access</text>
+    <rect x="376" y="446" width="80" height="18" rx="9" fill="#dcfce7"/>
+    <text x="416" y="459" text-anchor="middle" font-size="9" font-weight="700" fill="#14532d">accepted ✓</text>
+    <text x="500" y="458" font-size="10" fill="#475569">3 days ago</text>
+    <text x="608" y="458" font-size="14" fill="#1e40af">▸</text>
+
+    <rect x="20" y="472" width="620" height="20" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="330" y="486" text-anchor="middle" font-size="10" fill="#475569">+ 5 more clients · click any row to open detail</text>
+  </g>
+
+  <line x1="720" y1="380" x2="760" y2="380" stroke="#166534" stroke-width="3" marker-end="url(#arCA2)"/>
+
+  <!-- FRAME 2 — Client detail -->
+  <g transform="translate(780, 110)">
+    <rect width="620" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA2)"/>
+    <rect width="620" height="36" rx="12" fill="#166534"/><rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">② Client detail — one-click from list or notification</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/clients/usr_9b4c…</text>
+
+    <!-- Identity -->
+    <rect x="20" y="58" width="580" height="74" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+    <circle cx="58" cy="95" r="26" fill="#dbeafe"/>
+    <text x="58" y="102" text-anchor="middle" font-size="16" font-weight="700" fill="#1e40af">AV</text>
+    <text x="100" y="86" font-size="14" font-weight="700" fill="#0f172a">Asha Verma</text>
+    <text x="100" y="104" font-size="11" font-family="ui-monospace, monospace" fill="#475569">PAN: ABCDE1234F · 📧 asha@example.com · 📱 +91 99000-00000</text>
+    <text x="100" y="120" font-size="10" fill="#64748b">Mumbai · Grant: directory_request · review_edit · FY 2024-25 · activated 5 May 2026</text>
+
+    <rect x="510" y="90" width="80" height="24" rx="6" fill="#fff" stroke="#dc2626"/>
+    <text x="550" y="106" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">Revoke</text>
+
+    <!-- Filings -->
+    <text x="20" y="156" font-size="13" font-weight="700" fill="#0f172a">Filings shared with you</text>
+
+    <rect x="20" y="168" width="580" height="48" rx="6" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="36" y="188" font-size="11" font-weight="600" fill="#0f172a">FY 2024-25 · draft</text>
+    <text x="36" y="204" font-size="10" fill="#78350f">47 transactions · 32 verified · ready to compute</text>
+    <rect x="500" y="178" width="84" height="28" rx="6" fill="#166534"/>
+    <text x="542" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Open ▸</text>
+
+    <!-- Tabs -->
+    <rect x="0" y="232" width="620" height="34" fill="#f1f5f9"/>
+    <text x="20" y="254" font-size="11" fill="#64748b">Overview</text>
+    <text x="100" y="254" font-size="11" fill="#64748b">Documents (3)</text>
+    <text x="206" y="254" font-size="11" font-weight="700" fill="#166534">Transactions (47)</text>
+    <line x1="200" y1="263" x2="324" y2="263" stroke="#166534" stroke-width="3"/>
+    <text x="334" y="254" font-size="11" fill="#64748b">Regime</text>
+    <text x="396" y="254" font-size="11" fill="#64748b">Summary</text>
+
+    <!-- Transactions preview (CA editing) -->
+    <rect x="20" y="282" width="580" height="32" rx="6" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="36" y="302" font-size="11" font-weight="700" fill="#1e3a8a">15 of 47 still unverified · Ready to add 80C deductions Asha missed</text>
+
+    <rect x="20" y="322" width="580" height="34" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="342" font-size="10" fill="#0f172a">02 Jul 2024  Birla Mutual Fund</text>
+    <text x="270" y="342" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">₹50,000</text>
+    <text x="346" y="342" font-size="10" font-weight="700" fill="#16a34a">elss_80c ✎</text>
+    <rect x="420" y="328" width="40" height="20" rx="10" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="440" y="342" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">AI 71%</text>
+    <text x="500" y="342" font-size="9" fill="#16a34a">edited by CA</text>
+
+    <rect x="20" y="356" width="580" height="34" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="376" font-size="10" fill="#0f172a">22 May 2024  UPI/RAZORPAY/FY-LIC-PRMM</text>
+    <text x="270" y="376" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">₹12,000</text>
+    <text x="346" y="376" font-size="10" font-weight="700" fill="#16a34a">insurance_80c ✎</text>
+    <rect x="420" y="362" width="40" height="20" rx="10" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="440" y="376" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">AI 87%</text>
+    <text x="500" y="376" font-size="9" fill="#16a34a">edited by CA</text>
+
+    <!-- Status: edits captured to change_set -->
+    <rect x="20" y="402" width="580" height="32" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+    <text x="36" y="422" font-size="10" font-weight="700" fill="#14532d">✓ 2 edits captured to change_set chg_q2…</text>
+    <text x="540" y="422" text-anchor="end" font-size="10" fill="#64748b">PUT /consultant/clients/.../filings/.../tx</text>
+
+    <!-- Mode-driven CTA -->
+    <rect x="20" y="446" width="580" height="42" rx="8" fill="#166534"/>
+    <text x="310" y="471" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">↩  Return to Asha for her review &amp; submission →</text>
+  </g>
+
+  <!-- Arrow row 1 → row 2 -->
+  <line x1="1090" y1="630" x2="1090" y2="660" stroke="#166534" stroke-width="3"/>
+  <line x1="1090" y1="660" x2="350" y2="660" stroke="#166534" stroke-width="3"/>
+  <line x1="350" y1="660" x2="350" y2="690" stroke="#166534" stroke-width="3" marker-end="url(#arCA2)"/>
+
+  <!-- FRAME 3 — review_edit: Return to taxpayer -->
+  <g transform="translate(40, 700)">
+    <rect width="660" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA2)"/>
+    <rect width="660" height="36" rx="12" fill="#166534"/><rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">③ review_edit mode — return filing to taxpayer</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/clients/.../filings/.../return-to-taxpayer</text>
+
+    <text x="20" y="68" font-size="13" font-weight="700" fill="#0f172a">Return-to-taxpayer modal</text>
+    <text x="20" y="84" font-size="10" fill="#475569">In review_edit mode, you cannot submit. Only the taxpayer can. Send them your change-set with notes.</text>
+
+    <!-- Modal -->
+    <rect x="60" y="106" width="540" height="370" rx="12" fill="#fff" stroke="#166534" stroke-width="2" filter="url(#shCA2)"/>
+    <rect x="60" y="106" width="540" height="40" rx="12" fill="#f0fdf4"/>
+    <rect x="60" y="124" width="540" height="22" fill="#f0fdf4"/>
+    <text x="80" y="132" font-size="13" font-weight="700" fill="#14532d">Return to Asha Verma</text>
+
+    <!-- Summary of changes -->
+    <text x="80" y="174" font-size="11" font-weight="700" fill="#0f172a">Change-set summary</text>
+    <g font-size="10" fill="#475569">
+      <text x="80" y="194">  • Transaction tx_c3…  category: other_income → elss_80c</text>
+      <text x="80" y="210">  • Transaction tx_c4…  category: other_income → insurance_80c</text>
+      <text x="80" y="226">  • Filing summary  deductions.80c: ₹0 → ₹62,000</text>
+      <text x="80" y="244" font-style="italic" fill="#3730a3">→ Tax savings if accepted: ₹12,920 (new regime)</text>
+    </g>
+
+    <!-- Notes -->
+    <text x="80" y="276" font-size="11" font-weight="700" fill="#0f172a">Notes for Asha</text>
+    <rect x="80" y="284" width="500" height="84" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="94" y="306" font-size="10" fill="#0f172a">Hi Asha — I categorized your Birla MF and LIC payments under</text>
+    <text x="94" y="322" font-size="10" fill="#0f172a">80C (eligible). Total deduction added: ₹62,000. Please review</text>
+    <text x="94" y="338" font-size="10" fill="#0f172a">the diff and submit when you're comfortable. The new regime</text>
+    <text x="94" y="354" font-size="10" fill="#0f172a">is still recommended — saves ~₹31k.  Thanks.</text>
+
+    <!-- Disclosure -->
+    <rect x="80" y="380" width="500" height="32" rx="6" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="98" y="400" font-size="10" font-weight="700" fill="#78350f">⚠  Submission authority stays with the taxpayer (review_edit · access_mode)</text>
+
+    <rect x="320" y="426" width="120" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="380" y="446" text-anchor="middle" font-size="11" fill="#475569">Cancel</text>
+    <rect x="450" y="426" width="130" height="32" rx="6" fill="#166534"/>
+    <text x="515" y="446" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Return now →</text>
+
+    <text x="80" y="476" font-size="9" font-style="italic" fill="#64748b">filing_change_sets row inserted · filing.status = revision_returned · notif consultant_returned_filing sent</text>
+
+    <!-- After state -->
+    <rect x="60" y="490" width="540" height="36" rx="6" fill="#f0fdf4" stroke="#86efac"/>
+    <text x="80" y="510" font-size="11" font-weight="700" fill="#14532d">✓ Returned · Asha will see the diff in her notifications and decide.</text>
+  </g>
+
+  <line x1="720" y1="970" x2="760" y2="970" stroke="#166534" stroke-width="3" marker-end="url(#arCA2)"/>
+
+  <!-- FRAME 4 — full_access: CA submits -->
+  <g transform="translate(780, 700)">
+    <rect width="620" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA2)"/>
+    <rect width="620" height="36" rx="12" fill="#166534"/><rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">④ full_access mode — CA submits on taxpayer's behalf</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/clients/.../filings/.../submit</text>
+
+    <!-- Identity banner -->
+    <rect x="20" y="58" width="580" height="40" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+    <text x="36" y="82" font-size="11" font-weight="700" fill="#7f1d1d">⚠  Submitting as: Rajesh Patel · LMNOP1234C · full_access grant</text>
+
+    <!-- Pre-conditions -->
+    <text x="20" y="120" font-size="12" font-weight="700" fill="#0f172a">Pre-submission checklist</text>
+    <g font-size="11">
+      <text x="36" y="142" fill="#16a34a">✓  All 38 transactions verified</text>
+      <text x="36" y="160" fill="#16a34a">✓  New regime chosen · no 115BAC restriction</text>
+      <text x="36" y="178" fill="#16a34a">✓  Calculation trace replayable · ₹2,14,000 tax payable</text>
+      <text x="36" y="196" fill="#16a34a">✓  CA email + phone verified</text>
+      <text x="36" y="214" fill="#16a34a">✓  Grant still active · not revoked by taxpayer</text>
+    </g>
+
+    <!-- Your authority -->
+    <rect x="20" y="232" width="580" height="62" rx="8" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="36" y="252" font-size="11" font-weight="700" fill="#78350f">Your authority</text>
+    <text x="36" y="270" font-size="10" fill="#78350f">In full_access, you can submit the return without the taxpayer's involvement.</text>
+    <text x="36" y="286" font-size="10" fill="#78350f">The submission is recorded with submitted_by_user_id = your user_id.</text>
+
+    <!-- Your OTP -->
+    <rect x="20" y="306" width="580" height="120" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+    <text x="310" y="328" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a">Enter the 6-digit code we sent to YOUR phone</text>
+    <text x="310" y="346" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#0f172a">+91 98xxx-*9999  (CA's verified phone)</text>
+
+    <g transform="translate(178, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">9</text>
+    </g>
+    <g transform="translate(228, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">2</text>
+    </g>
+    <g transform="translate(278, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">7</text>
+    </g>
+    <g transform="translate(328, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">5</text>
+    </g>
+    <g transform="translate(378, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">3</text>
+    </g>
+    <g transform="translate(428, 358)">
+      <rect width="40" height="48" rx="6" fill="#fff" stroke="#1e40af" stroke-width="2"/>
+      <text x="20" y="34" text-anchor="middle" font-size="22" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">8</text>
+    </g>
+
+    <!-- Authorization check -->
+    <rect x="36" y="438" width="14" height="14" rx="2" fill="#dc2626"/>
+    <path d="M 38 445.5 L 41 448 L 47 443" stroke="#fff" stroke-width="1.5" fill="none"/>
+    <text x="58" y="450" font-size="11" fill="#0f172a">I confirm I am authorized by Rajesh Patel to submit this filing.</text>
+
+    <rect x="20" y="468" width="580" height="44" rx="8" fill="#dc2626"/>
+    <text x="310" y="495" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Submit filing on Rajesh's behalf →</text>
+
+    <text x="310" y="528" text-anchor="middle" font-size="9" fill="#64748b">submitted_by_user_id = ca user · audit-logged · taxpayer notified consultant_submitted_filing</text>
+  </g>
+
+  <!-- Arrow row 2 → row 3 -->
+  <line x1="1090" y1="1260" x2="1090" y2="1280" stroke="#166534" stroke-width="3"/>
+  <line x1="1090" y1="1280" x2="350" y2="1280" stroke="#166534" stroke-width="3"/>
+  <line x1="350" y1="1280" x2="350" y2="1300" stroke="#166534" stroke-width="3" marker-end="url(#arCA2)"/>
+
+  <!-- FRAME 5 — Activity log (audit trail) -->
+  <g transform="translate(40, 1310)">
+    <rect width="1360" height="480" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shCA2)"/>
+    <rect width="1360" height="36" rx="12" fill="#166534"/><rect y="20" width="1360" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">⑤ Your activity log — visible to the client too (by design · trust transparency)</text>
+    <text x="1340" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant/audit</text>
+
+    <text x="20" y="68" font-size="13" font-weight="700" fill="#0f172a">My actions on Asha Verma's filings</text>
+    <text x="20" y="84" font-size="10" fill="#64748b">Same view available to Asha — full transparency. Every read and write logged with actor_role='consultant'.</text>
+
+    <!-- Filter -->
+    <rect x="20" y="104" width="120" height="26" rx="6" fill="#dcfce7" stroke="#16a34a"/>
+    <text x="80" y="121" text-anchor="middle" font-size="10" font-weight="700" fill="#14532d">Asha Verma ▾</text>
+    <rect x="148" y="104" width="100" height="26" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="198" y="121" text-anchor="middle" font-size="10" fill="#475569">Last 30 days ▾</text>
+    <rect x="256" y="104" width="100" height="26" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="306" y="121" text-anchor="middle" font-size="10" fill="#475569">Action ▾</text>
+
+    <!-- Table -->
+    <rect x="20" y="142" width="1320" height="30" fill="#f8fafc"/>
+    <g font-size="10" font-weight="700" fill="#475569">
+      <text x="36" y="161">Timestamp</text>
+      <text x="200" y="161">Action</text>
+      <text x="400" y="161">Entity</text>
+      <text x="640" y="161">Before</text>
+      <text x="900" y="161">After</text>
+      <text x="1180" y="161">IP / device</text>
+    </g>
+
+    <rect x="20" y="172" width="1320" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="190" font-size="10" fill="#0f172a">12 May 2026 10:23 IST</text>
+    <text x="200" y="190" font-size="10" font-weight="600" fill="#1e3a8a">cag_directory_accepted</text>
+    <text x="400" y="190" font-size="10" font-family="ui-monospace, monospace" fill="#475569">consultant_access_grants/cag_p1…</text>
+    <text x="640" y="190" font-size="10" fill="#7f1d1d">status: pending</text>
+    <text x="900" y="190" font-size="10" fill="#14532d">status: active</text>
+    <text x="1180" y="190" font-size="10" fill="#64748b">14.x.x.42 · Chrome</text>
+
+    <rect x="20" y="202" width="1320" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="220" font-size="10" fill="#0f172a">12 May 2026 11:02 IST</text>
+    <text x="200" y="220" font-size="10" font-weight="600" fill="#1e3a8a">transaction_categorized</text>
+    <text x="400" y="220" font-size="10" font-family="ui-monospace, monospace" fill="#475569">transactions/tx_c3…</text>
+    <text x="640" y="220" font-size="10" fill="#7f1d1d">category: other_income</text>
+    <text x="900" y="220" font-size="10" fill="#14532d">category: elss_80c</text>
+    <text x="1180" y="220" font-size="10" fill="#64748b">14.x.x.42 · Chrome</text>
+
+    <rect x="20" y="232" width="1320" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="250" font-size="10" fill="#0f172a">12 May 2026 11:04 IST</text>
+    <text x="200" y="250" font-size="10" font-weight="600" fill="#1e3a8a">transaction_categorized</text>
+    <text x="400" y="250" font-size="10" font-family="ui-monospace, monospace" fill="#475569">transactions/tx_c4…</text>
+    <text x="640" y="250" font-size="10" fill="#7f1d1d">category: other_income</text>
+    <text x="900" y="250" font-size="10" fill="#14532d">category: insurance_80c</text>
+    <text x="1180" y="250" font-size="10" fill="#64748b">14.x.x.42 · Chrome</text>
+
+    <rect x="20" y="262" width="1320" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="280" font-size="10" fill="#0f172a">12 May 2026 11:08 IST</text>
+    <text x="200" y="280" font-size="10" font-weight="600" fill="#1e3a8a">filing_calculated</text>
+    <text x="400" y="280" font-size="10" font-family="ui-monospace, monospace" fill="#475569">tax_returns/fil_d4…</text>
+    <text x="640" y="280" font-size="10" fill="#475569">trace v_old</text>
+    <text x="900" y="280" font-size="10" fill="#475569">trace v_new · final_total ₹1,01,400</text>
+    <text x="1180" y="280" font-size="10" fill="#64748b">14.x.x.42 · Chrome</text>
+
+    <rect x="20" y="292" width="1320" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="310" font-size="10" fill="#0f172a">12 May 2026 11:14 IST</text>
+    <text x="200" y="310" font-size="10" font-weight="600" fill="#1e3a8a">filing_change_set_created</text>
+    <text x="400" y="310" font-size="10" font-family="ui-monospace, monospace" fill="#475569">filing_change_sets/chg_q2…</text>
+    <text x="640" y="310" font-size="10" fill="#475569">2 changes</text>
+    <text x="900" y="310" font-size="10" fill="#14532d">returned_at = NOW · revision_returned</text>
+    <text x="1180" y="310" font-size="10" fill="#64748b">14.x.x.42 · Chrome</text>
+
+    <!-- Footer note -->
+    <rect x="20" y="338" width="1320" height="46" rx="6" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="36" y="358" font-size="11" font-weight="700" fill="#3730a3">🛡  Trust by transparency</text>
+    <text x="36" y="374" font-size="10" fill="#475569">audit_logs is append-only (DB trigger blocks UPDATE / DELETE). Same activity is visible in Asha's /audit page.</text>
+
+    <!-- Notifications received -->
+    <text x="20" y="416" font-size="11" font-weight="700" fill="#0f172a">Notifications you received during this engagement</text>
+    <g font-size="10" fill="#475569">
+      <text x="36" y="436">  consultant_access_request          ← Asha sent the directory request</text>
+      <text x="36" y="452">  consultant_client_filing_updated   ← Asha uploaded more docs (twice)</text>
+      <text x="36" y="468">  consultant_rule_change_impact      ← Section 80C rule v2 came out (4 of your clients affected)</text>
+    </g>
+  </g>
+</svg>

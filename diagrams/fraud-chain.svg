@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 900" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <marker id="a-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#92400e"/>
+    </marker>
+    <marker id="a-pink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9d174d"/>
+    </marker>
+    <marker id="a-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#991b1b"/>
+    </marker>
+    <marker id="a-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fafafa"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1500" height="900" fill="url(#bg4)"/>
+
+  <!-- Title -->
+  <text x="750" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">Fraud Chain — Officer → Judicial → Enforcement</text>
+  <text x="750" y="65" text-anchor="middle" font-size="13" fill="#475569">Silent to the taxpayer · every transition audited · enforcement access is time-bound</text>
+
+  <!-- Swim lane backgrounds -->
+  <rect x="20" y="100" width="380" height="720" rx="14" fill="#fef3c7" fill-opacity="0.3" stroke="#92400e" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="210" y="130" text-anchor="middle" font-size="16" font-weight="700" fill="#92400e">OFFICER (L1 – L5)</text>
+  <text x="210" y="150" text-anchor="middle" font-size="11" fill="#78350f">read taxpayer data via worklist</text>
+
+  <rect x="420" y="100" width="380" height="720" rx="14" fill="#fce7f3" fill-opacity="0.3" stroke="#9d174d" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="610" y="130" text-anchor="middle" font-size="16" font-weight="700" fill="#9d174d">JUDICIAL OFFICER</text>
+  <text x="610" y="150" text-anchor="middle" font-size="11" fill="#831843">full read access while case is open</text>
+
+  <rect x="820" y="100" width="380" height="720" rx="14" fill="#fee2e2" fill-opacity="0.3" stroke="#991b1b" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="1010" y="130" text-anchor="middle" font-size="16" font-weight="700" fill="#991b1b">ENFORCEMENT AGENCY</text>
+  <text x="1010" y="150" text-anchor="middle" font-size="11" fill="#7f1d1d">time-bound · case-referenced</text>
+
+  <rect x="1220" y="100" width="260" height="720" rx="14" fill="#f1f5f9" fill-opacity="0.6" stroke="#475569" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="1350" y="130" text-anchor="middle" font-size="16" font-weight="700" fill="#475569">AUDIT</text>
+  <text x="1350" y="150" text-anchor="middle" font-size="11" fill="#475569">append-only · per case</text>
+
+  <!-- ========================================== -->
+  <!-- OFFICER LANE -->
+  <!-- ========================================== -->
+
+  <!-- Filing comes in -->
+  <rect x="50" y="190" width="320" height="50" rx="25" fill="#fef3c7" stroke="#92400e" stroke-width="2"/>
+  <text x="210" y="213" text-anchor="middle" font-size="13" font-weight="700" fill="#78350f">Filing submitted → officer worklist</text>
+  <text x="210" y="230" text-anchor="middle" font-size="10" fill="#78350f">tax_returns.current_officer_level = L1</text>
+
+  <line x1="210" y1="240" x2="210" y2="266" stroke="#92400e" stroke-width="2" marker-end="url(#a-amber)"/>
+
+  <!-- L2+ flags -->
+  <rect x="50" y="266" width="320" height="62" rx="8" fill="#ffffff" stroke="#92400e" stroke-width="2"/>
+  <text x="210" y="290" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Officer (L2+) flags filing</text>
+  <text x="210" y="307" text-anchor="middle" font-size="11" fill="#475569">POST /fraud-cases</text>
+  <text x="210" y="321" text-anchor="middle" font-size="10" fill="#475569">flag_reason · flag_notes · jurisdiction</text>
+
+  <line x1="210" y1="328" x2="210" y2="356" stroke="#92400e" stroke-width="2" marker-end="url(#a-amber)"/>
+
+  <!-- Case created -->
+  <rect x="50" y="356" width="320" height="60" rx="8" fill="#fef3c7" stroke="#92400e" stroke-width="2"/>
+  <text x="210" y="380" text-anchor="middle" font-size="13" font-weight="600" fill="#78350f">fraud_cases row created</text>
+  <text x="210" y="396" text-anchor="middle" font-size="11" fill="#78350f">status = flagged</text>
+  <text x="210" y="410" text-anchor="middle" font-size="10" fill="#78350f">visible to officers in jurisdiction</text>
+
+  <line x1="210" y1="416" x2="210" y2="444" stroke="#92400e" stroke-width="2" marker-end="url(#a-amber)"/>
+
+  <!-- Officer requests judicial review -->
+  <rect x="50" y="444" width="320" height="62" rx="8" fill="#ffffff" stroke="#92400e" stroke-width="2"/>
+  <text x="210" y="468" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Request judicial review</text>
+  <text x="210" y="486" text-anchor="middle" font-size="11" fill="#475569">POST /fraud-cases/{id}/request-judicial-review</text>
+  <text x="210" y="500" text-anchor="middle" font-size="10" fill="#475569">round-robin assignment within jurisdiction</text>
+
+  <line x1="370" y1="475" x2="430" y2="475" stroke="#9d174d" stroke-width="3" marker-end="url(#a-pink)"/>
+  <text x="400" y="466" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">handoff</text>
+
+  <!-- silence note -->
+  <rect x="50" y="700" width="320" height="100" rx="8" fill="#fff" stroke="#475569" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="210" y="724" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">🔇  Taxpayer silence rule</text>
+  <text x="210" y="744" text-anchor="middle" font-size="11" fill="#475569">No notifications sent to taxpayer about</text>
+  <text x="210" y="758" text-anchor="middle" font-size="11" fill="#475569">flag · judicial review · enforcement</text>
+  <text x="210" y="772" text-anchor="middle" font-size="11" fill="#475569">assignment · closure.</text>
+  <text x="210" y="790" text-anchor="middle" font-size="10" fill="#7f1d1d">notification_type enum omits these.</text>
+
+  <!-- ========================================== -->
+  <!-- JUDICIAL LANE -->
+  <!-- ========================================== -->
+
+  <!-- judicial assignment -->
+  <rect x="450" y="190" width="320" height="60" rx="8" fill="#fce7f3" stroke="#9d174d" stroke-width="2"/>
+  <text x="610" y="214" text-anchor="middle" font-size="13" font-weight="600" fill="#9d174d">Notification: fraud_case_assigned</text>
+  <text x="610" y="230" text-anchor="middle" font-size="11" fill="#831843">status = judicial_review</text>
+  <text x="610" y="244" text-anchor="middle" font-size="10" fill="#831843">judicial_officer_id set</text>
+
+  <line x1="610" y1="250" x2="610" y2="278" stroke="#9d174d" stroke-width="2" marker-end="url(#a-pink)"/>
+
+  <!-- judicial opens -->
+  <rect x="450" y="278" width="320" height="62" rx="8" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+  <text x="610" y="302" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Open case</text>
+  <text x="610" y="320" text-anchor="middle" font-size="11" fill="#475569">GET /judicial/cases/{id}</text>
+  <text x="610" y="334" text-anchor="middle" font-size="10" fill="#475569">filing · docs · txns · traces · prior cases</text>
+
+  <line x1="610" y1="340" x2="610" y2="368" stroke="#9d174d" stroke-width="2" marker-end="url(#a-pink)"/>
+
+  <!-- judicial investigates -->
+  <rect x="450" y="368" width="320" height="56" rx="8" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+  <text x="610" y="392" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Investigate</text>
+  <text x="610" y="410" text-anchor="middle" font-size="11" fill="#475569">every read logged to audit_logs</text>
+
+  <line x1="610" y1="424" x2="610" y2="448" stroke="#9d174d" stroke-width="2" marker-end="url(#a-pink)"/>
+
+  <!-- judicial decides diamond -->
+  <polygon points="610,448 760,520 610,592 460,520" fill="#fce7f3" stroke="#9d174d" stroke-width="2"/>
+  <text x="610" y="510" text-anchor="middle" font-size="13" font-weight="700" fill="#9d174d">Decision</text>
+  <text x="610" y="528" text-anchor="middle" font-size="10" fill="#831843">POST /judicial/cases/{id}/decide</text>
+
+  <!-- dismiss left-down -->
+  <line x1="460" y1="520" x2="420" y2="520" stroke="#475569" stroke-width="2"/>
+  <line x1="420" y1="520" x2="420" y2="700" stroke="#475569" stroke-width="2"/>
+  <line x1="420" y1="700" x2="450" y2="700" stroke="#475569" stroke-width="2" marker-end="url(#a-gray)"/>
+  <text x="385" y="510" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">dismiss</text>
+
+  <!-- assign right -->
+  <line x1="760" y1="520" x2="820" y2="520" stroke="#9d174d" stroke-width="3" marker-end="url(#a-pink)"/>
+  <text x="790" y="510" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">assign</text>
+
+  <!-- Closed dismissed -->
+  <rect x="450" y="678" width="180" height="50" rx="25" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
+  <text x="540" y="700" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">status = closed</text>
+  <text x="540" y="718" text-anchor="middle" font-size="10" fill="#475569">dismissed · taxpayer not notified</text>
+
+  <!-- ========================================== -->
+  <!-- ENFORCEMENT LANE -->
+  <!-- ========================================== -->
+
+  <!-- assignment -->
+  <rect x="850" y="490" width="320" height="62" rx="8" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+  <text x="1010" y="514" text-anchor="middle" font-size="13" font-weight="600" fill="#7f1d1d">Notification: enforcement_access_granted</text>
+  <text x="1010" y="530" text-anchor="middle" font-size="11" fill="#7f1d1d">status = enforcement_assigned</text>
+  <text x="1010" y="544" text-anchor="middle" font-size="10" fill="#7f1d1d">enforcement_access row · expires_at = now+90d</text>
+
+  <line x1="1010" y1="552" x2="1010" y2="580" stroke="#991b1b" stroke-width="2" marker-end="url(#a-red)"/>
+
+  <!-- investigate -->
+  <rect x="850" y="580" width="320" height="56" rx="8" fill="#ffffff" stroke="#991b1b" stroke-width="2"/>
+  <text x="1010" y="604" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Investigate (read-only)</text>
+  <text x="1010" y="622" text-anchor="middle" font-size="11" fill="#475569">scoped to enforcement_access.tax_years</text>
+
+  <line x1="1010" y1="636" x2="1010" y2="660" stroke="#991b1b" stroke-width="2" marker-end="url(#a-red)"/>
+
+  <!-- TTL check -->
+  <polygon points="1010,660 1130,710 1010,760 890,710" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+  <text x="1010" y="704" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b">Access still valid?</text>
+  <text x="1010" y="720" text-anchor="middle" font-size="10" fill="#7f1d1d">expires_at &gt; NOW()</text>
+
+  <!-- yes back up -->
+  <line x1="1130" y1="710" x2="1170" y2="710" stroke="#991b1b" stroke-width="2"/>
+  <line x1="1170" y1="710" x2="1170" y2="608" stroke="#991b1b" stroke-width="2"/>
+  <line x1="1170" y1="608" x2="1170" y2="608" stroke="#991b1b" stroke-width="2"/>
+  <line x1="1170" y1="608" x2="1175" y2="608" stroke="#991b1b" stroke-width="2"/>
+  <path d="M 1170 608 Q 1180 608 1180 580 Q 1180 560 1170 560" fill="none" stroke="#991b1b" stroke-width="2"/>
+  <text x="1145" y="700" font-size="10" font-weight="700" fill="#991b1b">yes</text>
+
+  <!-- no -> close -->
+  <line x1="1010" y1="760" x2="1010" y2="788" stroke="#991b1b" stroke-width="2" marker-end="url(#a-red)"/>
+  <text x="1028" y="780" font-size="10" font-weight="700" fill="#991b1b">no / done</text>
+
+  <!-- close -->
+  <rect x="850" y="788" width="320" height="50" rx="25" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+  <text x="1010" y="810" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">Close case</text>
+  <text x="1010" y="828" text-anchor="middle" font-size="10" fill="#7f1d1d">outcome · auto-revoke access · status=closed</text>
+
+  <!-- expiring soon banner -->
+  <rect x="850" y="190" width="320" height="76" rx="8" fill="#fef3c7" stroke="#92400e" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="1010" y="212" text-anchor="middle" font-size="12" font-weight="700" fill="#78350f">⏰  Time-bound access</text>
+  <text x="1010" y="230" text-anchor="middle" font-size="11" fill="#78350f">expiring_soon notification &lt; 48h</text>
+  <text x="1010" y="246" text-anchor="middle" font-size="11" fill="#78350f">expired notification at TTL hit</text>
+  <text x="1010" y="262" text-anchor="middle" font-size="10" fill="#475569">renewal only by judicial officer</text>
+
+  <!-- ========================================== -->
+  <!-- AUDIT LANE -->
+  <!-- ========================================== -->
+  <g font-size="11">
+    <rect x="1240" y="190" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="212" text-anchor="middle" font-weight="600" fill="#0f172a">fraud_case_created</text>
+    <text x="1350" y="228" text-anchor="middle" font-size="10" fill="#475569">officer_id · jurisdiction · reason</text>
+
+    <rect x="1240" y="260" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="282" text-anchor="middle" font-weight="600" fill="#0f172a">judicial_assigned</text>
+    <text x="1350" y="298" text-anchor="middle" font-size="10" fill="#475569">judicial_officer_id</text>
+
+    <rect x="1240" y="330" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="352" text-anchor="middle" font-weight="600" fill="#0f172a">data_accessed</text>
+    <text x="1350" y="368" text-anchor="middle" font-size="10" fill="#475569">entity_type · entity_id</text>
+
+    <rect x="1240" y="400" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="422" text-anchor="middle" font-weight="600" fill="#0f172a">judicial_decision</text>
+    <text x="1350" y="438" text-anchor="middle" font-size="10" fill="#475569">dismiss | assign_enforcement</text>
+
+    <rect x="1240" y="470" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="492" text-anchor="middle" font-weight="600" fill="#0f172a">enforcement_granted</text>
+    <text x="1350" y="508" text-anchor="middle" font-size="10" fill="#475569">expires_at · tax_years</text>
+
+    <rect x="1240" y="540" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="562" text-anchor="middle" font-weight="600" fill="#0f172a">fraud_case_data_accessed</text>
+    <text x="1350" y="578" text-anchor="middle" font-size="10" fill="#475569">every read by enforcement</text>
+
+    <rect x="1240" y="610" width="220" height="50" rx="6" fill="#fff" stroke="#475569" stroke-width="2"/>
+    <text x="1350" y="632" text-anchor="middle" font-weight="600" fill="#0f172a">fraud_case_closed</text>
+    <text x="1350" y="648" text-anchor="middle" font-size="10" fill="#475569">outcome · auto-revoke</text>
+
+    <text x="1350" y="690" text-anchor="middle" font-size="10" fill="#475569">all denormalized with</text>
+    <text x="1350" y="705" text-anchor="middle" font-size="10" font-weight="600" fill="#0f172a">fraud_case_id</text>
+    <text x="1350" y="720" text-anchor="middle" font-size="10" fill="#475569">for one-query reconstruction</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(40, 855)" font-size="11">
+    <text x="0" y="0" font-weight="700" fill="#0f172a">Status path:</text>
+    <text x="90" y="0" fill="#475569">flagged → judicial_review → enforcement_assigned → closed</text>
+    <text x="500" y="0" font-weight="700" fill="#0f172a">Roles authorized to flag:</text>
+    <text x="700" y="0" fill="#475569">Officer L2+ only · L1 reads only</text>
+    <text x="1000" y="0" font-weight="700" fill="#0f172a">Access:</text>
+    <text x="1060" y="0" fill="#475569">Judicial full read · Enforcement time-bound</text>
+  </g>
+</svg>
