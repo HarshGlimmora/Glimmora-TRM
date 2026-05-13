@@ -47,14 +47,22 @@ If AI breaks, the engine still produces a correct tax number (with manual catego
 
 ### 1. Taxpayer Filing
 ```
-Register → Consent → Upload docs → Review extracted txns → Compare regimes → Tax summary → PDF
+Register (email + phone) → Verify email + phone OTP → Consent
+   → Upload docs → Review extracted txns → Compare regimes → Tax summary
+   → Submit (re-verified by phone OTP) → PDF
 ```
+
+Taxpayers must verify **both** email and phone before they can submit a filing. A fresh phone OTP is required at submission time as an anti-fraud measure.
 
 ### 2. Regime Switch Warning
 If a taxpayer's previous filing used a different regime, the system warns before allowing the switch — India's tax law restricts regime switching for certain taxpayer types (notably those with business/professional income, who can switch back only once). See [ARCHITECTURE.md §6](ARCHITECTURE.md#6-regime-switch-warning) and [API_CONTRACTS.md §5.2](API_CONTRACTS.md#52-filing-calculation).
 
 ### 3. Consultant Access
-A CA cannot see any user's data unless explicitly granted access by that taxpayer. When granted, the CA receives a notification containing the taxpayer's PAN, and the taxpayer appears in the CA's client list. The CA can also search for any client they have access to by PAN. See [ARCHITECTURE.md §7](ARCHITECTURE.md#7-consultant-access-workflow).
+A CA cannot see any user's data unless explicitly granted access by that taxpayer. Two paths to grant access:
+1. **Directory** — taxpayer browses CAs in their city (`GET /consultants?city=…`), picks one, and sends a request. CA accepts or declines.
+2. **Invite code** — for CAs outside the taxpayer's city, or pre-arranged relationships. CA generates a code, shares it out-of-band, and the taxpayer redeems it. Grant is `active` immediately.
+
+Either way, the CA receives a notification with the taxpayer's PAN, basic details, and shared documents, and the client appears in the CA's client list with a one-click "View" affordance. The CA can also search by PAN among their active grants. See [ARCHITECTURE.md §7](ARCHITECTURE.md#7-consultant-access-workflow).
 
 ### 4. Fraud → Judicial → Enforcement Chain
 ```

@@ -29,7 +29,11 @@ Hero card: **"Start your FY 2024-25 return"** with a 4-step progress visualizer 
 
 Secondary widgets:
 
-- **Setup checklist** — profile completeness, PAN verified, regime preference noted, mobile/email verified
+- **Verification panel (top of list, blocking)** — shows email and phone verification status with inline actions:
+  - Email verification: `Send link` / `Resend link` button + "Check your inbox" state
+  - Phone OTP: 6-digit input + `Resend OTP` (60s cooldown)
+  - Both must be green-checked before the user can submit a filing. The UI displays a banner explaining that submission requires both checks plus a fresh phone OTP at submit time.
+- **Setup checklist** — profile completeness, PAN verified, city set (used by CA directory), regime preference noted
 - **What you'll need** — document checklist (Form 16, 26AS, AIS/TIS, bank statements, salary slips) with sample/anonymized previews
 - **Trust explainer (collapsible)** — the three-layer principle in plain language; one-time read, dismissible
 - **Consents panel** — shows the three consents required, none granted yet
@@ -47,7 +51,8 @@ Widget grid (2-col):
 | **Documents** | Uploaded docs with extraction status (parsed / needs review / failed). Re-upload inline |
 | **Transactions needing your review** | Count of AI-suggested categorizations awaiting confirmation. Empty when none |
 | **Filing history** | Last 3 FYs with status pills (Draft / Filed / Acknowledged / Under review / Flagged) |
-| **Consultant access** | List of CAs with access, scope, expiry, revoke button (README §Workflow 3). Empty state: "Grant access to a CA by PAN" |
+| **Consultant access** | List of CAs with active grants, mode, granted FYs, expiry, revoke button. Two CTAs in the empty state: **"Find a CA in your city"** (opens the directory at `GET /consultants?city=<my_city>`) and **"Enter an invite code"** (opens the code-redemption modal for out-of-city CAs). |
+| **CA directory** *(when opened)* | Card grid of listed CAs in the taxpayer's city, filterable by specialization / language / fee range / years of experience. Each card shows name, photo, self-attested ICAI #, bio, languages, fee range indicator. Primary CTA per card: **"Request access"** (asks for `access_mode` + `tax_years` + optional message). Status returns as `pending` until the CA responds. |
 | **Notifications** | Officer queries, CA requests, regime warnings, rule updates affecting their filing |
 
 Edge case widgets (only when applicable):
@@ -64,14 +69,16 @@ CA homepage is **client-portfolio-driven**. A CA sees zero PII until a taxpayer 
 
 ### 2a. New CA (No Clients Yet)
 
-Hero card: **"Awaiting client access"** explaining the consent model — clients must invite the CA by PAN; CAs cannot self-add clients.
+Hero card: **"Get listed and start receiving clients"** explaining the two paths through which a CA can be engaged: directory listing (taxpayer finds you in their city) and invite codes (you generate a code and share it with a specific taxpayer).
 
 Widgets:
 
-- **Search by PAN** — disabled with helper text "You can search clients only after they grant you access"
-- **Pending invitations** — clients who initiated grants but haven't completed
-- **Profile / credentials** — ICAI membership #, specialization tags
-- **Knowledge feed** — recent rule changes (RAG-curated), pinned
+- **Directory listing toggle** — primary CTA. Shows current state of the CA's `ca_profiles` row: `listed_in_directory`, `accepting_clients`, served cities. Disabled until the CA has verified both email and phone — explicit message: *"Verify your email and phone first to be listed."*
+- **Profile / credentials** — self-attested ICAI membership #, bio, specialization tags, languages, years of experience, fee range indicator, photo. Editable; saves to `PUT /consultant/profile`.
+- **Invite codes** — list of the CA's active codes with `label`, `max_uses`, `used_count`, `expires_at`. Primary CTA: **"Generate new invite code"** opens a modal that returns the plaintext code exactly once (warning: "Save this code now — it will not be shown again").
+- **Search by PAN** — disabled with helper text *"You can search clients only after they grant you access."*
+- **Pending directory requests** — taxpayers who chose this CA from the directory but the CA hasn't accepted/declined yet. Each row has `Accept` / `Decline` buttons.
+- **Knowledge feed** — recent rule changes (RAG-curated), pinned.
 
 ### 2b. Active CA
 
@@ -81,11 +88,19 @@ Widget grid:
 
 | Widget | Content |
 |---|---|
-| **Client list (primary table)** | PAN, name (per client's display preference), filing status, last activity, regime, access expiry, quick actions (open draft, message, request docs) |
-| **Action queue** | Per-client items needing CA attention: ambiguous transactions the client deferred, regime decisions, missing docs |
-| **Search by PAN** | For clients already granted; types out a confirmation that lookup is logged in client's audit trail |
-| **Rule change impact** | "3 of your clients are affected by Section X amendment" — links to RAG explainer |
-| **Activity log** | The CA's own actions across all clients (readable by the client too, by design) |
+| **Client list (primary table)** | PAN, name, filing status, last activity, regime, granted FYs, access expiry, and a single **"View"** button per row that opens the full client detail view in one click (equivalent to the `client_detail_url` from the original grant notification). No multi-step navigation. |
+| **Client detail view (opened via "View")** | Drills into a single client: profile (PAN, name, contact), shared documents grouped by type, transactions, active filings per granted FY, calculation traces, change-set history, "Edit / Return / Submit" actions per the grant's `access_mode`. |
+| **Action queue** | Per-client items needing CA attention: ambiguous transactions the client deferred, regime decisions, missing docs. Each item also has a one-click jump to that client's detail view. |
+| **Search by PAN** | For clients already granted; the lookup is logged in the client's audit trail. Returning a match also exposes the same one-click "View" affordance. |
+| **Rule change impact** | "3 of your clients are affected by Section X amendment" — links to the affected clients' detail views and to the RAG explainer. |
+| **Activity log** | The CA's own actions across all clients (readable by the client too, by design). |
+
+> **Notification → client click-through.** Two notification types lead to the same place:
+>
+> - `consultant_access_request` — from a directory request (CA must accept first; "View" appears after accept).
+> - `consultant_invite_code_used` — from an invite-code redemption (client appears immediately; "View" works right away).
+>
+> Both payloads carry a `client_detail_url` deep link. Clicking the notification — or the "View" button on the client list row — opens the same client detail view. The CA never has to search by PAN to find a newly-granted client.
 
 A CA never sees:
 

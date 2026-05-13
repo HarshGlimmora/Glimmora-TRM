@@ -15,12 +15,13 @@ This document describes the system architecture, trust model, and core workflows
 4. [Service Boundaries](#4-service-boundaries)
 5. [Tax Engine Internals](#5-tax-engine-internals)
 6. [Regime Switch Warning (Section 115BAC)](#6-regime-switch-warning-section-115bac)
-7. [Consultant Access Workflow](#7-consultant-access-workflow)
-8. [Fraud → Judicial → Enforcement Workflow](#8-fraud--judicial--enforcement-workflow)
-9. [RAG Pipeline](#9-rag-pipeline)
-10. [Security & Compliance Architecture](#10-security--compliance-architecture)
-11. [Database Schema (Updated)](#11-database-schema-updated)
-12. [Deployment Topology](#12-deployment-topology)
+7. [Financial Year Workspace](#7-financial-year-workspace)
+8. [Consultant Access Workflow](#8-consultant-access-workflow)
+9. [Fraud → Judicial → Enforcement Workflow](#9-fraud--judicial--enforcement-workflow)
+10. [RAG Pipeline](#10-rag-pipeline)
+11. [Security & Compliance Architecture](#11-security--compliance-architecture)
+12. [Database Schema (Updated)](#12-database-schema-updated)
+13. [Deployment Topology](#13-deployment-topology)
 
 ---
 
@@ -88,6 +89,7 @@ If Layer 3 fails, nothing else is affected.
 | **Auth Service** | Users, sessions | `users`, `user_consents` | `users`, `user_consents`, `audit_logs` | bcrypt |
 | **Document Service** | Uploads, metadata | `documents` | `documents`, FS | — |
 | **AI/OCR Service** | Extraction, categorization | `documents`, `country_rules` | `transactions`, `audit_logs` | PaddleOCR, pdfplumber, OpenAI |
+| **FY Router Service** | Auto-assign docs/txns to FYs from dates | `documents`, `transactions`, `tax_returns` | `documents`, `transactions`, `tax_returns`, `pending_router_inbox`, `audit_logs` | — |
 | **Taxation Service** | Filings, calculations | `transactions`, `country_rules`, `tax_returns` | `tax_returns`, `audit_logs` | — |
 | **Rules Service** | Tax rules | `country_rules` | `country_rules`, `audit_logs` | — |
 | **RAG Service** | Tax knowledge Q&A | `knowledge_chunks` | `knowledge_chunks`, `audit_logs` | OpenAI |
@@ -320,13 +322,178 @@ The `tax_returns` table records `regime_used` and `regime_switch_acknowledged` o
 - **Form 10-IEA**: MVP does not generate the form. It surfaces a reminder with a link to the official form on the IT Department portal. v1.1 will pre-fill.
 - **Mid-year rule change**: if Section 115BAC is amended, rules are re-versioned (see [§5.2](#52-rule-resolution)) and the engine uses the version in effect at the start of the tax year.
 
-See [API_CONTRACTS.md §5.2](API_CONTRACTS.md#52-filing-calculation) for the request / response contract.
+See [API_CONTRACTS.md §6.2](API_CONTRACTS.md#62-post-apiv1filingsidprecheck-regime) for the request / response contract.
 
 ---
 
-## 7. Consultant Access Workflow
+## 7. Financial Year Workspace
 
-**Principle:** A CA has zero access to any taxpayer's data unless that taxpayer explicitly grants it. There is no broad "search all users" capability. The taxpayer also chooses **how much** access to grant.
+**Principle:** All taxpayer-facing data is partitioned by financial year. The UI exposes a year switcher that scopes filings, documents, transactions, and views. Officers, judicial officers, enforcement agents, and CAs see the same FY-filter pattern everywhere. **Uploads are auto-routed to the right FY based on the dates inside the documents** — the user does not pre-select a year.
+
+### 7.1 Why FY-First
+
+Indian tax filings are inherently per-FY: rules change between years (slabs, deductions, surcharge), regime selection is per-year, and Form 16 / 26AS / AIS are all FY-bound. Mixing years in a single workspace causes user confusion and (worse) leads to applying the wrong rule version to the wrong year. The FY workspace makes the year a **first-class navigation primitive** rather than a hidden field on a filing.
+
+### 7.2 Workspace Rules
+
+- **One draft per (user, FY, country)**: at most one filing in a non-terminal state per FY. Terminal states (`accepted`, `rejected`) are immutable.
+- **Lazy creation**: a new FY workspace activates on April 1; the draft filing is created the first time data needs to be routed into it (upload, manual filing start).
+- **Hard data partition**: documents and transactions reference a `filing_id` → `tax_year`. They never cross years.
+- **Year switching is pure navigation**: changing the active year doesn't mutate filings. It updates `users.active_tax_year` for cross-device persistence.
+
+### 7.3 Auto FY Routing (Dates → Financial Year)
+
+Indian FY runs **April 1 → March 31**. Routing logic:
+
+```python
+def date_to_fy(d: date) -> str:
+    if d.month >= 4:
+        return f"FY{d.year}-{str(d.year + 1)[-2:]}"   # 2024-04-01 → FY2024-25
+    return f"FY{d.year - 1}-{str(d.year)[-2:]}"       # 2025-03-31 → FY2024-25
+```
+
+#### 7.3.1 Routing by Document Type
+
+| Document | How FY is Determined |
+|---|---|
+| **Form 16** | OCR extracts the **Assessment Year** field (e.g., `AY 2025-26`). FY = AY − 1 (here, FY2024-25). Falls back to the period of employment dates if AY is unreadable. |
+| **Form 26AS** | Extract the FY field from the page header (always present on official 26AS). |
+| **AIS / TIS** | Extract the FY field from the header. |
+| **Salary slip** | Extract the pay-period month; derive FY from the month/year. |
+| **Bank CSV** | Each row carries a transaction date. Rows are routed **individually** to the FY of their `date` column. A single CSV may seed transactions into multiple FYs. |
+
+#### 7.3.2 Routing Flow
+
+```
+Upload (no filing_id required)
+   │
+   ▼
+[Staging: document stored, status=uploaded]
+   │
+   ▼
+[OCR / parse → extract dates + AY/FY metadata]
+   │
+   ▼
+[Group extracted items by derived FY]
+   │
+   ▼
+For each FY:
+   ├── Ensure a draft filing exists for (user, FY) — create lazily if not
+   ├── Attach the document (or relevant rows) to that filing
+   └── Insert transactions with filing_id and tax_year
+   │
+   ▼
+[Emit routing report: which items went to which FY]
+   │
+   ▼
+[User reviews; can override per-item if needed]
+```
+
+#### 7.3.3 Edge Cases
+
+| Case | Behavior |
+|---|---|
+| **Bank CSV spanning 2 FYs** (e.g., Jan–Dec) | Split: rows up to Mar 31 → FY(N-1), rows from Apr 1 → FY(N). One document, two filings. |
+| **AY not extractable from Form 16** | Use the period-of-employment dates. If still ambiguous, surface to user as `routing_unresolved`. |
+| **Date in future** (data entry error) | Route as flagged: status=`routing_review_required`. Excluded from any filing until user confirms. |
+| **Date predates user's earliest tax history** | Auto-create the older FY workspace. No data loss. |
+| **Transaction date in a terminal-status FY** (filing already `accepted`) | Held in `pending_router_inbox`. User must explicitly file an amendment or discard. The system never mutates a terminal filing. |
+| **Conflicting AY in Form 16 vs employer date range** | Trust the explicit AY field; raise a low-severity warning. |
+
+#### 7.3.4 Routing Report
+
+After processing, every upload produces a routing report visible to the user:
+
+```jsonc
+{
+  "document_id": "doc_a1…",
+  "routing_decisions": [
+    { "scope": "document", "tax_year": "FY2024-25", "filing_id": "fil_d4…", "reason": "Form 16 AY=2025-26" }
+  ],
+  "transactions_routed": {
+    "FY2024-25": 41,
+    "FY2023-24": 6
+  },
+  "unresolved": [
+    { "transaction_index": 17, "raw_date": "2024-04-32", "reason": "invalid_date" }
+  ],
+  "review_required": []
+}
+```
+
+The user can **edit the FY of any document or transaction** at any time:
+
+- Direct edit on a single document: `PUT /api/v1/documents/{id}` with `tax_year` changes the document's FY assignment ([API §4.3](API_CONTRACTS.md#43-put-apiv1documentsid--edit-document-fields-including-tax_year)).
+- Direct edit on a single transaction: `PUT /api/v1/filings/{id}/transactions/{tx_id}` with `tax_year` moves the transaction to that FY's filing ([API §6.10](API_CONTRACTS.md#610-put-apiv1filingsidtransactionstx_id--edit-a-transaction)).
+- Bulk override for a document and its transactions: `POST /api/v1/documents/{id}/reroute` ([API §4.4](API_CONTRACTS.md#44-post-apiv1documentsidreroute)).
+
+All overrides are audited with action `routing_override` recording the user, before/after FY, and reason. The transaction's `routing_method` flips from `auto` to `manual_override`.
+
+#### 7.3.5 Why This Matters
+
+- **Eliminates a class of user errors**: no more "I uploaded my Jan 2025 bank statement under FY2024-25 by accident."
+- **Multi-year uploads in one shot**: a year's bank CSV automatically populates both adjacent FYs.
+- **Rule version correctness**: each transaction lands in the FY whose rule version actually applies to it.
+
+### 7.4 Rule Versioning per FY
+
+The Tax Engine ([§5.2](#52-rule-resolution)) selects rules based on `effective_from` / `effective_to`. A filing for FY2023-24 always uses the rule version that was active during that FY, even if reopened in 2026. The `calculation_trace` stores `rule_version` so the math is reproducible regardless of when it's replayed.
+
+### 7.5 Templated New-Year Filing
+
+When starting a filing for FY(N), the user may optionally **template from FY(N-1)**. The template copies non-numeric configuration:
+
+| Copied | Not Copied |
+|---|---|
+| Deduction categories the user typically claims | Actual transactions |
+| HRA / rent declaration baseline | Document references |
+| Bank account labels | Any numeric amounts |
+| Employer references | Form 16 contents |
+
+### 7.6 FY Filter Across Roles
+
+Every list / dashboard endpoint accepts a `tax_year` filter. Defaults differ by role:
+
+| Role | Default FY scope |
+|---|---|
+| Taxpayer | User's `active_tax_year` |
+| Consultant | All FYs in their active grants for the queried client |
+| Officer / Judicial / Enforcement / Admin | All FYs (no filter) — typically reviewing across years |
+
+All list responses include a `meta.by_tax_year` breakdown. See [API_CONTRACTS.md §14](API_CONTRACTS.md#14-fy-filter--global-convention) for the global convention.
+
+### 7.7 Cross-Cutting Effects
+
+- **Regime warning ([§6](#6-regime-switch-warning-section-115bac))**: compares the FY being filed against the most recent prior FY.
+- **CA grants ([§8](#8-consultant-access-workflow))**: each grant explicitly lists the FYs the CA can see.
+- **Fraud cases ([§9](#9-fraud--judicial--enforcement-workflow))**: filed against a specific filing → a specific FY.
+- **Enforcement access**: can be restricted to specific FYs at grant time.
+
+---
+
+## 8. Consultant Access Workflow
+
+**Principle:** A CA has zero access to any taxpayer's data unless that taxpayer explicitly grants it. There is no broad "search all users" capability. The taxpayer also chooses **how much** access to grant and **how they find** the CA.
+
+### 7.0 Hybrid CA Selection: Directory + Invite Code
+
+Taxpayers find a CA via one of two complementary paths. Both produce a row in [`consultant_access_grants`](SCHEMA.md#93-consultant_access_grants) but differ in initial state.
+
+| Path | When | Initial status |
+|---|---|---|
+| **Directory (in-city)** | Taxpayer browses CAs in their own city, picks one, sends a request. CA can accept or decline. | `pending` |
+| **Invite code (out-of-city / pre-arranged)** | CA generates a one-time (or N-time) code and shares it out-of-band. Taxpayer redeems the code; both sides have already shown intent, so the grant is `active` immediately. | `active` |
+
+**Directory eligibility.** A CA appears in `/consultants?city=X` only when:
+
+1. They have role `consultant`
+2. Both `email_verified_at` and `phone_verified_at` are set on their `users` row
+3. Their [`ca_profiles`](SCHEMA.md#55-ca_profiles) row has `listed_in_directory = TRUE` AND `accepting_clients = TRUE`
+4. `users.city = X` OR `X = ANY(ca_profiles.serves_cities)`
+
+**Self-attested ICAI membership.** ICAI numbers are typed at registration; no admin verification in MVP. The UI surfaces the number so taxpayers can verify out-of-band. ICAI registry integration is tracked for v1.1.
+
+**Invite codes.** Format `CA-[A-Z0-9]{6,14}`. Stored hashed; the plaintext is shown to the CA exactly once at creation. CAs can configure `max_uses`, `default_access_mode` ceiling, and `allowed_tax_years` constraints. Codes expire (default 14 days).
 
 ### 7.1 Two Access Modes
 
@@ -377,47 +544,89 @@ Both modes are read-write on the data; the only difference is **who holds submis
 - `active` → `revoked`: taxpayer revokes anytime (CA loses access immediately)
 - `pending` → `expired`: TTL hit without acceptance (default 14 days)
 
-### 7.3 Flow Diagram
+### 7.3 Flow Diagrams
+
+#### Directory Path
 
 ```
 Taxpayer                  System                       Consultant
    │                        │                              │
-   │ 1. Grant access:       │                              │
-   │    email + mode        │                              │
-   │    (full | review_edit)│                              │
-   │───────────────────────▶│                              │
-   │                        │ 2. Create grant              │
-   │                        │    (status: pending)         │
-   │                        │ 3. Notify CA — includes      │
-   │                        │    taxpayer PAN + mode ─────▶│
+   │ 1. Browse directory    │                              │
+   │    GET /consultants    │                              │
+   │    ?city=Mumbai────────▶                              │
+   │ ◀── filtered list ─────│                              │
    │                        │                              │
-   │                        │ 4. CA opens notification     │
-   │                        │◀─────────────────────────────│
-   │                        │ 5. CA accepts                │
-   │                        │    grant.status = active     │
+   │ 2. Pick CA + mode + FYs│                              │
+   │    POST /consultant-   │                              │
+   │    access/grants ──────▶                              │
+   │                        │ Insert grant                 │
+   │                        │ (origin=directory_request,   │
+   │                        │  status=pending)             │
+   │                        │ Notify CA: consultant_       │
+   │                        │ access_request  ────────────▶│
    │                        │                              │
-   │                        │ 6. Client now visible in     │
-   │                        │    CA's client list          │
-   │                        │ 7. CA can search by PAN      │
-   │                        │    (limited to active grants)│
-   │                        │                              │
-   │              REVIEW_EDIT FLOW                         │
-   │                        │ 8a. CA edits filing          │
-   │                        │     status: in_review_by_ca  │
-   │                        │ 9a. CA "returns to taxpayer" │
-   │                        │     status: revision_returned│
-   │ 10a. Taxpayer reviews  │                              │
-   │      CA's diff, submits│                              │
-   │                        │                              │
-   │              FULL_ACCESS FLOW                         │
-   │                        │ 8b. CA edits + submits       │
-   │                        │     directly                 │
-   │                        │ 9b. (optional) auto-apply    │
-   │                        │     to IT portal             │
-   │                        │                              │
-   │ 11. Taxpayer can       │                              │
-   │     revoke anytime ───▶│                              │
-   │                        │ grant.status = revoked       │
+   │                        │ ◀── POST .../{id}/respond ───│
+   │                        │       { accept|decline }     │
+   │                        │ status → active | rejected   │
+   │ ◀── notify taxpayer ───│                              │
+```
+
+#### Invite-Code Path
+
+```
+CA                         System                       Taxpayer
+ │                           │                              │
+ │ Generate invite code      │                              │
+ │ POST /consultant/         │                              │
+ │ invite-codes ────────────▶│                              │
+ │ ◀── { code: "CA-7K3PQX" } │                              │
+ │                           │                              │
+ │ Share code out-of-band  ─────────────────────────────────▶│
+ │ (WhatsApp / email / in person)                           │
+ │                           │                              │
+ │                           │ ◀── POST /consultant-access/ │
+ │                           │     grants/redeem-code       │
+ │                           │     { invite_code,           │
+ │                           │       access_mode,           │
+ │                           │       tax_years }            │
+ │                           │ Insert grant                 │
+ │                           │ (origin=invite_code,         │
+ │                           │  status=active)              │
+ │                           │ Increment code.used_count    │
+ │ ◀── Notify CA:            │                              │
+ │   consultant_invite_      │                              │
+ │   code_used (with         │                              │
+ │   taxpayer details +      │                              │
+ │   shared documents)       │                              │
+```
+
+#### After grant is `active` (both paths)
+
+```
+Taxpayer                   System                       Consultant
+   │                         │                              │
+   │                         │ Client visible in CA's       │
+   │                         │ client list                  │
+   │                         │ CA can search by PAN         │
+   │                         │ (scoped to active grants)    │
+   │                         │                              │
+   │              REVIEW_EDIT MODE                          │
+   │                         │ CA edits filing              │
+   │                         │ status: in_review_by_ca      │
+   │                         │ CA returns to taxpayer       │
+   │                         │ status: revision_returned    │
+   │ Taxpayer reviews diff,  │                              │
+   │ submits (with OTP) ─────▶                              │
+   │                         │                              │
+   │              FULL_ACCESS MODE                          │
+   │                         │ CA edits + submits directly  │
+   │                         │ (CA OTP required at submit)  │
+   │                         │ (optional) auto-apply to     │
+   │                         │ IT portal — v1.1             │
+   │                         │                              │
+   │ Taxpayer can revoke     │                              │
+   │ anytime ────────────────▶                              │
+   │                         │ grant.status = revoked       │
 ```
 
 ### 7.4 What the CA Can See
@@ -447,17 +656,22 @@ WHERE g.consultant_id = :me
   AND u.pan ILIKE :search;
 ```
 
+> **Note:** PAN search exists in addition to (not instead of) the CA's client list. The client list — populated from active grants — is the primary navigation; PAN search is for fast lookup when the CA has many clients.
+
 ### 7.6 Notification Content
 
-When a grant is created, the consultant receives a notification containing:
-- Taxpayer name
-- Taxpayer PAN
-- Access mode (`full_access` or `review_edit`)
-- Tax year(s) requested
-- Message from taxpayer
-- Action links: `Accept` / `Decline`
+When a grant is created, the consultant receives a `consultant_access_request` notification containing **everything needed to identify the client and jump straight into their workspace**:
 
-Notifications are stored in `notifications` and surfaced in-app. Email delivery is optional in MVP.
+- **Taxpayer identity:** name, PAN, email, phone, city
+- **Access scope:** `access_mode` (`full_access` | `review_edit`), `tax_years` granted
+- **Shared documents:** the list of documents the taxpayer has already uploaded for the granted FYs (id, type, filename, size) — gives the CA an at-a-glance preview of what they'll be working with
+- **Message** from the taxpayer (optional free text)
+- **One-click `client_detail_url`:** deep link straight to the client's full detail view in the CA's workspace — no separate PAN search required
+- **Action links:** `Accept` / `Decline`
+
+The same record also surfaces on the **client list** in the CA's homepage ([HOMEPAGE_PLAN §2b](HOMEPAGE_PLAN.md#2b-active-ca)). From the client list, one click on any row's "View" button opens the same full client detail view — equivalent to clicking `client_detail_url` from the notification.
+
+Notifications are stored in `notifications` and surfaced in-app. Email delivery is optional in MVP. The full notification payload shape is specified in [API_CONTRACTS.md §12.5](API_CONTRACTS.md#125-notification-payloads-by-type).
 
 ### 7.7 Return-to-Taxpayer (review_edit only)
 
@@ -476,7 +690,7 @@ For `full_access` grants, MVP exposes a stub: the CA clicks **Submit + Apply to 
 
 ---
 
-## 8. Fraud → Judicial → Enforcement Workflow
+## 9. Fraud → Judicial → Enforcement Workflow
 
 **Principle:** No one outside Admin gets unrestricted access to taxpayer data. Every escalation step is gated by a role, recorded in `audit_logs`, and time-bound where applicable.
 
@@ -563,7 +777,11 @@ Every transition writes to `audit_logs`:
 - `fraud_case_data_accessed` (any access under this case)
 - `fraud_case_closed` (enforcement)
 
-The taxpayer can see a non-detailed record of "an investigation occurred" only after the case is `closed` and only for cases involving enforcement (right-to-be-informed). Active cases are never visible to the taxpayer.
+**Taxpayer is not notified about fraud cases.** Flag, judicial review, enforcement assignment, and case closure are all **silent** to the taxpayer — there is no in-app notification, no email, and no record in the taxpayer's notification inbox for any of these transitions. This is deliberate: premature disclosure would compromise active investigations.
+
+The taxpayer continues to receive `filing_under_officer_review` and `filing_escalated_to_l{2..5}` notifications for the normal L1 → L5 officer review pipeline (acceptance, rejection, revision requests). That pipeline is operationally separate from the fraud flow described above.
+
+Any formal contact arising from a fraud investigation happens through channels outside the in-app notification system (statutory notices, summons, etc., issued by the Judicial Officer or Enforcement Agency through their own legal processes).
 
 ### 8.5 Separation from Admin Enforcement Grants
 
@@ -571,7 +789,7 @@ The `enforcement_access` table also supports admin-granted access (outside the f
 
 ---
 
-## 9. RAG Pipeline
+## 10. RAG Pipeline
 
 ### 9.1 Ingestion
 
@@ -624,7 +842,7 @@ Answer in 2–4 sentences. Cite the source section.
 
 ---
 
-## 10. Security & Compliance Architecture
+## 11. Security & Compliance Architecture
 
 ### 10.1 AuthN & AuthZ
 
@@ -634,7 +852,21 @@ Answer in 2–4 sentences. Cite the source section.
 | Password | bcrypt cost 12 |
 | Session | Refresh rotation; revoked tokens blocklisted |
 | AuthZ | Role + scope; `@require_role(...)` decorators |
-| MFA | Out of MVP (v1.1) |
+| Email verification | URL-safe token (sha256-hashed in DB), single-use, 24h TTL |
+| Phone verification | 6-digit OTP, sha256-hashed with per-user pepper, single-use, 10-min TTL, 5-attempt lock |
+| Submit-time OTP | A fresh phone OTP is issued and consumed inline with [`POST /filings/{id}/submit`](API_CONTRACTS.md#67-post-apiv1filingsidsubmit); the OTP record is bound to a specific `filing_id` to prevent replay across filings. `tax_returns.submit_otp_verification_id` is set on success ([SCHEMA §6.1](SCHEMA.md#61-tax_returns)). |
+| MFA (TOTP) | Out of MVP (v1.1) — phone OTP at registration + at submission covers the most sensitive moments |
+
+**Verification gates** (enforced at the API layer):
+
+| Action | Required state |
+|---|---|
+| Login | None (verification status returned in `/auth/me`) |
+| Upload documents | `email_verified_at IS NOT NULL` |
+| Calculate, view summaries | `email_verified_at IS NOT NULL` |
+| Submit a filing | `email_verified_at IS NOT NULL` AND `phone_verified_at IS NOT NULL` AND a fresh `submit_phone` OTP consumed for this filing |
+| Grant CA access | `email_verified_at IS NOT NULL` AND `phone_verified_at IS NOT NULL` |
+| List in CA directory | CA's own `email_verified_at IS NOT NULL` AND `phone_verified_at IS NOT NULL` |
 
 ### 10.2 Consent Cascade
 
@@ -660,7 +892,7 @@ Before any text leaves to OpenAI:
 
 ---
 
-## 11. Database Schema (Updated)
+## 12. Database Schema (Updated)
 
 The base schema is in the implementation plan §5. The following tables are **added or modified** to support the new workflows.
 
@@ -766,12 +998,62 @@ CREATE INDEX idx_fraud_cases_taxpayer ON fraud_cases(taxpayer_id);
 
 ```sql
 ALTER TABLE enforcement_access
-  ADD COLUMN fraud_case_id UUID REFERENCES fraud_cases(id);
+  ADD COLUMN fraud_case_id UUID REFERENCES fraud_cases(id),
+  ADD COLUMN tax_years TEXT[];                  -- restrict access to specific FYs
 ```
+
+### 11.7 Modified: `documents`
+
+```sql
+ALTER TABLE documents
+  ADD COLUMN filing_id UUID REFERENCES tax_returns(id),  -- now nullable until routed
+  ADD COLUMN tax_year VARCHAR(20),                       -- derived during routing
+  ADD COLUMN routing_status VARCHAR(30) DEFAULT 'pending',
+  -- pending | routed | partially_routed | unresolved | overridden
+  ADD COLUMN routing_report JSONB,                       -- per-FY breakdown + reasons
+  ADD COLUMN routed_at TIMESTAMPTZ;
+```
+
+A document may now span multiple FYs (e.g., a bank CSV). The `filing_id` field references the primary filing; the full breakdown of which transactions went where is in `routing_report` and on the individual transaction rows.
+
+### 11.8 Modified: `transactions`
+
+```sql
+ALTER TABLE transactions
+  ADD COLUMN tax_year VARCHAR(20) NOT NULL,              -- derived from date
+  ADD COLUMN routing_method VARCHAR(20) DEFAULT 'auto',  -- auto | manual_override
+  ADD COLUMN routing_source_field VARCHAR(50);           -- e.g. 'date', 'pay_period', 'header_fy'
+```
+
+Every transaction explicitly carries its FY (no JOINs needed for FY-filtered queries) and records how the FY was determined.
+
+### 11.9 New: `pending_router_inbox`
+
+For items that cannot be auto-routed (invalid dates, terminal-FY conflicts, ambiguous documents):
+
+```sql
+CREATE TABLE pending_router_inbox (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) NOT NULL,
+    document_id UUID REFERENCES documents(id),
+    raw_payload JSONB NOT NULL,             -- the unrouted item (txn, doc, etc.)
+    reason VARCHAR(50) NOT NULL,
+    -- invalid_date | terminal_fy_conflict | ambiguous_fy | routing_review_required
+    suggested_tax_year VARCHAR(20),
+    resolved BOOLEAN DEFAULT FALSE,
+    resolved_tax_year VARCHAR(20),
+    resolved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_router_inbox_user_unresolved
+  ON pending_router_inbox(user_id) WHERE resolved = FALSE;
+```
+
+The user resolves these from a dedicated "Needs your attention" view in the UI. Each resolution is audited.
 
 ---
 
-## 12. Deployment Topology
+## 13. Deployment Topology
 
 ### MVP (Local / Single VM)
 
