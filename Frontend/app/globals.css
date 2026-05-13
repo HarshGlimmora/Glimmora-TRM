@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Ink — primary text scale */
+    --ink: 218 35% 11%;
+    --ink-muted: 218 14% 38%;
+    --ink-subtle: 218 10% 55%;
+
+    /* Navy — sovereign brand */
+    --navy: 218 56% 18%;
+    --navy-deep: 218 64% 12%;
+    --navy-soft: 218 36% 28%;
+    --navy-tint: 218 32% 94%;
+
+    /* Surface — backgrounds */
+    --surface: 220 25% 98%;
+    --surface-raised: 0 0% 100%;
+    --surface-sunken: 220 22% 96%;
+    --surface-inverse: 218 60% 14%;
+
+    /* Lines */
+    --line: 220 16% 90%;
+    --line-strong: 220 14% 82%;
+    --line-subtle: 220 18% 94%;
+
+    /* Accent — restrained teal-blue, trust */
+    --accent: 196 78% 26%;
+    --accent-soft: 196 50% 94%;
+    --accent-deep: 196 82% 18%;
+
+    /* Seal — restrained gold, used very sparingly for trust marks */
+    --seal: 36 48% 46%;
+    --seal-soft: 38 50% 94%;
+
+    /* Signals */
+    --signal-success: 152 50% 28%;
+    --signal-success-soft: 150 45% 94%;
+    --signal-warning: 32 80% 40%;
+    --signal-warning-soft: 38 80% 95%;
+    --signal-error: 358 62% 42%;
+    --signal-error-soft: 358 60% 96%;
+    --signal-info: 210 70% 34%;
+    --signal-info-soft: 210 60% 95%;
+
+    /* Shadow tint */
+    --shadow: 218 50% 16%;
+
+    /* Fonts (loaded via app/layout) */
+    --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Instrument Serif", "Spectral", Georgia, serif;
+    --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  *,
+  *::before,
+  *::after {
+    border-color: hsl(var(--line));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: hsl(var(--surface));
+    color: hsl(var(--ink));
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv02", "cv11";
+  }
+
+  ::selection {
+    background-color: hsl(var(--navy) / 0.18);
+    color: hsl(var(--navy-deep));
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--surface)), 0 0 0 4px hsl(var(--accent));
+    border-radius: 6px;
+  }
+
+  /* Sensitive inputs — no autofill background */
+  input.sensitive:-webkit-autofill,
+  input.sensitive:-webkit-autofill:hover,
+  input.sensitive:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px hsl(var(--surface-raised)) inset;
+    -webkit-text-fill-color: hsl(var(--ink));
+    caret-color: hsl(var(--ink));
+  }
+
+  /* Tabular numbers for data, codes, identifiers */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "lnum";
+  }
+
+  /* Custom scrollbar — subtle, government-style */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--line-strong));
+    border-radius: 8px;
+    border: 2px solid hsl(var(--surface));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--ink-subtle));
+  }
+}
+
+@layer components {
+  .frame {
+    background-image: radial-gradient(
+        circle at 1px 1px,
+        hsl(var(--line) / 0.7) 1px,
+        transparent 0
+      );
+    background-size: 24px 24px;
+  }
+
+  .micro-label {
+    @apply text-2xs font-medium uppercase tracking-widest text-ink-subtle;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-2.5 py-1 text-2xs font-medium uppercase tracking-widest text-ink-muted;
+  }
+
+  .field-label {
+    @apply mb-1.5 flex items-center gap-2 text-2xs font-medium uppercase tracking-[0.14em] text-ink-muted;
+  }
+
+  .divider-with-text {
+    @apply relative flex items-center text-2xs uppercase tracking-widest text-ink-subtle;
+  }
+  .divider-with-text::before,
+  .divider-with-text::after {
+    @apply h-px flex-1 bg-line content-[''];
+  }
+  .divider-with-text > * {
+    @apply px-3;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .bg-vellum {
+    background-color: hsl(var(--surface));
+    background-image:
+      radial-gradient(
+        1200px 600px at 50% -10%,
+        hsl(var(--navy-tint) / 0.85),
+        transparent 60%
+      ),
+      radial-gradient(
+        800px 500px at 100% 110%,
+        hsl(var(--accent-soft) / 0.6),
+        transparent 70%
+      );
+  }
+  .bg-sovereign {
+    background-color: hsl(var(--surface-inverse));
+    background-image:
+      radial-gradient(
+        700px 400px at 15% 10%,
+        hsl(var(--navy-soft) / 0.5),
+        transparent 60%
+      ),
+      radial-gradient(
+        600px 400px at 85% 90%,
+        hsl(var(--accent-deep) / 0.4),
+        transparent 70%
+      );
+  }
+  .ring-focus {
+    @apply ring-2 ring-accent ring-offset-2 ring-offset-surface;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  /* The auth flow is a live identity check — not a printable document.
+     Keep the brand panel out of the print, force a single-column layout,
+     and clamp SVG icons to sane sizes so browser "Save as PDF" stays tidy. */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #101a2b !important;
+  }
+  aside,
+  header nav,
+  .bg-sovereign,
+  .bg-vellum {
+    background: #ffffff !important;
+    color: inherit !important;
+  }
+  svg {
+    max-width: 1.25rem !important;
+    max-height: 1.25rem !important;
+  }
+  .grid {
+    display: block !important;
+  }
+  .shadow-elevated,
+  .shadow-card {
+    box-shadow: none !important;
+  }
+  a[href]::after {
+    content: "" !important;
+  }
+}
