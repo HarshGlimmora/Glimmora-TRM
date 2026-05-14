@@ -18,8 +18,10 @@ import { RadioGroup } from "@/components/ui/Radio";
 import { Icon } from "@/components/shared/Icon";
 import { useAuthStore } from "@/lib/store/auth-store";
 import {
+  fetchServerConnections,
   listLinksFor,
   requestLink,
+  respondToServerGrant,
   updateLinkStatus,
 } from "@/lib/api";
 import type {
@@ -34,6 +36,12 @@ import {
 import { validatePan } from "@/lib/validation/identity";
 import { formatDate, formatRelative } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
+import { BrowseConsultants } from "@/components/connections/BrowseConsultants";
+import { ConnectViaCode } from "@/components/connections/ConnectViaCode";
+import { MyInviteCode } from "@/components/connections/MyInviteCode";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isServerGrantId = (id: string): boolean => UUID_RE.test(id);
 
 const TAX_YEARS = ["FY 2024-25", "FY 2023-24", "FY 2022-23"];
 
@@ -72,8 +80,28 @@ export default function ConnectionsPage() {
   const refresh = React.useCallback(async () => {
     if (!profile) return;
     setLoading(true);
-    const data = await listLinksFor(profile.id);
-    setLinks(data);
+    // Pull from both sources: the legacy mock (still drives the PAN-based
+    // "Link by PAN" modal flow) and the real backend (drives the new card +
+    // 5-digit code flows). Server-backed grants come first so they appear
+    // at the top of the lists.
+    const myPanMasked =
+      profile.role === "taxpayer" ? profile.identity.panMasked : "—";
+    const [mockGrants, serverGrants] = await Promise.all([
+      listLinksFor(profile.id),
+      fetchServerConnections({
+        myRole: profile.role,
+        myName: profile.displayName,
+        myPanMasked,
+      }),
+    ]);
+    const seen = new Set<string>();
+    const merged: LinkGrant[] = [];
+    for (const g of [...serverGrants, ...mockGrants]) {
+      if (seen.has(g.id)) continue;
+      seen.add(g.id);
+      merged.push(g);
+    }
+    setLinks(merged);
     setLoading(false);
   }, [profile]);
 
@@ -95,7 +123,14 @@ export default function ConnectionsPage() {
 
   const respondTo = async (g: LinkGrant, action: "active" | "rejected") => {
     try {
-      await updateLinkStatus(g.id, action);
+      if (isServerGrantId(g.id)) {
+        await respondToServerGrant({
+          grantId: g.id,
+          action: action === "active" ? "accept" : "decline",
+        });
+      } else {
+        await updateLinkStatus(g.id, action);
+      }
       setNotice({
         kind: action === "active" ? "success" : "info",
         msg:
@@ -112,7 +147,11 @@ export default function ConnectionsPage() {
 
   const revoke = async (g: LinkGrant) => {
     try {
-      await updateLinkStatus(g.id, "revoked");
+      if (isServerGrantId(g.id)) {
+        await respondToServerGrant({ grantId: g.id, action: "revoke" });
+      } else {
+        await updateLinkStatus(g.id, "revoked");
+      }
       setNotice({
         kind: "info",
         msg: "Access revoked. The counterparty's session no longer has this data.",
@@ -143,13 +182,42 @@ export default function ConnectionsPage() {
         <div className="flex items-center gap-2">
           <Button
             size="md"
+            variant="outline"
             leftIcon={<Icon.Plus size={14} />}
             onClick={() => setOpenNew(true)}
           >
-            {isTaxpayer ? "Link a consultant" : "Request a taxpayer"}
+            {isTaxpayer ? "Link by PAN" : "Request a taxpayer"}
           </Button>
         </div>
       </header>
+
+      {isTaxpayer && (
+        <div
+          aria-label="Connect a consultant"
+          className="grid grid-cols-1 gap-4 lg:grid-cols-2"
+        >
+          <BrowseConsultants
+            onConnected={(name) => {
+              setNotice({
+                kind: "success",
+                msg: `Request sent to ${name}. They have 14 days to accept.`,
+              });
+              void refresh();
+            }}
+          />
+          <ConnectViaCode
+            onConnected={() => {
+              setNotice({
+                kind: "success",
+                msg: "Linked. Your consultant now has the agreed scope of access.",
+              });
+              void refresh();
+            }}
+          />
+        </div>
+      )}
+
+      {!isTaxpayer && <MyInviteCode />}
 
       {notice && (
         <Alert

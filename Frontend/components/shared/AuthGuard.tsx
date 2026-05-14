@@ -48,13 +48,19 @@ export function AuthGuard({
         router.replace("/dashboard");
         return;
       }
-      // If the server says we belong somewhere else, defer to it — but only
-      // when the suggested route isn't the page we're already on.
-      const suggested = stripQuery(data.next);
-      const current = stripQuery(pathname);
-      if (data.next && suggested !== current && !sameFamily(suggested, current)) {
-        router.replace(data.next);
-        return;
+      // The server's `next` is a *landing hint* (default destination right
+      // after login). For users with a completed profile it's always
+      // /dashboard — but that must NOT trap them on /dashboard when they
+      // explicitly navigate to other app pages like /connections.
+      // Only follow `next` when the user actually belongs somewhere else
+      // (login required, role pick required, onboarding incomplete).
+      if (data.next && !data.hasProfile) {
+        const suggested = stripQuery(data.next);
+        const current = stripQuery(pathname);
+        if (suggested !== current && !sameFamily(suggested, current)) {
+          router.replace(data.next);
+          return;
+        }
       }
       setChecking(false);
     })();

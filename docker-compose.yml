@@ -1,0 +1,31 @@
+# Local Postgres for Glimmora TRM development.
+#
+#   docker compose up -d db
+#
+# Connects on localhost:5432 with credentials matching Frontend/.env.example.
+# Uses the pgvector image because migration 0001 enables the `vector` extension
+# (RAG / knowledge_chunks). Without pgvector the initial migration fails.
+#
+# To wipe the data volume and start fresh:
+#   docker compose down -v
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: glmra-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: glmra
+      POSTGRES_PASSWORD: glmra_dev
+      POSTGRES_DB: glmra
+    ports:
+      - "5432:5432"
+    volumes:
+      - glmra_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glmra -d glmra"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  glmra_pgdata:

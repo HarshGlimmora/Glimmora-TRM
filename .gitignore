@@ -9,3 +9,7 @@ next-env.d.ts
 .DS_Store
 .vscode
 .idea
+
+# Local embedded Postgres data (PGlite) — used when DATABASE_URL is unset.
+.data/
+

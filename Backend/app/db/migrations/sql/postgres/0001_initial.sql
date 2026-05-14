@@ -286,9 +286,14 @@ CREATE TABLE IF NOT EXISTS user_verifications (
     CONSTRAINT chk_verif_expires_future CHECK (expires_at > created_at)
 );
 
+-- Partial-unique on unconsumed rows. We can't include `expires_at > NOW()`
+-- here because Postgres requires IMMUTABLE expressions in index predicates
+-- (NOW() is STABLE, not IMMUTABLE). Expiry is filtered at query time
+-- (see otpRepo.findLive) and stale unconsumed rows are consumed by the
+-- next OTP request — see otpRepo.upsertOutstanding.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_verif_outstanding
   ON user_verifications(user_id, purpose)
-  WHERE consumed_at IS NULL AND expires_at > NOW();
+  WHERE consumed_at IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_verif_user    ON user_verifications(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_verif_filing  ON user_verifications(filing_id) WHERE filing_id IS NOT NULL;
@@ -553,13 +558,12 @@ CREATE TABLE IF NOT EXISTS consultant_invite_codes (
     revoked_at           TIMESTAMPTZ,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
+    -- NOTE: Postgres CHECK constraints cannot contain subqueries, so the
+    -- element-wise FY format check (originally `NOT EXISTS (SELECT 1 FROM
+    -- unnest(allowed_tax_years) ...)`) is enforced at the application
+    -- layer instead. See lib/server/services/links.ts.
     CONSTRAINT chk_invite_code_format CHECK (code ~ '^CA-[A-Z0-9]{6,14}$'),
-    CONSTRAINT chk_invite_max_uses    CHECK (max_uses >= 1 AND used_count <= max_uses),
-    CONSTRAINT chk_invite_tax_years   CHECK (
-        allowed_tax_years IS NULL OR NOT EXISTS (
-            SELECT 1 FROM unnest(allowed_tax_years) AS ty WHERE ty !~ '^FY\d{4}-\d{2}$'
-        )
-    )
+    CONSTRAINT chk_invite_max_uses    CHECK (max_uses >= 1 AND used_count <= max_uses)
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_invite_code_hash ON consultant_invite_codes(code_hash);
@@ -583,13 +587,10 @@ CREATE TABLE IF NOT EXISTS consultant_access_grants (
     expires_at          TIMESTAMPTZ NOT NULL,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
+    -- Element-wise FY format check is enforced at the application layer
+    -- (Postgres CHECK constraints cannot contain subqueries).
     CONSTRAINT chk_cag_distinct  CHECK (consultant_id <> target_user_id),
-    CONSTRAINT chk_cag_tax_years CHECK (
-        cardinality(tax_years) >= 1 AND
-        NOT EXISTS (
-            SELECT 1 FROM unnest(tax_years) AS ty WHERE ty !~ '^FY\d{4}-\d{2}$'
-        )
-    ),
+    CONSTRAINT chk_cag_tax_years CHECK (cardinality(tax_years) >= 1),
     CONSTRAINT chk_cag_origin_invite CHECK (
         (origin = 'invite_code'        AND invite_code_id IS NOT NULL) OR
         (origin = 'directory_request'  AND invite_code_id IS NULL)
@@ -680,11 +681,8 @@ CREATE TABLE IF NOT EXISTS enforcement_access (
     expires_at          TIMESTAMPTZ NOT NULL,
     revoked_at          TIMESTAMPTZ,
 
-    CONSTRAINT chk_ea_tax_years CHECK (
-        tax_years IS NULL OR NOT EXISTS (
-            SELECT 1 FROM unnest(tax_years) AS ty WHERE ty !~ '^FY\d{4}-\d{2}$'
-        )
-    ),
+    -- Element-wise FY format check is enforced at the application layer
+    -- (Postgres CHECK constraints cannot contain subqueries).
     CONSTRAINT chk_ea_distinct      CHECK (target_user_id <> granted_to),
     CONSTRAINT chk_ea_expires_after CHECK (expires_at > granted_at)
 );
