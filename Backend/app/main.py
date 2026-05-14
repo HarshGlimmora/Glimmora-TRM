@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Useful for tests and tooling. The SQL migrations remain the source of truth.
 import app.models  # noqa: F401
 from app.api.health import router as health_router
+from app.api.v1.filings import router as filings_router
 from app.config import get_settings
 from app.db.init_db import init_database
 
@@ -56,6 +57,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(filings_router)
 
 
 @app.get("/")
