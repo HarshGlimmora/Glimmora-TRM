@@ -475,6 +475,181 @@ export async function updateLinkStatus(
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Server-backed consultant linking (browse + code)                          */
+/*                                                                            */
+/*  These hit /api/ca-link/* and /api/consultants/* directly — no mock DB.    */
+/*  Kept separate from listLinksFor/requestLink (which are still mock) so     */
+/*  the existing PAN-modal flow keeps working unchanged.                      */
+/* -------------------------------------------------------------------------- */
+
+export interface DirectoryConsultantDTO {
+  id: string;
+  displayName: string;
+  legalName: string | null;
+  firmName: string | null;
+  city: string | null;
+  state: string | null;
+  yearsExperience: number | null;
+  specializations: string[];
+  bio: string | null;
+  acceptingClients: boolean;
+}
+
+export interface InviteCodeDTO {
+  code: string;
+  status: "active" | "revoked";
+  maxUses: number;
+  usedCount: number;
+  createdAt: string;
+  expiresAt: string | null;
+}
+
+interface ServerGrantDTO {
+  id: string;
+  consultantId: string;
+  taxpayerId: string;
+  accessMode: AccessMode;
+  status: GrantStatus;
+  origin: "directory_request" | "invite_code";
+  taxYears: string[];
+  message: string | null;
+  requestedAt: string;
+  decidedAt: string | null;
+  revokedAt: string | null;
+  expiresAt: string | null;
+  counterpartyName: string;
+  counterpartyPan: string | null;
+  myRoleInGrant: "consultant" | "taxpayer";
+}
+
+export async function listDirectoryConsultants(): Promise<DirectoryConsultantDTO[]> {
+  const res = await fetch("/api/consultants/directory", {
+    method: "GET",
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    if (res.status === 401) fail("UNAUTHENTICATED", "Sign in first.");
+    fail("DIRECTORY_FAILED", "Could not load consultants.");
+  }
+  const data = (await res.json()) as { consultants: DirectoryConsultantDTO[] };
+  return data.consultants;
+}
+
+export async function connectConsultantById(args: {
+  consultantId: string;
+  accessMode?: AccessMode;
+  taxYears?: string[];
+  message?: string;
+}): Promise<ServerGrantDTO> {
+  const out = await postJson<{ grant: ServerGrantDTO }>("/api/ca-link/by-id", args);
+  return out.grant;
+}
+
+export async function connectConsultantByCode(args: {
+  code: string;
+  message?: string;
+}): Promise<ServerGrantDTO> {
+  // Strict client-side format guard so we don't even round-trip a bad code.
+  if (!/^\d{5}$/.test(args.code)) {
+    fail("CODE_FORMAT", "Enter a 5-digit code (digits only).");
+  }
+  const out = await postJson<{ grant: ServerGrantDTO; consultantId: string }>(
+    "/api/ca-link/by-code",
+    args,
+  );
+  return out.grant;
+}
+
+export async function getMyInviteCode(): Promise<InviteCodeDTO> {
+  const res = await fetch("/api/consultants/my-code", {
+    method: "GET",
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    if (res.status === 401) fail("UNAUTHENTICATED", "Sign in first.");
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+      code?: string;
+    } | null;
+    fail(body?.code ?? "INVITE_CODE_FAILED", body?.error ?? "Could not load code.");
+  }
+  const data = (await res.json()) as { inviteCode: InviteCodeDTO };
+  return data.inviteCode;
+}
+
+export async function rotateMyInviteCode(): Promise<InviteCodeDTO> {
+  const out = await postJson<{ inviteCode: InviteCodeDTO }>(
+    "/api/consultants/my-code",
+    {},
+  );
+  return out.inviteCode;
+}
+
+/**
+ * Read DB-backed grants for the current user. Mapped into the existing
+ * `LinkGrant` shape so the connections page can render server-backed and
+ * (legacy) mock grants in the same list.
+ */
+export async function fetchServerConnections(args: {
+  myRole: Role;
+  myName: string;
+  myPanMasked: string;
+}): Promise<LinkGrant[]> {
+  const res = await fetch("/api/ca-link", {
+    method: "GET",
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    if (res.status === 401) return [];
+    return [];
+  }
+  const data = (await res.json()) as { grants: ServerGrantDTO[] };
+  return data.grants.map((g) => {
+    const iAmConsultant = g.myRoleInGrant === "consultant";
+    const counterpartyPanMasked = g.counterpartyPan
+      ? maskPan(g.counterpartyPan)
+      : "—";
+    // Origin tells us who initiated: invite_code is always taxpayer-driven;
+    // directory_request from this side means the taxpayer pressed Connect.
+    const requestedBy: "taxpayer" | "consultant" =
+      g.origin === "invite_code" ? "taxpayer" : "taxpayer";
+    return {
+      id: g.id,
+      consultantId: g.consultantId,
+      taxpayerId: g.taxpayerId,
+      consultantName: iAmConsultant ? args.myName : g.counterpartyName,
+      taxpayerName: iAmConsultant ? g.counterpartyName : args.myName,
+      taxpayerPanMasked: iAmConsultant ? counterpartyPanMasked : args.myPanMasked,
+      accessMode: g.accessMode,
+      status: g.status,
+      taxYears: g.taxYears,
+      message: g.message ?? undefined,
+      requestedBy,
+      requestedAt: g.requestedAt,
+      respondedAt: g.decidedAt ?? undefined,
+      revokedAt: g.revokedAt ?? undefined,
+      expiresAt: g.expiresAt ?? undefined,
+    } satisfies LinkGrant;
+  });
+}
+
+export async function respondToServerGrant(args: {
+  grantId: string;
+  action: "accept" | "decline" | "revoke";
+}): Promise<void> {
+  await fetch("/api/ca-link", {
+    method: "PATCH",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify(args),
+  });
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Dashboard                                                                 */
 /* -------------------------------------------------------------------------- */
 

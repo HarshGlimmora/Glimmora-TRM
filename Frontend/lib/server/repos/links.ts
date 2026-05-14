@@ -1,5 +1,5 @@
 import "server-only";
-import { query } from "@/lib/server/db/client";
+import { query, type DbClient } from "@/lib/server/db/client";
 
 export interface GrantRow {
   id: string;
@@ -38,19 +38,24 @@ export const caGrantsRepo = {
     status?: "pending" | "active";
     expiresAt?: string | null;
   }): Promise<GrantRow> {
+    // Default the status in JS rather than via `COALESCE($5, 'pending')` in
+    // SQL — PG would have to coerce the literal to the grant_status enum
+    // and PGlite refuses (42804). Always passing a non-null status keeps
+    // the bind list trivially typed.
+    const status = args.status ?? "pending";
     const r = await query<GrantRow>(
       `INSERT INTO consultant_access_grants(
           consultant_id, target_user_id, origin, access_mode, status,
           tax_years, message, expires_at
        )
-       VALUES($1, $2, $3, $4, COALESCE($5, 'pending'), $6, $7, $8)
+       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING ${COLS}`,
       [
         args.consultantId,
         args.targetUserId,
         args.origin,
         args.accessMode,
-        args.status ?? null,
+        status,
         args.taxYears,
         args.message ?? null,
         args.expiresAt ?? null,
@@ -61,13 +66,18 @@ export const caGrantsRepo = {
     return row;
   },
 
-  async findLiveBetween(consultantId: string, taxpayerId: string): Promise<GrantRow | null> {
-    const r = await query<GrantRow>(
-      `SELECT ${COLS} FROM consultant_access_grants
+  async findLiveBetween(
+    consultantId: string,
+    taxpayerId: string,
+    client?: DbClient,
+  ): Promise<GrantRow | null> {
+    const text = `SELECT ${COLS} FROM consultant_access_grants
        WHERE consultant_id = $1 AND target_user_id = $2
-         AND status IN ('pending', 'active')`,
-      [consultantId, taxpayerId],
-    );
+         AND status IN ('pending', 'active')`;
+    const params = [consultantId, taxpayerId];
+    const r = client
+      ? await client.query<GrantRow>(text, params)
+      : await query<GrantRow>(text, params);
     return r.rows[0] ?? null;
   },
 
