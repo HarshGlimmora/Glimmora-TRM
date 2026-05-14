@@ -89,10 +89,12 @@ export async function POST(req: Request) {
 
   // Successful — look up a seeded user if the identifier matches
   let role: "taxpayer" | "consultant" | undefined;
+  let profileId: string | undefined;
   let hasProfile = false;
   for (const u of mockDB.users.values()) {
     if (u.email === record.identifier || u.mobile === record.identifier) {
       role = u.role;
+      profileId = u.id;
       hasProfile = true;
       break;
     }
@@ -106,6 +108,7 @@ export async function POST(req: Request) {
       sessionId,
       hasProfile,
       role,
+      profileId,
       isFirstTime: !hasProfile,
     },
     { status: 200 },

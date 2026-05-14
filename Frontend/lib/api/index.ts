@@ -134,6 +134,7 @@ export interface VerifyOtpResult {
   sessionId: string;
   hasProfile: boolean;
   role?: Role;
+  profileId?: string;
   isFirstTime: boolean;
 }
 

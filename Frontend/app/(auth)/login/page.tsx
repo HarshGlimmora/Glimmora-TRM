@@ -85,40 +85,45 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
   const [channel, setChannel] = React.useState<Channel>("email");
   const [emailValue, setEmailValue] = React.useState("");
   const [mobileValue, setMobileValue] = React.useState("");
-  const [touched, setTouched] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
-  const [remoteError, setRemoteError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const value = channel === "email" ? emailValue : mobileValue;
-  const sanitized =
-    channel === "email" ? sanitizeEmail(value) : sanitizeMobile(value);
-
-  const error = React.useMemo(() => {
-    if (!touched || !sanitized) return null;
-    const r =
-      channel === "email"
-        ? validateEmail(sanitized)
-        : validateMobile(sanitized);
-    return r.ok ? null : r.message;
-  }, [sanitized, channel, touched]);
-
-  const switchChannel = (id: Channel) => {
-    if (id === channel) return;
-    setChannel(id);
-    setTouched(false);
-    setRemoteError(null);
+  const setValue = (v: string) => {
+    if (channel === "email") setEmailValue(v);
+    else setMobileValue(v);
+    if (error) setError(null);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setTouched(true);
-    setRemoteError(null);
+  // Switch via direct setState — guaranteed not to be intercepted by anything.
+  const pickEmail = () => {
+    setChannel("email");
+    setError(null);
+  };
+  const pickMobile = () => {
+    setChannel("mobile");
+    setError(null);
+  };
+
+  const handleSend = async () => {
+    setError(null);
+    const raw = value.trim();
+    if (!raw) {
+      setError(
+        channel === "email"
+          ? "Please enter your email address."
+          : "Please enter your mobile number.",
+      );
+      return;
+    }
+    const sanitized =
+      channel === "email" ? sanitizeEmail(raw) : sanitizeMobile(raw);
     const r =
       channel === "email"
         ? validateEmail(sanitized)
         : validateMobile(sanitized);
     if (!r.ok) {
-      setRemoteError(r.message);
+      setError(r.message);
       return;
     }
     try {
@@ -134,9 +139,14 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
       });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unable to send code.";
-      setRemoteError(msg);
+      setError(msg);
       setSubmitting(false);
     }
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void handleSend();
   };
 
   return (
@@ -155,122 +165,79 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
       </p>
 
       <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-5" noValidate>
-        <fieldset>
-          <legend className="field-label">Receive code via</legend>
+        <fieldset disabled={submitting} className="contents">
+          <legend className="field-label mb-2 block">Receive code via</legend>
+
           <div
             role="tablist"
-            aria-label="Choose identifier"
+            aria-label="Choose identifier channel"
             className="grid grid-cols-2 gap-2"
           >
-            {CHANNELS.map((t) => {
-              const active = channel === t.id;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => switchChannel(t.id)}
-                  className={cn(
-                    "group flex items-start gap-3 rounded-lg border bg-surface-raised p-3 text-left transition-all",
-                    active
-                      ? "border-accent/45 bg-accent-soft/40 shadow-[inset_0_0_0_1px_hsl(var(--accent)/0.35)]"
-                      : "border-line hover:border-line-strong hover:bg-surface-sunken/50",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border transition-colors",
-                      active
-                        ? "border-accent/30 bg-accent text-white"
-                        : "border-line bg-surface-sunken text-navy",
-                    )}
-                    aria-hidden
-                  >
-                    {t.icon}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold tracking-[-0.005em] text-ink">
-                        {t.label}
-                      </span>
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "inline-flex h-4 w-4 items-center justify-center rounded-full border text-white transition-colors",
-                          active
-                            ? "border-accent bg-accent"
-                            : "border-line bg-surface-sunken text-transparent",
-                        )}
-                      >
-                        <Icon.Check size={10} />
-                      </span>
-                    </span>
-                    <span className="mt-0.5 block text-xs text-ink-muted">
-                      {t.hint}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
+            <ChannelTab
+              active={channel === "email"}
+              onSelect={pickEmail}
+              icon={<Icon.Mail size={16} />}
+              label="Email"
+              hint="We'll email you a code"
+            />
+            <ChannelTab
+              active={channel === "mobile"}
+              onSelect={pickMobile}
+              icon={<Icon.Phone size={16} />}
+              label="Mobile"
+              hint="Indian mobile, 10 digits"
+            />
           </div>
+
+          <Field
+            label={channel === "email" ? "Email address" : "Mobile number"}
+            required
+            htmlFor="identifier"
+            hint={
+              channel === "email"
+                ? "We'll deliver a 6-digit code to this inbox."
+                : "10 digits, no spaces. Demo: mobile OTPs are forwarded to the platform email."
+            }
+            trailingLabel={
+              <span className="inline-flex items-center gap-1">
+                <Icon.Lock size={11} />
+                <span>Never stored on this device</span>
+              </span>
+            }
+          >
+            <Input
+              id="identifier"
+              name="identifier"
+              type={channel === "email" ? "email" : "tel"}
+              inputMode={channel === "email" ? "email" : "numeric"}
+              autoComplete={channel === "email" ? "email" : "tel-national"}
+              placeholder={
+                channel === "email" ? "you@domain.in" : "98XXXXXXXX"
+              }
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              leadingAddon={channel === "mobile" ? "+91" : undefined}
+              maxLength={channel === "email" ? 254 : 10}
+              autoFocus
+            />
+          </Field>
+
+          {error && (
+            <Alert tone="error" title="We couldn't send the code" compact>
+              {error}
+            </Alert>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            fullWidth
+            loading={submitting}
+            rightIcon={<Icon.ArrowRight size={16} />}
+          >
+            {submitting ? "Sending code…" : "Send 6-digit code"}
+          </Button>
         </fieldset>
-
-        <Field
-          key={channel}
-          label={channel === "email" ? "Email address" : "Mobile number"}
-          required
-          htmlFor="identifier"
-          error={error}
-          hint={
-            channel === "email"
-              ? "We'll deliver a 6-digit code to this inbox."
-              : "Indian mobile, 10 digits. For this demo, mobile OTPs are forwarded to the platform email."
-          }
-          trailingLabel={
-            <span className="inline-flex items-center gap-1">
-              <Icon.Lock size={11} />
-              <span>Never stored on this device</span>
-            </span>
-          }
-        >
-          <Input
-            id="identifier"
-            name="identifier"
-            type={channel === "email" ? "email" : "tel"}
-            inputMode={channel === "email" ? "email" : "numeric"}
-            autoComplete={channel === "email" ? "email" : "tel"}
-            placeholder={channel === "email" ? "you@domain.in" : "98XXXXXXXX"}
-            value={value}
-            onChange={(e) => {
-              if (channel === "email") setEmailValue(e.target.value);
-              else setMobileValue(e.target.value);
-              if (remoteError) setRemoteError(null);
-            }}
-            onBlur={() => setTouched(true)}
-            invalid={Boolean(error)}
-            leadingAddon={channel === "mobile" ? "+91" : undefined}
-            maxLength={channel === "email" ? 254 : 10}
-            autoFocus
-          />
-        </Field>
-
-        {remoteError && (
-          <Alert tone="error" title="We couldn't send the code" compact>
-            {remoteError}
-          </Alert>
-        )}
-
-        <Button
-          type="submit"
-          size="lg"
-          fullWidth
-          loading={submitting}
-          disabled={submitting || sanitized.length === 0}
-          rightIcon={<Icon.ArrowRight size={16} />}
-        >
-          {submitting ? "Sending code…" : "Send 6-digit code"}
-        </Button>
 
         <Divider label="or" />
 
@@ -302,6 +269,67 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
         </p>
       </form>
     </div>
+  );
+}
+
+function ChannelTab({
+  active,
+  onSelect,
+  icon,
+  label,
+  hint,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onSelect}
+      className={cn(
+        "group relative flex cursor-pointer select-none items-start gap-3 rounded-lg border bg-surface-raised p-3 text-left transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+        active
+          ? "border-accent bg-accent-soft/50 ring-1 ring-accent/30"
+          : "border-line hover:border-line-strong hover:bg-surface-sunken/40",
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border transition-colors",
+          active
+            ? "border-accent bg-accent text-white"
+            : "border-line bg-surface-sunken text-navy",
+        )}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center justify-between gap-2">
+          <span className="text-sm font-semibold tracking-[-0.005em] text-ink">
+            {label}
+          </span>
+          <span
+            aria-hidden
+            className={cn(
+              "inline-flex h-4 w-4 items-center justify-center rounded-full border text-white transition-colors",
+              active
+                ? "border-accent bg-accent"
+                : "border-line bg-surface-sunken text-transparent",
+            )}
+          >
+            <Icon.Check size={10} />
+          </span>
+        </span>
+        <span className="mt-0.5 block text-xs text-ink-muted">{hint}</span>
+      </span>
+    </button>
   );
 }
 
@@ -346,7 +374,10 @@ function OtpForm({
   const submit = React.useCallback(
     async (codeArg?: string) => {
       const c = codeArg ?? code;
-      if (c.length !== 6) return;
+      if (c.length !== 6) {
+        setError("Enter the full 6-digit code first.");
+        return;
+      }
       setError(null);
       setSubmitting(true);
       try {
@@ -359,7 +390,7 @@ function OtpForm({
           sessionId: res.sessionId,
           displayIdentifier: session.display || session.identifier,
           role: res.role,
-          profileId: undefined,
+          profileId: res.profileId,
         });
         if (res.hasProfile) {
           router.push("/dashboard");
@@ -456,7 +487,6 @@ function OtpForm({
           size="lg"
           fullWidth
           loading={submitting}
-          disabled={code.length !== 6 || submitting}
           rightIcon={<Icon.ArrowRight size={16} />}
         >
           {submitting ? "Verifying…" : "Verify and continue"}
@@ -467,7 +497,7 @@ function OtpForm({
             type="button"
             onClick={onResend}
             disabled={cooldown > 0 || resending}
-            className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-medium text-navy hover:underline underline-offset-4 disabled:cursor-not-allowed disabled:text-ink-subtle disabled:no-underline"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-medium text-navy hover:underline underline-offset-4 disabled:cursor-not-allowed disabled:text-ink-subtle disabled:no-underline"
           >
             <Icon.Refresh size={14} />
             {cooldown > 0
@@ -479,7 +509,7 @@ function OtpForm({
           <button
             type="button"
             onClick={onChangeIdentifier}
-            className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm hover:text-ink hover:underline underline-offset-4"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1 py-0.5 text-sm hover:text-ink hover:underline underline-offset-4"
           >
             <Icon.ChevronLeft size={14} /> Change{" "}
             {session.channel === "email" ? "email" : "mobile"}
