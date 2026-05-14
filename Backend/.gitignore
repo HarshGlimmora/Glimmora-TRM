@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.local
+
+# Local SQLite database + WAL/SHM
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
