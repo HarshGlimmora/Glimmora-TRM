@@ -1,0 +1,472 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1820" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="pageBg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="shadow3" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#166534"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="1820" fill="url(#pageBg3)"/>
+
+  <text x="720" y="44" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Taxpayer · Collaboration &amp; Portal Features</text>
+  <text x="720" y="70" text-anchor="middle" font-size="14" fill="#475569">CA directory · invite code · review CA edits · notifications · settings · assistant</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 1 — Consultant access empty state with two paths -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(40, 110)">
+    <rect width="660" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="660" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">① Consultant access — two paths to engage a CA</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultant-access</text>
+
+    <!-- Top bar -->
+    <rect x="0" y="36" width="660" height="38" fill="#f1f5f9"/>
+    <text x="20" y="61" font-size="13" font-weight="700" fill="#1e3a8a">GlimmoraTax</text>
+    <rect x="450" y="44" width="100" height="22" rx="11" fill="#fff" stroke="#cbd5e1"/>
+    <text x="500" y="60" text-anchor="middle" font-size="11" fill="#0f172a">FY 2024-25 ▾</text>
+    <text x="568" y="60" font-size="14" fill="#475569">🔒</text>
+    <text x="590" y="60" font-size="14" fill="#16a34a">🔔</text>
+    <circle cx="598" cy="50" r="6" fill="#dc2626"/>
+    <text x="598" y="53" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">2</text>
+    <text x="618" y="60" font-size="14" fill="#475569">👤</text>
+
+    <text x="20" y="100" font-size="18" font-weight="700" fill="#0f172a">Consultant access</text>
+    <text x="20" y="118" font-size="11" fill="#64748b">You haven't engaged a CA yet. Pick one of two paths below.</text>
+
+    <!-- Path A card -->
+    <rect x="20" y="138" width="305" height="340" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+    <rect x="20" y="138" width="305" height="40" rx="12" fill="#dcfce7"/>
+    <rect x="20" y="158" width="305" height="20" fill="#dcfce7"/>
+    <text x="36" y="164" font-size="11" font-weight="700" fill="#14532d">PATH A · Directory</text>
+    <text x="312" y="164" text-anchor="end" font-size="10" fill="#14532d">in your city</text>
+
+    <text x="36" y="200" font-size="12" fill="#0f172a">Browse CAs listed in your city.</text>
+    <text x="36" y="216" font-size="10" fill="#475569">You request access · the CA accepts or declines.</text>
+
+    <!-- Mini directory preview -->
+    <g transform="translate(36, 230)">
+      <rect width="273" height="48" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <circle cx="22" cy="24" r="14" fill="#dbeafe"/>
+      <text x="22" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">RS</text>
+      <text x="44" y="20" font-size="11" font-weight="700" fill="#0f172a">CA Rohit Sharma</text>
+      <text x="44" y="34" font-size="9" fill="#64748b">Mumbai · 10y · salaried · ₹₹</text>
+      <text x="265" y="29" text-anchor="end" font-size="9" font-weight="700" fill="#16a34a">★ 4.8</text>
+    </g>
+
+    <g transform="translate(36, 288)">
+      <rect width="273" height="48" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <circle cx="22" cy="24" r="14" fill="#fce7f3"/>
+      <text x="22" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">MN</text>
+      <text x="44" y="20" font-size="11" font-weight="700" fill="#0f172a">CA Meera Nair</text>
+      <text x="44" y="34" font-size="9" fill="#64748b">Mumbai · 6y · capital_gains · ₹</text>
+      <text x="265" y="29" text-anchor="end" font-size="9" font-weight="700" fill="#16a34a">★ 4.6</text>
+    </g>
+
+    <g transform="translate(36, 346)">
+      <rect width="273" height="48" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <circle cx="22" cy="24" r="14" fill="#fef3c7"/>
+      <text x="22" y="29" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">VK</text>
+      <text x="44" y="20" font-size="11" font-weight="700" fill="#0f172a">CA Vinod Kumar</text>
+      <text x="44" y="34" font-size="9" fill="#64748b">Mumbai · 15y · startup · ₹₹₹</text>
+      <text x="265" y="29" text-anchor="end" font-size="9" font-weight="700" fill="#16a34a">★ 4.9</text>
+    </g>
+
+    <text x="172" y="424" text-anchor="middle" font-size="9" fill="#64748b">+ 4 more CAs in Mumbai</text>
+
+    <rect x="36" y="436" width="273" height="32" rx="6" fill="#16a34a"/>
+    <text x="172" y="457" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Find a CA in your city →</text>
+
+    <!-- Path B card -->
+    <rect x="335" y="138" width="305" height="340" rx="12" fill="#fef3c7" stroke="#fbbf24" stroke-width="2"/>
+    <rect x="335" y="138" width="305" height="40" rx="12" fill="#fef3c7"/>
+    <rect x="335" y="158" width="305" height="20" fill="#fef3c7"/>
+    <text x="351" y="164" font-size="11" font-weight="700" fill="#78350f">PATH B · Invite code</text>
+    <text x="627" y="164" text-anchor="end" font-size="10" fill="#78350f">elsewhere / pre-arranged</text>
+
+    <text x="351" y="200" font-size="12" fill="#0f172a">Use this if your CA is from another city,</text>
+    <text x="351" y="216" font-size="12" fill="#0f172a">or has shared a code with you.</text>
+
+    <!-- Mock invite code input -->
+    <rect x="351" y="234" width="273" height="56" rx="8" fill="#fff" stroke="#fbbf24" stroke-width="2"/>
+    <text x="364" y="252" font-size="9" font-weight="700" fill="#78350f">CODE FROM YOUR CA</text>
+    <text x="364" y="278" font-size="20" font-weight="700" font-family="ui-monospace, monospace" fill="#0f172a">CA-7K3PQX</text>
+    <line x1="476" y1="284" x2="487" y2="284" stroke="#0f172a" stroke-width="2"/>
+
+    <!-- Code info -->
+    <rect x="351" y="300" width="273" height="106" rx="6" fill="#fff" stroke="#fbbf24"/>
+    <text x="365" y="318" font-size="10" font-weight="700" fill="#78350f">Found: CA Padma Iyer · Bengaluru</text>
+    <g font-size="10" fill="#475569">
+      <text x="365" y="336">  Max access:    review_edit</text>
+      <text x="365" y="352">  Allowed FYs:   FY 2024-25</text>
+      <text x="365" y="368">  Expires:       19 May 2026</text>
+      <text x="365" y="384">  Uses left:     1 of 5</text>
+    </g>
+    <text x="365" y="400" font-size="9" font-style="italic" fill="#3730a3">Server checks consultant_invite_codes.code_hash</text>
+
+    <rect x="351" y="416" width="273" height="32" rx="6" fill="#92400e"/>
+    <text x="487" y="437" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Look up &amp; redeem →</text>
+
+    <!-- footnote -->
+    <text x="172" y="490" text-anchor="middle" font-size="9" fill="#16a34a">Status: pending until CA accepts</text>
+    <text x="487" y="490" text-anchor="middle" font-size="9" fill="#92400e">Status: active immediately</text>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 2 — CA Directory detail / grant request modal -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(780, 110)">
+    <rect width="620" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="620" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">② CA detail → request access</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/consultants/usr_ca1…</text>
+
+    <!-- CA header -->
+    <g opacity="0.45">
+      <circle cx="70" cy="100" r="32" fill="#dbeafe"/>
+      <text x="70" y="108" text-anchor="middle" font-size="20" font-weight="700" fill="#1e40af">RS</text>
+      <text x="118" y="92" font-size="16" font-weight="700" fill="#0f172a">CA Rohit Sharma</text>
+      <text x="118" y="110" font-size="11" fill="#64748b">Mumbai · 10 years experience · ★ 4.8 · Accepting clients</text>
+      <text x="118" y="126" font-size="10" fill="#475569">ICAI-123456 (self-attested)</text>
+
+      <text x="20" y="160" font-size="11" font-weight="700" fill="#0f172a">About</text>
+      <text x="20" y="178" font-size="10" fill="#475569">"10 years salaried + capital gains. I work across Hindi, English,</text>
+      <text x="20" y="192" font-size="10" fill="#475569">and Marathi. Mid-tier fees. Quick turnaround on FY filings."</text>
+
+      <text x="20" y="220" font-size="11" font-weight="700" fill="#0f172a">Specializations</text>
+      <rect x="20" y="228" width="80" height="20" rx="10" fill="#dbeafe"/>
+      <text x="60" y="241" text-anchor="middle" font-size="9" font-weight="600" fill="#1e3a8a">salaried</text>
+      <rect x="106" y="228" width="100" height="20" rx="10" fill="#dbeafe"/>
+      <text x="156" y="241" text-anchor="middle" font-size="9" font-weight="600" fill="#1e3a8a">capital gains</text>
+
+      <text x="20" y="276" font-size="11" font-weight="700" fill="#0f172a">Languages</text>
+      <text x="120" y="276" font-size="10" fill="#475569">English · Hindi · Marathi</text>
+
+      <text x="20" y="298" font-size="11" font-weight="700" fill="#0f172a">Serves cities</text>
+      <text x="120" y="298" font-size="10" fill="#475569">Mumbai · Thane · Pune</text>
+    </g>
+
+    <!-- Self-attested warning -->
+    <rect x="20" y="320" width="580" height="32" rx="6" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="36" y="340" font-size="10" fill="#78350f">⚠  ICAI membership is self-declared. Verify out-of-band before granting access.</text>
+
+    <!-- Grant modal -->
+    <rect x="60" y="60" width="500" height="424" rx="12" fill="#fff" stroke="#16a34a" stroke-width="2" filter="url(#shadow3)"/>
+    <rect x="60" y="60" width="500" height="40" rx="12" fill="#f0fdf4"/>
+    <rect x="60" y="78" width="500" height="22" fill="#f0fdf4"/>
+    <text x="76" y="85" font-size="13" font-weight="700" fill="#14532d">Request access · CA Rohit Sharma</text>
+
+    <text x="76" y="124" font-size="11" font-weight="700" fill="#0f172a">Access mode</text>
+    <text x="76" y="148" font-size="11" fill="#0f172a">◉</text>
+    <text x="94" y="148" font-size="11" font-weight="700" fill="#0f172a">Review &amp; edit</text>
+    <text x="200" y="148" font-size="10" fill="#64748b">CA can edit but only you can submit (recommended)</text>
+    <text x="76" y="170" font-size="11" fill="#94a3b8">○</text>
+    <text x="94" y="170" font-size="11" fill="#475569">Full access</text>
+    <text x="180" y="170" font-size="10" fill="#64748b">CA can submit on your behalf</text>
+
+    <text x="76" y="206" font-size="11" font-weight="700" fill="#0f172a">Tax year(s)</text>
+    <g font-size="11">
+      <rect x="76" y="216" width="14" height="14" rx="2" fill="#16a34a"/>
+      <path d="M 78 223.5 L 81 226 L 87 221" stroke="#fff" stroke-width="1.5" fill="none"/>
+      <text x="100" y="227" fill="#0f172a">FY 2024-25</text>
+      <text x="200" y="227" font-size="9" fill="#64748b">(current)</text>
+
+      <rect x="76" y="238" width="14" height="14" rx="2" fill="#fff" stroke="#cbd5e1"/>
+      <text x="100" y="249" fill="#475569">FY 2023-24</text>
+
+      <rect x="76" y="260" width="14" height="14" rx="2" fill="#fff" stroke="#cbd5e1"/>
+      <text x="100" y="271" fill="#475569">FY 2022-23</text>
+    </g>
+
+    <text x="76" y="306" font-size="11" font-weight="700" fill="#0f172a">Message (optional)</text>
+    <rect x="76" y="316" width="468" height="56" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="90" y="338" font-size="10" fill="#475569">Hi Rohit, please review my FY 2024-25 filing. I have a few</text>
+    <text x="90" y="354" font-size="10" fill="#475569">questions about Section 80C…</text>
+
+    <rect x="324" y="392" width="100" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="374" y="412" text-anchor="middle" font-size="11" fill="#475569">Cancel</text>
+    <rect x="434" y="392" width="110" height="32" rx="6" fill="#16a34a"/>
+    <text x="489" y="412" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Send request</text>
+
+    <text x="310" y="446" text-anchor="middle" font-size="9" font-style="italic" fill="#475569">POST /consultant-access/grants · origin=directory_request · status=pending</text>
+  </g>
+
+  <!-- Arrow down to row 2 -->
+  <line x1="1090" y1="620" x2="1090" y2="650" stroke="#166534" stroke-width="3"/>
+  <line x1="1090" y1="650" x2="350" y2="650" stroke="#166534" stroke-width="3"/>
+  <line x1="350" y1="650" x2="350" y2="680" stroke="#166534" stroke-width="3" marker-end="url(#arrB)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 3 — Change-set diff (CA returned filing) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(40, 690)">
+    <rect width="660" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="660" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">③ CA returned your filing — review the diff</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/filings/fil_d4…/change-sets/chg_q2…</text>
+
+    <!-- Banner -->
+    <rect x="20" y="56" width="620" height="56" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+    <text x="36" y="78" font-size="13" font-weight="700" fill="#14532d">↩  Filing returned by CA Rohit Sharma · 5 minutes ago</text>
+    <text x="36" y="96" font-size="11" font-style="italic" fill="#15803d">"I've added 80C investments you missed. Please review and submit."</text>
+
+    <!-- Header -->
+    <text x="20" y="138" font-size="12" font-weight="700" fill="#0f172a">3 changes</text>
+    <text x="640" y="138" text-anchor="end" font-size="10" fill="#64748b">filing_change_sets.changes []</text>
+
+    <!-- Change 1: Transaction category -->
+    <rect x="20" y="152" width="620" height="92" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="36" y="172" font-size="11" font-weight="700" fill="#0f172a">Transaction · tx_c3…</text>
+    <text x="180" y="172" font-size="10" fill="#64748b">02 Jul 2024 · ₹50,000 · Birla Mutual Fund</text>
+
+    <text x="36" y="196" font-size="10" fill="#475569">Category</text>
+    <rect x="36" y="206" width="280" height="28" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+    <text x="50" y="225" font-size="11" font-family="ui-monospace, monospace" fill="#991b1b">- other_income</text>
+
+    <text x="332" y="225" font-size="14" fill="#475569">→</text>
+
+    <rect x="360" y="206" width="280" height="28" rx="6" fill="#dcfce7" stroke="#86efac"/>
+    <text x="374" y="225" font-size="11" font-family="ui-monospace, monospace" fill="#14532d">+ elss_80c</text>
+
+    <!-- Change 2: 80C deduction -->
+    <rect x="20" y="254" width="620" height="92" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="36" y="274" font-size="11" font-weight="700" fill="#0f172a">Filing summary · deductions.80c</text>
+
+    <text x="36" y="298" font-size="10" fill="#475569">Amount</text>
+    <rect x="36" y="308" width="280" height="28" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+    <text x="50" y="327" font-size="11" font-family="ui-monospace, monospace" fill="#991b1b">- ₹0.00</text>
+
+    <text x="332" y="327" font-size="14" fill="#475569">→</text>
+
+    <rect x="360" y="308" width="280" height="28" rx="6" fill="#dcfce7" stroke="#86efac"/>
+    <text x="374" y="327" font-size="11" font-family="ui-monospace, monospace" fill="#14532d">+ ₹1,50,000.00</text>
+
+    <!-- Impact summary -->
+    <rect x="20" y="356" width="620" height="76" rx="8" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="36" y="376" font-size="12" font-weight="700" fill="#3730a3">💡  Impact on your tax</text>
+    <text x="36" y="396" font-size="10" fill="#3730a3">Old regime tax was: ₹1,32,600 → now ₹1,01,400 (down ₹31,200)</text>
+    <text x="36" y="412" font-size="10" fill="#3730a3">CA's changes save you ₹31,200 by claiming 80C ELSS investment.</text>
+    <text x="36" y="426" font-size="9" font-style="italic" fill="#64748b">Recalc preview · not yet committed</text>
+
+    <!-- Actions -->
+    <rect x="20" y="444" width="190" height="40" rx="6" fill="#fff" stroke="#dc2626"/>
+    <text x="115" y="468" text-anchor="middle" font-size="12" font-weight="700" fill="#dc2626">Reject all changes</text>
+
+    <rect x="220" y="444" width="190" height="40" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="315" y="468" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">Accept all</text>
+
+    <rect x="420" y="444" width="220" height="40" rx="6" fill="#16a34a"/>
+    <text x="530" y="468" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Accept and submit →</text>
+
+    <text x="330" y="502" text-anchor="middle" font-size="9" fill="#64748b">POST /filings/{id}/accept-change-set/{cs_id} → status returns to draft → submit (with OTP)</text>
+    <text x="330" y="516" text-anchor="middle" font-size="9" fill="#64748b">Only you can submit in review_edit mode. CA cannot bypass this.</text>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 4 — Notifications -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(780, 690)">
+    <rect width="620" height="540" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="620" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">④ Notifications — your filing's lifecycle</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/notifications</text>
+
+    <!-- Tabs -->
+    <rect x="0" y="36" width="620" height="36" fill="#f1f5f9"/>
+    <text x="20" y="59" font-size="11" font-weight="700" fill="#166534">All (12)</text>
+    <line x1="14" y1="68" x2="80" y2="68" stroke="#166534" stroke-width="3"/>
+    <text x="100" y="59" font-size="11" fill="#64748b">Unread (4)</text>
+    <text x="170" y="59" font-size="11" fill="#64748b">By type ▾</text>
+
+    <text x="600" y="59" text-anchor="end" font-size="10" fill="#1e40af" text-decoration="underline">Mark all read</text>
+
+    <!-- Notif 1 -->
+    <rect x="20" y="86" width="580" height="60" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <circle cx="36" cy="116" r="6" fill="#1e40af"/>
+    <text x="56" y="106" font-size="11" font-weight="700" fill="#0f172a">📋  Officer L2 picked up your FY 2024-25 filing</text>
+    <text x="56" y="124" font-size="10" fill="#475569">Stage: deeper_review · current_officer_level: L2</text>
+    <text x="56" y="138" font-size="9" fill="#64748b">type: filing_escalated_to_l2</text>
+    <text x="586" y="106" text-anchor="end" font-size="9" fill="#64748b">2h ago</text>
+
+    <!-- Notif 2 -->
+    <rect x="20" y="154" width="580" height="60" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <circle cx="36" cy="184" r="6" fill="#1e40af"/>
+    <text x="56" y="174" font-size="11" font-weight="700" fill="#0f172a">⚠  Mismatch detected — salary vs Form 26AS</text>
+    <text x="56" y="192" font-size="10" fill="#475569">Declared ₹12,00,000 · 26AS reports ₹18,00,000 · ₹6,00,000 gap</text>
+    <text x="56" y="206" font-size="9" fill="#64748b">type: filing_mismatch_detected · respond by 30 days</text>
+    <text x="586" y="174" text-anchor="end" font-size="9" fill="#64748b">1d ago</text>
+
+    <!-- Notif 3 -->
+    <rect x="20" y="222" width="580" height="60" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+    <circle cx="36" cy="252" r="6" fill="#16a34a"/>
+    <text x="56" y="242" font-size="11" font-weight="700" fill="#0f172a">↩  CA Rohit Sharma returned your filing</text>
+    <text x="56" y="260" font-size="10" fill="#475569">"I've added 80C investments. Please review and submit."</text>
+    <text x="56" y="274" font-size="9" fill="#64748b">type: consultant_returned_filing → review change-set</text>
+    <text x="586" y="242" text-anchor="end" font-size="9" fill="#64748b">3d ago</text>
+
+    <!-- Notif 4 -->
+    <rect x="20" y="290" width="580" height="60" rx="8" fill="#fff" stroke="#e2e8f0"/>
+    <text x="56" y="310" font-size="11" font-weight="600" fill="#475569">📤  Filing submitted — FY 2024-25</text>
+    <text x="56" y="328" font-size="10" fill="#64748b">Reference: fil_d4… · Submitted 12 May 2026, 10:14 IST</text>
+    <text x="56" y="342" font-size="9" fill="#64748b">type: filing_submitted_ack</text>
+    <text x="586" y="310" text-anchor="end" font-size="9" fill="#64748b">5d ago</text>
+
+    <!-- Notif 5 -->
+    <rect x="20" y="358" width="580" height="60" rx="8" fill="#fff" stroke="#e2e8f0"/>
+    <text x="56" y="378" font-size="11" font-weight="600" fill="#475569">✓  Phone verified</text>
+    <text x="56" y="396" font-size="10" fill="#64748b">+91 99000-*0000 confirmed</text>
+    <text x="56" y="410" font-size="9" fill="#64748b">type: account_phone_verified</text>
+    <text x="586" y="378" text-anchor="end" font-size="9" fill="#64748b">8d ago</text>
+
+    <!-- Fraud silence callout -->
+    <rect x="20" y="430" width="580" height="76" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text x="36" y="450" font-size="11" font-weight="700" fill="#0f172a">🔇  What you'll never see here</text>
+    <text x="36" y="468" font-size="10" fill="#475569">Fraud flags, judicial reviews, enforcement assignments, case closures</text>
+    <text x="36" y="482" font-size="10" fill="#475569">— all silent to the taxpayer by design (ARCHITECTURE §9.4).</text>
+    <text x="36" y="498" font-size="9" font-style="italic" fill="#64748b">notification_type enum deliberately omits taxpayer-facing fraud types</text>
+  </g>
+
+  <!-- Arrow down to row 3 -->
+  <line x1="1090" y1="1240" x2="1090" y2="1270" stroke="#166534" stroke-width="3"/>
+  <line x1="1090" y1="1270" x2="350" y2="1270" stroke="#166534" stroke-width="3"/>
+  <line x1="350" y1="1270" x2="350" y2="1300" stroke="#166534" stroke-width="3" marker-end="url(#arrB)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 5 — Settings (consent + verification + security) -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(40, 1310)">
+    <rect width="660" height="480" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="660" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="660" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">⑤ Settings — consents · verifications · sessions</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/settings/consent</text>
+
+    <!-- Settings sub-nav -->
+    <rect x="20" y="56" width="160" height="384" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+    <g font-size="11">
+      <rect x="20" y="56" width="160" height="32" rx="8" fill="#dcfce7"/>
+      <text x="36" y="76" font-weight="700" fill="#14532d">Consents</text>
+      <text x="36" y="108" fill="#475569">Profile</text>
+      <text x="36" y="138" fill="#475569">Security</text>
+      <text x="36" y="168" fill="#475569">Regime preference</text>
+      <text x="36" y="198" fill="#475569">FY workspace</text>
+      <text x="36" y="228" fill="#475569">Notifications</text>
+    </g>
+
+    <!-- Right pane -->
+    <text x="200" y="80" font-size="16" font-weight="700" fill="#0f172a">Consent management</text>
+    <text x="200" y="98" font-size="10" fill="#64748b">Revocation cascades. Granting takes effect immediately.</text>
+
+    <!-- Consent rows -->
+    <g transform="translate(200, 116)">
+      <rect width="440" height="80" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+      <text x="16" y="22" font-size="12" font-weight="700" fill="#0f172a">📄 Document processing</text>
+      <rect x="380" y="14" width="44" height="22" rx="11" fill="#16a34a"/>
+      <circle cx="408" cy="25" r="8" fill="#fff"/>
+      <text x="16" y="42" font-size="10" fill="#15803d">✓ Granted on 5 May 2026</text>
+      <text x="16" y="58" font-size="9" fill="#64748b">Cascade: revoke → uploads blocked, existing docs preserved</text>
+      <text x="16" y="72" font-size="9" font-style="italic" fill="#1e40af" text-decoration="underline">Revoke</text>
+    </g>
+
+    <g transform="translate(200, 204)">
+      <rect width="440" height="80" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+      <text x="16" y="22" font-size="12" font-weight="700" fill="#0f172a">🤖 AI analysis</text>
+      <rect x="380" y="14" width="44" height="22" rx="11" fill="#16a34a"/>
+      <circle cx="408" cy="25" r="8" fill="#fff"/>
+      <text x="16" y="42" font-size="10" fill="#15803d">✓ Granted on 5 May 2026</text>
+      <text x="16" y="58" font-size="9" fill="#64748b">Cascade: revoke → RAG + AI categorize off · rules still compute</text>
+      <text x="16" y="72" font-size="9" font-style="italic" fill="#1e40af" text-decoration="underline">Revoke</text>
+    </g>
+
+    <g transform="translate(200, 292)">
+      <rect width="440" height="80" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+      <text x="16" y="22" font-size="12" font-weight="700" fill="#0f172a">🗄 Data retention</text>
+      <rect x="380" y="14" width="44" height="22" rx="11" fill="#16a34a"/>
+      <circle cx="408" cy="25" r="8" fill="#fff"/>
+      <text x="16" y="42" font-size="10" fill="#15803d">✓ Granted on 5 May 2026</text>
+      <text x="16" y="58" font-size="9" fill="#64748b">Cascade: revoke → 30-day erasure workflow · audit chain preserved</text>
+      <text x="16" y="72" font-size="9" font-style="italic" fill="#1e40af" text-decoration="underline">Revoke</text>
+    </g>
+
+    <!-- Verification status -->
+    <rect x="200" y="384" width="440" height="60" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="216" y="404" font-size="11" font-weight="700" fill="#1e3a8a">Verification status</text>
+    <text x="216" y="424" font-size="10" fill="#1e3a8a">✓ Email · ✓ Phone · ✓ PAN — submission unlocked</text>
+    <text x="216" y="438" font-size="9" font-style="italic" fill="#475569">SCHEMA: users.{email|phone|pan}_verified_at all populated</text>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- FRAME 6 — RAG Assistant -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <g transform="translate(780, 1310)">
+    <rect width="620" height="480" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shadow3)"/>
+
+    <rect width="620" height="36" rx="12" fill="#166534"/>
+    <rect y="20" width="620" height="16" fill="#166534"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">⑥ Ask GlimmoraTax — RAG assistant</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#bbf7d0">/assistant · L3 · read-only</text>
+
+    <!-- Page being viewed (faded behind) -->
+    <g opacity="0.4">
+      <rect x="20" y="60" width="380" height="400" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="36" y="84" font-size="11" font-weight="700" fill="#0f172a">Tax summary · FY 2024-25</text>
+      <text x="36" y="106" font-size="10" fill="#475569">[ summary content here ]</text>
+    </g>
+
+    <!-- Side panel -->
+    <rect x="280" y="60" width="320" height="400" rx="10" fill="#fff" stroke="#1e40af" stroke-width="2" filter="url(#shadow3)"/>
+    <rect x="280" y="60" width="320" height="36" rx="10" fill="#1e40af"/>
+    <rect x="280" y="80" width="320" height="16" fill="#1e40af"/>
+    <text x="296" y="83" font-size="12" font-weight="700" fill="#fff">Ask GlimmoraTax</text>
+    <text x="586" y="83" text-anchor="end" font-size="14" fill="#fff">×</text>
+
+    <!-- Suggested topics -->
+    <text x="296" y="118" font-size="10" font-weight="700" fill="#64748b">SUGGESTED</text>
+    <rect x="296" y="124" width="288" height="26" rx="6" fill="#eff6ff"/>
+    <text x="310" y="141" font-size="10" fill="#1e3a8a">→  What is Section 80C?</text>
+
+    <rect x="296" y="156" width="288" height="26" rx="6" fill="#eff6ff"/>
+    <text x="310" y="173" font-size="10" fill="#1e3a8a">→  How does the new regime differ?</text>
+
+    <!-- Q + A -->
+    <rect x="296" y="194" width="288" height="36" rx="14" fill="#1e40af"/>
+    <text x="306" y="216" font-size="11" fill="#fff">What's the limit for Section 80C?</text>
+
+    <rect x="296" y="240" width="288" height="92" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="306" y="258" font-size="10" fill="#0f172a">Under Section 80C, the maximum deduction is</text>
+    <text x="306" y="272" font-size="10" font-weight="700" fill="#0f172a">₹1,50,000 per financial year¹.</text>
+    <text x="306" y="290" font-size="10" fill="#0f172a">Eligible: PPF, ELSS, LIC premiums, home loan</text>
+    <text x="306" y="304" font-size="10" fill="#0f172a">principal repayment, NSC, etc.</text>
+    <text x="306" y="324" font-size="9" fill="#3730a3">¹ Source: Income Tax Act Section 80C · chunk kc_f6…</text>
+
+    <!-- Disclaimer -->
+    <rect x="296" y="340" width="288" height="22" rx="4" fill="#fef3c7"/>
+    <text x="440" y="354" text-anchor="middle" font-size="9" fill="#78350f">Informational only. Not a tax decision.</text>
+
+    <!-- Guardrail demo -->
+    <rect x="296" y="368" width="288" height="44" rx="10" fill="#fee2e2" stroke="#fca5a5"/>
+    <text x="310" y="386" font-size="10" font-weight="700" fill="#7f1d1d">⚠  Adversarial example</text>
+    <text x="310" y="402" font-size="9" fill="#7f1d1d">"Calculate my tax" → redirected to filing flow</text>
+
+    <!-- Input -->
+    <rect x="296" y="420" width="220" height="32" rx="6" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="310" y="440" font-size="10" fill="#94a3b8">Ask anything…</text>
+    <rect x="524" y="420" width="60" height="32" rx="6" fill="#1e40af"/>
+    <text x="554" y="440" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Send</text>
+  </g>
+</svg>

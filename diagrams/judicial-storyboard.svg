@@ -1,0 +1,283 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1180" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="bgJud" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#e2e8f0"/></linearGradient>
+    <filter id="shJud" x="-5%" y="-5%" width="110%" height="115%"><feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.12"/></filter>
+    <marker id="arJud" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#9d174d"/></marker>
+  </defs>
+  <rect width="1440" height="1180" fill="url(#bgJud)"/>
+
+  <text x="720" y="44" text-anchor="middle" font-size="26" font-weight="700" fill="#0f172a">Judicial Officer · Case Review &amp; Decision</text>
+  <text x="720" y="70" text-anchor="middle" font-size="14" fill="#475569">Inbox → open case (full taxpayer data, every read audited) → decide: dismiss or assign to enforcement</text>
+
+  <!-- FRAME 1 — Inbox -->
+  <g transform="translate(40, 110)">
+    <rect width="660" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shJud)"/>
+    <rect width="660" height="36" rx="12" fill="#9d174d"/><rect y="20" width="660" height="16" fill="#9d174d"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">① Inbox — cases assigned to me</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#fbcfe8">/judicial/cases?assigned_to_me=true</text>
+
+    <rect x="0" y="36" width="660" height="38" fill="#f1f5f9"/>
+    <text x="20" y="61" font-size="13" font-weight="700" fill="#9d174d">GlimmoraTax</text>
+    <rect x="200" y="44" width="14" height="14" rx="3" fill="#fce7f3"/>
+    <text x="218" y="58" font-size="10" fill="#831843">Judicial Officer Rao · Mumbai Bench</text>
+    <text x="610" y="60" font-size="14" fill="#9d174d">🔔</text>
+    <circle cx="618" cy="50" r="6" fill="#dc2626"/>
+
+    <!-- KPI strip -->
+    <rect x="20" y="90" width="620" height="58" rx="8" fill="#fce7f3" stroke="#9d174d"/>
+    <g font-size="10">
+      <text x="36" y="114" font-size="20" font-weight="700" fill="#9d174d">5</text>
+      <text x="36" y="132" fill="#831843">Pending review</text>
+
+      <text x="160" y="114" font-size="20" font-weight="700" fill="#9d174d">2</text>
+      <text x="160" y="132" fill="#831843">In deliberation</text>
+
+      <text x="290" y="114" font-size="20" font-weight="700" fill="#9d174d">14</text>
+      <text x="290" y="132" fill="#831843">Dismissed (30d)</text>
+
+      <text x="420" y="114" font-size="20" font-weight="700" fill="#9d174d">8</text>
+      <text x="420" y="132" fill="#831843">Assigned to enf (30d)</text>
+
+      <text x="560" y="114" font-size="20" font-weight="700" fill="#9d174d">22</text>
+      <text x="560" y="132" fill="#831843">Avg days/case</text>
+    </g>
+
+    <!-- Inbox queue -->
+    <text x="20" y="178" font-size="13" font-weight="700" fill="#0f172a">Pending review · 5 cases</text>
+
+    <!-- Case 1 -->
+    <rect x="20" y="192" width="620" height="80" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+    <rect x="20" y="192" width="6" height="80" fill="#dc2626"/>
+    <text x="40" y="212" font-size="11" font-weight="700" fill="#0f172a">frd_r3… · income_mismatch</text>
+    <rect x="280" y="200" width="60" height="18" rx="9" fill="#dc2626"/>
+    <text x="310" y="213" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">HIGH</text>
+
+    <text x="40" y="230" font-size="10" fill="#475569">Asha Verma · ABCDE1234F · FY 2024-25</text>
+    <text x="40" y="246" font-size="10" fill="#475569">Flagged by: Officer Kumar (L2) · 3h ago · Mumbai-Zone-A</text>
+    <text x="40" y="262" font-size="9" font-style="italic" fill="#475569">"Salary 50% above declared vs 26AS. Pattern across area."</text>
+    <rect x="500" y="232" width="120" height="28" rx="6" fill="#9d174d"/>
+    <text x="560" y="251" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Open case →</text>
+
+    <!-- Case 2 -->
+    <rect x="20" y="280" width="620" height="68" rx="8" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="20" y="280" width="6" height="68" fill="#fbbf24"/>
+    <text x="40" y="300" font-size="11" font-weight="700" fill="#0f172a">frd_s4… · fabricated_deduction</text>
+    <rect x="290" y="288" width="60" height="18" rx="9" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="320" y="301" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">MED</text>
+
+    <text x="40" y="318" font-size="10" fill="#475569">Karan Mehra · GHIJK5432F · FY 2023-24</text>
+    <text x="40" y="334" font-size="10" fill="#475569">Flagged by: Officer Joshi (L3) · 1d ago</text>
+
+    <rect x="500" y="296" width="120" height="28" rx="6" fill="#fff" stroke="#9d174d"/>
+    <text x="560" y="315" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">Open case</text>
+
+    <!-- Case 3 -->
+    <rect x="20" y="356" width="620" height="68" rx="8" fill="#fff" stroke="#e2e8f0"/>
+    <rect x="20" y="356" width="6" height="68" fill="#16a34a"/>
+    <text x="40" y="376" font-size="11" font-weight="700" fill="#0f172a">frd_t5… · undisclosed_income</text>
+    <rect x="280" y="364" width="60" height="18" rx="9" fill="#dcfce7" stroke="#16a34a"/>
+    <text x="310" y="377" text-anchor="middle" font-size="9" font-weight="700" fill="#14532d">LOW</text>
+
+    <text x="40" y="394" font-size="10" fill="#475569">Vinod Singh · UVWXY1234Z · FY 2023-24</text>
+    <text x="40" y="410" font-size="10" fill="#475569">Flagged by: Officer Patel (L2) · 4d ago</text>
+
+    <rect x="500" y="372" width="120" height="28" rx="6" fill="#fff" stroke="#9d174d"/>
+    <text x="560" y="391" text-anchor="middle" font-size="11" font-weight="700" fill="#9d174d">Open case</text>
+
+    <!-- Conflict-of-interest tool -->
+    <rect x="20" y="436" width="620" height="50" rx="8" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="36" y="456" font-size="11" font-weight="700" fill="#3730a3">⚖  Recuse from a case</text>
+    <text x="36" y="472" font-size="10" fill="#475569">If you have a conflict of interest, recuse yourself — case auto-reassigns. Reason required.</text>
+  </g>
+
+  <line x1="720" y1="360" x2="760" y2="360" stroke="#9d174d" stroke-width="3" marker-end="url(#arJud)"/>
+
+  <!-- FRAME 2 — Case workspace (full taxpayer data) -->
+  <g transform="translate(780, 110)">
+    <rect width="620" height="500" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shJud)"/>
+    <rect width="620" height="36" rx="12" fill="#9d174d"/><rect y="20" width="620" height="16" fill="#9d174d"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">② Case workspace — full read access · every action audited</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#fbcfe8">/judicial/cases/frd_r3…</text>
+
+    <!-- Case header -->
+    <rect x="20" y="56" width="580" height="80" rx="8" fill="#fce7f3" stroke="#9d174d"/>
+    <text x="36" y="78" font-size="13" font-weight="700" fill="#9d174d">Case frd_r3… · judicial_review · 3h in queue</text>
+    <text x="36" y="96" font-size="10" fill="#831843">Subject: Asha Verma · ABCDE1234F · FY 2024-25</text>
+    <text x="36" y="112" font-size="10" fill="#831843">Flag: income_mismatch · Flagged by: Officer Kumar (L2) · Mumbai-Zone-A</text>
+    <text x="36" y="128" font-size="9" font-style="italic" fill="#9d174d">⏱  No SLA — taxpayer not notified · investigate at your pace</text>
+
+    <!-- Tabs -->
+    <rect x="20" y="148" width="580" height="32" rx="8" fill="#f8fafc"/>
+    <text x="40" y="168" font-size="11" font-weight="700" fill="#9d174d">Filing</text>
+    <line x1="36" y1="176" x2="78" y2="176" stroke="#9d174d" stroke-width="3"/>
+    <text x="100" y="168" font-size="11" fill="#64748b">Documents (3)</text>
+    <text x="200" y="168" font-size="11" fill="#64748b">Transactions (47)</text>
+    <text x="320" y="168" font-size="11" fill="#64748b">Trace</text>
+    <text x="376" y="168" font-size="11" fill="#64748b">Prior cases (2)</text>
+    <text x="488" y="168" font-size="11" fill="#64748b">Officer note</text>
+
+    <!-- Filing contents -->
+    <rect x="20" y="190" width="580" height="120" rx="8" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="210" font-size="11" font-weight="700" fill="#0f172a">Income breakdown — declaration vs 26AS</text>
+
+    <rect x="36" y="220" width="548" height="22" fill="#fee2e2"/>
+    <text x="50" y="236" font-size="10" fill="#0f172a">Salary · ACME Pvt Ltd</text>
+    <text x="280" y="236" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">Declared ₹12,00,000</text>
+    <text x="450" y="236" font-size="10" font-family="ui-monospace, monospace" fill="#7f1d1d">26AS ₹18,00,000</text>
+
+    <text x="36" y="262" font-size="10" fill="#475569">Total tax declared: ₹1,01,400 (new regime)</text>
+    <text x="36" y="278" font-size="10" fill="#475569">Total tax if 26AS used: ~₹2,93,000 (≈ ₹1,91,600 understatement)</text>
+    <text x="36" y="294" font-size="9" font-style="italic" fill="#3730a3">Trace replayable · 4 rule citations · Section 271(c) possibly applicable</text>
+
+    <!-- Prior cases hint -->
+    <rect x="20" y="320" width="580" height="64" rx="8" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="36" y="340" font-size="11" font-weight="700" fill="#78350f">⚠  2 prior cases in this jurisdiction</text>
+    <text x="36" y="358" font-size="10" fill="#78350f">Same employer (ACME Pvt Ltd) · 2 employees flagged for similar mismatch in past 90 days</text>
+    <text x="36" y="374" font-size="9" font-style="italic" fill="#475569">[ View prior cases ]   ← cross-reference may inform decision</text>
+
+    <!-- Audit ribbon -->
+    <rect x="20" y="396" width="580" height="84" rx="8" fill="#f1f5f9" stroke="#0f172a"/>
+    <text x="36" y="416" font-size="11" font-weight="700" fill="#0f172a">📜  Every read you make here is logged</text>
+    <g font-size="9" fill="#475569">
+      <text x="36" y="434">10:42 IST · case_opened · entity_type=fraud_cases · id=frd_r3…</text>
+      <text x="36" y="448">10:43 IST · fraud_case_data_accessed · filing/fil_d4… (read summary_json)</text>
+      <text x="36" y="462">10:44 IST · fraud_case_data_accessed · transactions/* (47 rows)</text>
+      <text x="36" y="476">All denormalized with fraud_case_id for one-query reconstruction.</text>
+    </g>
+  </g>
+
+  <!-- Arrow row 1 → row 2 -->
+  <line x1="1090" y1="630" x2="1090" y2="660" stroke="#9d174d" stroke-width="3"/>
+  <line x1="1090" y1="660" x2="350" y2="660" stroke="#9d174d" stroke-width="3"/>
+  <line x1="350" y1="660" x2="350" y2="690" stroke="#9d174d" stroke-width="3" marker-end="url(#arJud)"/>
+
+  <!-- FRAME 3 — Decision modal -->
+  <g transform="translate(40, 700)">
+    <rect width="660" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shJud)"/>
+    <rect width="660" height="36" rx="12" fill="#9d174d"/><rect y="20" width="660" height="16" fill="#9d174d"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">③ Decision — dismiss · assign to enforcement</text>
+    <text x="640" y="24" text-anchor="end" font-size="11" fill="#fbcfe8">POST /judicial/cases/frd_r3…/decide</text>
+
+    <!-- Two-option layout -->
+    <!-- Dismiss -->
+    <rect x="20" y="60" width="310" height="370" rx="10" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text x="36" y="88" font-size="14" font-weight="700" fill="#0f172a">✗  Dismiss case</text>
+    <text x="36" y="108" font-size="10" fill="#475569">Insufficient evidence · explanation accepted ·</text>
+    <text x="36" y="122" font-size="10" fill="#475569">not a fraud pattern · case closed.</text>
+
+    <text x="36" y="156" font-size="11" font-weight="700" fill="#0f172a">Reason / notes (required)</text>
+    <rect x="36" y="166" width="278" height="80" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="50" y="186" font-size="10" fill="#475569">Discrepancy explained by</text>
+    <text x="50" y="200" font-size="10" fill="#475569">mid-year job change and</text>
+    <text x="50" y="214" font-size="10" fill="#475569">Q1 stipend not reported by</text>
+    <text x="50" y="228" font-size="10" fill="#475569">previous employer in 26AS.</text>
+
+    <rect x="36" y="262" width="278" height="32" rx="6" fill="#fff" stroke="#475569"/>
+    <text x="175" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Dismiss · close case</text>
+
+    <text x="36" y="312" font-size="9" fill="#475569">Effect:</text>
+    <g font-size="9" fill="#475569">
+      <text x="36" y="328">• fraud_case.status → closed</text>
+      <text x="36" y="344">• Taxpayer NOT notified</text>
+      <text x="36" y="360">• Officer Kumar gets officer_case_closed notif</text>
+      <text x="36" y="376">• Audit: fraud_case_dismissed</text>
+    </g>
+
+    <text x="36" y="406" font-size="9" font-style="italic" fill="#64748b">judicial_decision: 'dismiss'</text>
+    <text x="36" y="420" font-size="9" font-style="italic" fill="#64748b">closed_at = NOW()</text>
+
+    <!-- Assign to enforcement -->
+    <rect x="346" y="60" width="294" height="370" rx="10" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+    <text x="362" y="88" font-size="14" font-weight="700" fill="#7f1d1d">⚖  Assign to Enforcement</text>
+    <text x="362" y="108" font-size="10" fill="#7f1d1d">Pattern of misreporting warrants</text>
+    <text x="362" y="122" font-size="10" fill="#7f1d1d">enforcement investigation.</text>
+
+    <text x="362" y="148" font-size="11" font-weight="700" fill="#0f172a">Enforcement agency *</text>
+    <rect x="362" y="158" width="260" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="376" y="178" font-size="11" fill="#0f172a">Singh ED · Mumbai · 14 open cases ▾</text>
+
+    <text x="362" y="204" font-size="11" font-weight="700" fill="#0f172a">Access duration (days)</text>
+    <rect x="362" y="214" width="80" height="30" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="402" y="234" text-anchor="middle" font-size="12" font-family="ui-monospace, monospace" fill="#0f172a">90</text>
+    <text x="450" y="234" font-size="9" fill="#475569">default · renewable</text>
+
+    <text x="362" y="262" font-size="11" font-weight="700" fill="#0f172a">Tax years to expose</text>
+    <rect x="362" y="270" width="84" height="20" rx="10" fill="#fef3c7"/>
+    <text x="404" y="284" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">FY 2024-25</text>
+    <rect x="452" y="270" width="84" height="20" rx="10" fill="#fef3c7"/>
+    <text x="494" y="284" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">FY 2023-24</text>
+
+    <text x="362" y="312" font-size="11" font-weight="700" fill="#0f172a">Justification (visible to enforcement)</text>
+    <rect x="362" y="320" width="260" height="40" rx="6" fill="#fff" stroke="#cbd5e1"/>
+    <text x="376" y="338" font-size="10" fill="#0f172a">Pattern of misreporting across 3 AYs ·</text>
+    <text x="376" y="354" font-size="10" fill="#0f172a">same employer · investigate.</text>
+
+    <rect x="362" y="376" width="260" height="38" rx="6" fill="#991b1b"/>
+    <text x="492" y="400" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Assign to Singh ED →</text>
+  </g>
+
+  <line x1="720" y1="930" x2="760" y2="930" stroke="#9d174d" stroke-width="3" marker-end="url(#arJud)"/>
+
+  <!-- FRAME 4 — Decision log + handoff -->
+  <g transform="translate(780, 700)">
+    <rect width="620" height="450" rx="12" fill="#ffffff" stroke="#cbd5e1" filter="url(#shJud)"/>
+    <rect width="620" height="36" rx="12" fill="#9d174d"/><rect y="20" width="620" height="16" fill="#9d174d"/>
+    <text x="20" y="24" font-size="13" font-weight="700" fill="#fff">④ Handoff complete · my decisions log</text>
+    <text x="600" y="24" text-anchor="end" font-size="11" fill="#fbcfe8">/judicial/decisions</text>
+
+    <!-- Success banner -->
+    <rect x="20" y="58" width="580" height="80" rx="8" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+    <text x="36" y="80" font-size="13" font-weight="700" fill="#7f1d1d">✓  Case assigned to Singh ED</text>
+    <text x="36" y="98" font-size="10" fill="#991b1b">enforcement_access row created · expires_at = 2026-08-10 (90 days)</text>
+    <text x="36" y="114" font-size="10" fill="#991b1b">enforcement_agency_id = usr_enf_singh · tax_years = {FY2024-25, FY2023-24}</text>
+    <text x="36" y="130" font-size="9" font-style="italic" fill="#7f1d1d">Notif sent: enforcement_access_granted · taxpayer NOT notified · status → enforcement_assigned</text>
+
+    <!-- My decisions log -->
+    <text x="20" y="166" font-size="13" font-weight="700" fill="#0f172a">My recent decisions</text>
+
+    <rect x="20" y="180" width="580" height="30" fill="#f8fafc"/>
+    <g font-size="9" font-weight="700" fill="#475569">
+      <text x="36" y="200">Date</text>
+      <text x="130" y="200">Case</text>
+      <text x="240" y="200">Decision</text>
+      <text x="380" y="200">Enforcement</text>
+      <text x="510" y="200">Final status</text>
+    </g>
+
+    <rect x="20" y="210" width="580" height="30" fill="#fee2e2" stroke="#fca5a5"/>
+    <text x="36" y="229" font-size="10" fill="#0f172a">Today 11:18</text>
+    <text x="130" y="229" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">frd_r3…</text>
+    <rect x="240" y="218" width="120" height="16" rx="8" fill="#fee2e2"/>
+    <text x="300" y="229" text-anchor="middle" font-size="9" font-weight="700" fill="#7f1d1d">→ enforcement</text>
+    <text x="380" y="229" font-size="10" fill="#475569">Singh ED · 90d</text>
+    <text x="510" y="229" font-size="10" fill="#7f1d1d">enforcement_assigned</text>
+
+    <rect x="20" y="240" width="580" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="259" font-size="10" fill="#0f172a">Yesterday</text>
+    <text x="130" y="259" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">frd_q8…</text>
+    <rect x="240" y="248" width="80" height="16" rx="8" fill="#f1f5f9"/>
+    <text x="280" y="259" text-anchor="middle" font-size="9" font-weight="700" fill="#475569">dismiss</text>
+    <text x="380" y="259" font-size="10" fill="#475569">—</text>
+    <text x="510" y="259" font-size="10" fill="#475569">closed</text>
+
+    <rect x="20" y="270" width="580" height="30" fill="#fff" stroke="#e2e8f0"/>
+    <text x="36" y="289" font-size="10" fill="#0f172a">3 days ago</text>
+    <text x="130" y="289" font-size="10" font-family="ui-monospace, monospace" fill="#0f172a">frd_p1…</text>
+    <rect x="240" y="278" width="120" height="16" rx="8" fill="#fee2e2"/>
+    <text x="300" y="289" text-anchor="middle" font-size="9" font-weight="700" fill="#7f1d1d">→ enforcement</text>
+    <text x="380" y="289" font-size="10" fill="#475569">Mehta ED · 60d</text>
+    <text x="510" y="289" font-size="10" fill="#7f1d1d">enforcement_assigned</text>
+
+    <!-- Renewal request -->
+    <rect x="20" y="316" width="580" height="64" rx="8" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="36" y="336" font-size="11" font-weight="700" fill="#78350f">📨  Renewal requests from enforcement</text>
+    <text x="36" y="354" font-size="10" fill="#92400e">Singh ED requested +60 days on frd_p1… · 2h ago</text>
+    <rect x="490" y="338" width="100" height="24" rx="6" fill="#fff" stroke="#92400e"/>
+    <text x="540" y="354" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">Review →</text>
+
+    <!-- Statute reference panel -->
+    <rect x="20" y="392" width="580" height="42" rx="6" fill="#eef2ff" stroke="#c7d2fe"/>
+    <text x="36" y="412" font-size="11" font-weight="700" fill="#3730a3">📚  Statute reference panel (RAG-curated · explains only)</text>
+    <text x="36" y="426" font-size="9" fill="#475569">Quick links: Section 131 · Section 271 · Section 153A · Section 277</text>
+  </g>
+</svg>
