@@ -11,11 +11,16 @@ import { Icon } from "@/components/shared/Icon";
 import { Badge } from "@/components/ui/Badge";
 import { Divider } from "@/components/ui/Divider";
 import { OtpInput } from "@/components/auth/OtpInput";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { sanitizeEmail, sanitizeMobile } from "@/lib/security/sanitize";
 import { validateEmail, validateMobile } from "@/lib/validation/identity";
-import { beginLogin, resendOtp, verifyOtp } from "@/lib/api";
+import { adminLogin, beginLogin, resendOtp, verifyOtp } from "@/lib/api";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { cn } from "@/lib/utils/cn";
+
+const IS_DEV = process.env.NODE_ENV !== "production";
+
+const REMEMBER_ME_KEY = "glmra.remember-me";
 
 type Channel = "email" | "mobile";
 type Phase = "identifier" | "otp";
@@ -52,11 +57,33 @@ const CHANNELS: {
 export default function LoginPage() {
   const [phase, setPhase] = React.useState<Phase>("identifier");
   const [session, setSession] = React.useState<OtpSession | null>(null);
+  const [rememberMe, setRememberMe] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.localStorage.getItem(REMEMBER_ME_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  const onRememberChange = React.useCallback((v: boolean) => {
+    setRememberMe(v);
+    if (typeof window !== "undefined") {
+      try {
+        if (v) window.localStorage.setItem(REMEMBER_ME_KEY, "1");
+        else window.localStorage.removeItem(REMEMBER_ME_KEY);
+      } catch {
+        /* ignore quota errors */
+      }
+    }
+  }, []);
 
   return (
     <AuthShell>
       {phase === "identifier" ? (
         <IdentifierForm
+          rememberMe={rememberMe}
+          onRememberChange={onRememberChange}
           onSent={(s) => {
             setSession(s);
             setPhase("otp");
@@ -66,6 +93,7 @@ export default function LoginPage() {
         session && (
           <OtpForm
             session={session}
+            rememberMe={rememberMe}
             onChangeIdentifier={() => setPhase("identifier")}
             onResent={(cd) =>
               setSession((prev) => (prev ? { ...prev, cooldownSec: cd } : prev))
@@ -81,12 +109,46 @@ export default function LoginPage() {
 /*  Phase 1 — identifier entry + send                                         */
 /* -------------------------------------------------------------------------- */
 
-function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
+function IdentifierForm({
+  onSent,
+  rememberMe,
+  onRememberChange,
+}: {
+  onSent: (s: OtpSession) => void;
+  rememberMe: boolean;
+  onRememberChange: (v: boolean) => void;
+}) {
+  const router = useRouter();
+  const signIn = useAuthStore((s) => s.signIn);
+  const loadMe = useAuthStore((s) => s.loadMe);
   const [channel, setChannel] = React.useState<Channel>("email");
   const [emailValue, setEmailValue] = React.useState("");
   const [mobileValue, setMobileValue] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [adminBusy, setAdminBusy] = React.useState<
+    "taxpayer" | "consultant" | null
+  >(null);
+
+  const handleAdmin = async (role: "taxpayer" | "consultant") => {
+    setError(null);
+    setAdminBusy(role);
+    try {
+      const res = await adminLogin(role);
+      signIn({
+        displayIdentifier: res.user.email ?? `admin-${role}`,
+        role: res.user.role ?? role,
+        profileId: res.user.id,
+      });
+      await loadMe();
+      router.push(res.next);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Admin login is unavailable.";
+      setError(msg);
+      setAdminBusy(null);
+    }
+  };
 
   const value = channel === "email" ? emailValue : mobileValue;
   const setValue = (v: string) => {
@@ -228,6 +290,13 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
             </Alert>
           )}
 
+          <Checkbox
+            checked={rememberMe}
+            onChange={(e) => onRememberChange(e.target.checked)}
+            label="Remember me on this device"
+            description="Keeps you signed in for 30 days. Don't tick this on a shared computer."
+          />
+
           <Button
             type="submit"
             size="lg"
@@ -255,6 +324,44 @@ function IdentifierForm({ onSent }: { onSent: (s: OtpSession) => void }) {
             </div>
           </div>
         </div>
+
+        {IS_DEV && (
+          <div className="rounded-xl border border-dashed border-line bg-surface-sunken/30 p-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-medium uppercase tracking-widest text-ink-subtle">
+                Dev shortcuts
+              </p>
+              <Badge tone="warning" size="sm">
+                Local only
+              </Badge>
+            </div>
+            <p className="mt-1 text-xs text-ink-muted">
+              Skip OTP and sign in as a pre-baked profile.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAdmin("taxpayer")}
+                loading={adminBusy === "taxpayer"}
+                disabled={adminBusy !== null}
+              >
+                Login as Taxpayer
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAdmin("consultant")}
+                loading={adminBusy === "consultant"}
+                disabled={adminBusy !== null}
+              >
+                Login as CA
+              </Button>
+            </div>
+          </div>
+        )}
 
         <p className="pt-2 text-center text-2xs text-ink-subtle">
           By continuing you accept Glimmora&apos;s{" "}
@@ -353,15 +460,18 @@ function useCountdown(initialSec: number, deps: React.DependencyList = []) {
 
 function OtpForm({
   session,
+  rememberMe,
   onChangeIdentifier,
   onResent,
 }: {
   session: OtpSession;
+  rememberMe: boolean;
   onChangeIdentifier: () => void;
   onResent: (cooldownSec: number) => void;
 }) {
   const router = useRouter();
   const signIn = useAuthStore((s) => s.signIn);
+  const loadMe = useAuthStore((s) => s.loadMe);
   const [code, setCode] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -385,18 +495,17 @@ function OtpForm({
           otpId: session.otpId,
           code: c,
           identifier: session.identifier,
+          rememberMe,
         });
         signIn({
-          sessionId: res.sessionId,
           displayIdentifier: session.display || session.identifier,
-          role: res.role,
-          profileId: res.profileId,
+          role: res.user.role ?? undefined,
+          profileId: res.user.id,
         });
-        if (res.hasProfile) {
-          router.push("/dashboard");
-        } else {
-          router.push("/role-select");
-        }
+        // Prime the auth-store cache before we navigate so the destination
+        // page doesn't re-fetch /me from a cold cache.
+        await loadMe();
+        router.push(res.next);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Verification failed.";
         setError(msg);
@@ -404,7 +513,7 @@ function OtpForm({
         setSubmitting(false);
       }
     },
-    [code, router, signIn, session],
+    [code, router, signIn, session, rememberMe, loadMe],
   );
 
   const onResend = async () => {

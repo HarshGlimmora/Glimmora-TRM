@@ -47,6 +47,13 @@ export interface TaxpayerProfile extends BaseUser {
     dateOfBirth: string; // YYYY-MM-DD
     gender: "male" | "female" | "other" | "prefer_not_to_say";
     residentialStatus: "resident" | "nri" | "rnor";
+    age?: number;
+    maritalStatus?:
+      | "single"
+      | "married"
+      | "divorced"
+      | "widowed"
+      | "separated";
   };
   identity: {
     panMasked: string;

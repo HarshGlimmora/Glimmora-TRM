@@ -25,6 +25,11 @@ const csp = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // PGlite ships a WASM bundle + extension tarballs that webpack must not
+  // rewrite — leave it as an external CommonJS require resolved at runtime.
+  experimental: {
+    serverComponentsExternalPackages: ["@electric-sql/pglite", "pg"],
+  },
   async headers() {
     return [
       {

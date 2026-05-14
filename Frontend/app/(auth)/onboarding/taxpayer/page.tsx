@@ -27,6 +27,7 @@ import {
 } from "@/components/onboarding/AsidePanels";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useOnboardingStore } from "@/lib/store/onboarding-store";
+import { useOnboardingServerSync } from "@/lib/store/onboarding-sync";
 import {
   sanitizeText,
   sanitizeEmail,
@@ -96,15 +97,48 @@ export default function TaxpayerOnboardingPage() {
 function Inner() {
   const router = useRouter();
   const sp = useSearchParams();
-  const session = useAuthStore((s) => s.session);
-  const expired = useAuthStore((s) => s.isExpired());
+  const loadMe = useAuthStore((s) => s.loadMe);
   const setProfile = useAuthStore((s) => s.setProfile);
+  const me = useAuthStore((s) => s.me);
+  const [authReady, setAuthReady] = React.useState(false);
 
   const store = useOnboardingStore();
 
   React.useEffect(() => {
-    if (!session || expired) router.replace("/login");
-  }, [session, expired, router]);
+    let cancelled = false;
+    (async () => {
+      const data = await loadMe();
+      if (cancelled) return;
+      if (!data || !data.authenticated) {
+        router.replace("/login");
+        return;
+      }
+      if (data.hasProfile) {
+        router.replace("/dashboard");
+        return;
+      }
+      setAuthReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadMe, router]);
+
+  const { hydrated } = useOnboardingServerSync({ authReady });
+
+  // The login identifier (me.email / me.phone) is the unique key on `users`.
+  // Once we know who's logged in AND the server draft is merged, lock the
+  // contact step's matching field to the verified value. This prevents the
+  // form from changing the identifier the user signs in with.
+  const lockedEmail = me?.email ?? null;
+  const lockedMobile = me?.phone ?? null;
+  React.useEffect(() => {
+    if (!hydrated) return;
+    const patch: Partial<{ email: string; mobile: string }> = {};
+    if (lockedEmail && store.contact.email !== lockedEmail) patch.email = lockedEmail;
+    if (lockedMobile && store.contact.mobile !== lockedMobile) patch.mobile = lockedMobile;
+    if (patch.email || patch.mobile) store.patchContact(patch);
+  }, [hydrated, lockedEmail, lockedMobile, store]);
 
   // Sensitive values live ONLY in component state (refs + state below).
   const panRef = React.useRef<IdentityFieldHandle>(null);
@@ -152,7 +186,11 @@ function Inner() {
     sanitizeText(store.personal.displayName).length >= 2 &&
     /^\d{4}-\d{2}-\d{2}$/.test(store.personal.dateOfBirth) &&
     store.personal.gender !== "" &&
-    store.personal.residentialStatus !== undefined;
+    store.personal.residentialStatus !== undefined &&
+    typeof store.personal.age === "number" &&
+    store.personal.age >= 0 &&
+    store.personal.age <= 150 &&
+    store.personal.maritalStatus !== "";
 
   const identityValid = panState.valid && aadhaarState.valid;
 
@@ -204,7 +242,7 @@ function Inner() {
     }
     try {
       setSubmitting(true);
-      const profile = await createTaxpayerProfile({
+      const { profile, next } = await createTaxpayerProfile({
         displayName: sanitizeText(store.personal.displayName, 80),
         email: sanitizeEmail(store.contact.email),
         mobile: sanitizeMobile(store.contact.mobile),
@@ -219,6 +257,16 @@ function Inner() {
             | "prefer_not_to_say",
           residentialStatus:
             store.personal.residentialStatus ?? "resident",
+          age:
+            typeof store.personal.age === "number"
+              ? store.personal.age
+              : Number(store.personal.age) || 0,
+          maritalStatus: store.personal.maritalStatus as
+            | "single"
+            | "married"
+            | "divorced"
+            | "widowed"
+            | "separated",
         },
         address: {
           line1: sanitizeText(store.address.line1, 120),
@@ -249,7 +297,8 @@ function Inner() {
       store.reset();
       panRef.current?.reset();
       aadhaarRef.current?.reset();
-      router.push("/dashboard");
+      await loadMe();
+      router.push(next);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Submission failed.";
       setSubmitError(msg);
@@ -416,6 +465,62 @@ function Inner() {
                   </Select>
                 </Field>
               </FormGrid>
+              <FormGrid>
+                <Field
+                  label="Age"
+                  required
+                  htmlFor="age"
+                  hint="In completed years."
+                >
+                  <Input
+                    id="age"
+                    type="number"
+                    min={0}
+                    max={150}
+                    inputMode="numeric"
+                    value={
+                      typeof store.personal.age === "number"
+                        ? String(store.personal.age)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (raw === "") {
+                        store.patchPersonal({ age: "" });
+                        return;
+                      }
+                      const n = Math.max(0, Math.min(150, Number(raw) || 0));
+                      store.patchPersonal({ age: n });
+                    }}
+                  />
+                </Field>
+                <Field label="Marital status" required htmlFor="marital">
+                  <Select
+                    id="marital"
+                    value={store.personal.maritalStatus}
+                    onChange={(e) =>
+                      store.patchPersonal({
+                        maritalStatus: e.target.value as
+                          | "single"
+                          | "married"
+                          | "divorced"
+                          | "widowed"
+                          | "separated"
+                          | "",
+                      })
+                    }
+                  >
+                    <option value="" disabled>
+                      Select
+                    </option>
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                    <option value="divorced">Divorced</option>
+                    <option value="widowed">Widowed</option>
+                    <option value="separated">Separated</option>
+                  </Select>
+                </Field>
+              </FormGrid>
             </FormRow>
           </FormSection>
         )}
@@ -528,6 +633,11 @@ function Inner() {
                   required
                   htmlFor="email"
                   error={contactEmailErr}
+                  hint={
+                    lockedEmail
+                      ? "This is the email you signed in with. To change it, contact support."
+                      : undefined
+                  }
                 >
                   <Input
                     id="email"
@@ -541,6 +651,8 @@ function Inner() {
                     }
                     placeholder="you@example.in"
                     invalid={Boolean(contactEmailErr)}
+                    disabled={Boolean(lockedEmail)}
+                    readOnly={Boolean(lockedEmail)}
                   />
                 </Field>
                 <Field
@@ -548,6 +660,11 @@ function Inner() {
                   required
                   htmlFor="mobile"
                   error={contactMobileErr}
+                  hint={
+                    lockedMobile
+                      ? "This is the number you signed in with. To change it, contact support."
+                      : undefined
+                  }
                 >
                   <Input
                     id="mobile"
@@ -563,6 +680,8 @@ function Inner() {
                     }
                     invalid={Boolean(contactMobileErr)}
                     maxLength={10}
+                    disabled={Boolean(lockedMobile)}
+                    readOnly={Boolean(lockedMobile)}
                   />
                 </Field>
               </FormGrid>
@@ -943,7 +1062,14 @@ function ReviewSummary({
           <Row label="Legal name" value={personal.legalName} />
           <Row label="Father's name" value={personal.fatherName} />
           <Row label="Date of birth" value={personal.dateOfBirth} />
+          <Row
+            label="Age"
+            value={
+              typeof personal.age === "number" ? `${personal.age} years` : "—"
+            }
+          />
           <Row label="Gender" value={personal.gender} />
+          <Row label="Marital status" value={personal.maritalStatus} />
           <Row
             label="Residency"
             value={personal.residentialStatus}

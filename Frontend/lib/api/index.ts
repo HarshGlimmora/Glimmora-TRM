@@ -131,17 +131,23 @@ export async function beginLogin(
 
 export interface VerifyOtpResult {
   ok: true;
-  sessionId: string;
+  next: string;
   hasProfile: boolean;
-  role?: Role;
-  profileId?: string;
-  isFirstTime: boolean;
+  user: {
+    id: string;
+    role: Role | null;
+    email: string | null;
+    phone: string | null;
+    displayName: string | null;
+    profileCompletedAt: string | null;
+  };
 }
 
 export async function verifyOtp(args: {
   otpId: string;
   code: string;
   identifier: string;
+  rememberMe?: boolean;
 }): Promise<VerifyOtpResult> {
   const r = validateOtp(args.code);
   if (!r.ok) fail(r.code, r.message);
@@ -149,7 +155,7 @@ export async function verifyOtp(args: {
   return postJson<VerifyOtpResult>("/api/auth/verify-otp", {
     otpId: args.otpId,
     code: args.code,
-    identifier: args.identifier,
+    rememberMe: Boolean(args.rememberMe),
   });
 }
 
@@ -157,6 +163,81 @@ export async function resendOtp(otpId: string): Promise<{ cooldownSec: number }>
   return postJson<{ cooldownSec: number }>("/api/auth/resend-otp", {
     otpId,
   });
+}
+
+export async function setRole(role: Role): Promise<{ next: string }> {
+  return postJson<{ next: string }>("/api/auth/set-role", { role });
+}
+
+export async function logoutApi(): Promise<void> {
+  await postJson<{ ok: true }>("/api/auth/logout", {});
+}
+
+/**
+ * Dev-only shortcut. Signs the caller in as a pre-baked admin user with a
+ * complete profile so we don't burn OTPs during development. Returns 404 in
+ * production (the route is gated by NODE_ENV).
+ */
+export async function adminLogin(
+  role: "taxpayer" | "consultant",
+): Promise<{
+  next: string;
+  user: {
+    id: string;
+    role: Role | null;
+    email: string | null;
+    phone: string | null;
+    displayName: string | null;
+  };
+}> {
+  return postJson<{
+    ok: true;
+    next: string;
+    user: {
+      id: string;
+      role: Role | null;
+      email: string | null;
+      phone: string | null;
+      displayName: string | null;
+    };
+  }>("/api/auth/admin-login", { role });
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Onboarding progress (server-persisted draft)                              */
+/* -------------------------------------------------------------------------- */
+
+export interface OnboardingProgress {
+  role: Role | null;
+  step: number;
+  personal: Record<string, unknown>;
+  contact: Record<string, unknown>;
+  address: Record<string, unknown>;
+  taxProfile: Record<string, unknown>;
+  credentials: Record<string, unknown>;
+  identityFlags: Record<string, unknown>;
+}
+
+export async function fetchProgress(): Promise<OnboardingProgress> {
+  const res = await fetch("/api/onboarding/progress", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to load onboarding progress (${res.status})`);
+  return res.json() as Promise<OnboardingProgress>;
+}
+
+export async function saveProgress(
+  patch: Partial<OnboardingProgress>,
+): Promise<OnboardingProgress> {
+  const res = await fetch("/api/onboarding/progress", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(`Failed to save onboarding progress (${res.status})`);
+  return res.json() as Promise<OnboardingProgress>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,18 +279,38 @@ export type ConsultantDraft = Omit<
 
 export async function createTaxpayerProfile(
   draft: TaxpayerDraft,
-): Promise<TaxpayerProfile> {
+): Promise<{ next: string; profile: TaxpayerProfile }> {
   const panR = validatePan(draft.rawPan);
   if (!panR.ok) fail(panR.code, panR.message);
   const aR = validateAadhaar(draft.rawAadhaar);
   if (!aR.ok) fail(aR.code, aR.message);
 
+  const res = await postJson<{
+    ok: true;
+    next: string;
+    user: {
+      id: string;
+      displayName: string | null;
+      email: string | null;
+      phone: string | null;
+    };
+  }>("/api/onboarding/taxpayer", {
+    personal: draft.personal,
+    contact: { email: draft.email, mobile: draft.mobile },
+    address: draft.address,
+    taxProfile: draft.taxProfile,
+    rawPan: draft.rawPan,
+    rawAadhaar: draft.rawAadhaar,
+  });
+
+  // Synthesise a TaxpayerProfile for the UI cache. The server has stored
+  // masked-only identifiers; we never put raw PAN/Aadhaar in client state.
   const profile: TaxpayerProfile = {
-    id: uid("usr"),
+    id: res.user.id,
     role: "taxpayer",
-    displayName: draft.displayName,
-    email: draft.email,
-    mobile: draft.mobile,
+    displayName: res.user.displayName ?? draft.displayName,
+    email: res.user.email ?? draft.email,
+    mobile: res.user.phone ?? draft.mobile,
     emailVerified: true,
     mobileVerified: true,
     profileStatus: "verified",
@@ -227,24 +328,41 @@ export async function createTaxpayerProfile(
     address: draft.address,
     taxProfile: draft.taxProfile,
   };
-  mockDB.users.set(profile.id, profile);
-  return delay(profile, 520);
+  return { next: res.next, profile };
 }
 
 export async function createConsultantProfile(
   draft: ConsultantDraft,
-): Promise<ConsultantProfile> {
+): Promise<{ next: string; profile: ConsultantProfile }> {
   const panR = validatePan(draft.rawPan);
   if (!panR.ok) fail(panR.code, panR.message);
   const aR = validateAadhaar(draft.rawAadhaar);
   if (!aR.ok) fail(aR.code, aR.message);
 
+  const res = await postJson<{
+    ok: true;
+    next: string;
+    user: {
+      id: string;
+      displayName: string | null;
+      email: string | null;
+      phone: string | null;
+    };
+  }>("/api/onboarding/consultant", {
+    personal: draft.personal,
+    credentials: draft.credentials,
+    contact: { email: draft.email, mobile: draft.mobile },
+    practice: draft.practice,
+    rawPan: draft.rawPan,
+    rawAadhaar: draft.rawAadhaar,
+  });
+
   const profile: ConsultantProfile = {
-    id: uid("usr"),
+    id: res.user.id,
     role: "consultant",
-    displayName: draft.displayName,
-    email: draft.email,
-    mobile: draft.mobile,
+    displayName: res.user.displayName ?? draft.displayName,
+    email: res.user.email ?? draft.email,
+    mobile: res.user.phone ?? draft.mobile,
     emailVerified: true,
     mobileVerified: true,
     profileStatus: "verified",
@@ -261,8 +379,7 @@ export async function createConsultantProfile(
     },
     practice: draft.practice,
   };
-  mockDB.users.set(profile.id, profile);
-  return delay(profile, 520);
+  return { next: res.next, profile };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -361,10 +478,16 @@ export async function updateLinkStatus(
 /*  Dashboard                                                                 */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchDashboard(userId: string): Promise<DashboardSummary> {
-  const profile = mockDB.users.get(userId);
+export async function fetchDashboard(
+  userIdOrProfile: string | AnyProfile,
+): Promise<DashboardSummary> {
+  const profile =
+    typeof userIdOrProfile === "string"
+      ? mockDB.users.get(userIdOrProfile)
+      : userIdOrProfile;
   if (!profile) fail("USER_NOT_FOUND", "Profile not found.");
 
+  const userId = profile.id;
   const links = (await listLinksFor(userId)).filter((l) => l.status !== "rejected");
 
   const alerts: DashboardAlert[] =

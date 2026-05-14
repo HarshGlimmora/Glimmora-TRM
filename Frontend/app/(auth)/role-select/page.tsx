@@ -9,6 +9,7 @@ import { Icon } from "@/components/shared/Icon";
 import { Alert } from "@/components/ui/Alert";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useOnboardingStore } from "@/lib/store/onboarding-store";
+import { setRole as setRoleApi } from "@/lib/api";
 import type { Role } from "@/lib/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -47,27 +48,41 @@ const ROLES: {
 
 export default function RoleSelectPage() {
   const router = useRouter();
-  const sessionExpired = useAuthStore((s) => s.isExpired());
+  const loadMe = useAuthStore((s) => s.loadMe);
   const session = useAuthStore((s) => s.session);
   const setAuthRole = useAuthStore((s) => s.setRole);
   const onboardingSetRole = useOnboardingStore((s) => s.setRole);
 
   React.useEffect(() => {
-    if (!session || sessionExpired) router.replace("/login");
-  }, [session, sessionExpired, router]);
+    void (async () => {
+      const me = await loadMe();
+      if (!me || !me.authenticated) router.replace("/login");
+    })();
+  }, [loadMe, router]);
 
   const [selected, setSelected] = React.useState<Role | null>(null);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const onContinue = () => {
-    if (!selected) return;
-    setAuthRole(selected);
-    onboardingSetRole(selected);
-    router.push(
-      selected === "taxpayer"
-        ? "/onboarding/taxpayer"
-        : "/onboarding/consultant",
-    );
+  const onContinue = async () => {
+    if (!selected || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await setRoleApi(selected);
+      setAuthRole(selected);
+      onboardingSetRole(selected);
+      // Prime cache so onboarding can immediately read me.role.
+      await loadMe();
+      router.push(res.next);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save role.");
+      setSubmitting(false);
+    }
   };
+
+  // Silence unused-warning while session is still consumed by isExpired below.
+  void session;
 
   return (
     <AuthShell step={{ current: 1, total: 5, label: "Role" }}>
@@ -157,10 +172,17 @@ export default function RoleSelectPage() {
           is recorded in your audit trail.
         </Alert>
 
+        {error && (
+          <Alert tone="error" compact className="mt-4">
+            {error}
+          </Alert>
+        )}
+
         <div className="mt-6 flex items-center justify-end gap-3">
           <Button
             size="lg"
             disabled={!selected}
+            loading={submitting}
             onClick={onContinue}
             rightIcon={<Icon.ArrowRight size={16} />}
           >

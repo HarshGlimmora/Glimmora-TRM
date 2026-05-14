@@ -20,6 +20,15 @@ export interface PersonalDraft {
   dateOfBirth: string;
   gender: "male" | "female" | "other" | "prefer_not_to_say" | "";
   residentialStatus?: "resident" | "nri" | "rnor";
+  /** Age in years. Asked alongside DOB; the user is the source of truth. */
+  age: number | "";
+  maritalStatus:
+    | "single"
+    | "married"
+    | "divorced"
+    | "widowed"
+    | "separated"
+    | "";
 }
 
 export interface ContactDraft {
@@ -100,6 +109,8 @@ const initial = {
     fatherName: "",
     dateOfBirth: "",
     gender: "" as PersonalDraft["gender"],
+    age: "" as PersonalDraft["age"],
+    maritalStatus: "" as PersonalDraft["maritalStatus"],
   },
   contact: {
     email: "",

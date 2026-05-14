@@ -23,6 +23,7 @@ import {
 import { SecurityNote } from "@/components/onboarding/AsidePanels";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useOnboardingStore } from "@/lib/store/onboarding-store";
+import { useOnboardingServerSync } from "@/lib/store/onboarding-sync";
 import {
   sanitizeText,
   sanitizeEmail,
@@ -63,14 +64,47 @@ export default function ConsultantOnboardingPage() {
 function Inner() {
   const router = useRouter();
   const sp = useSearchParams();
-  const session = useAuthStore((s) => s.session);
-  const expired = useAuthStore((s) => s.isExpired());
+  const loadMe = useAuthStore((s) => s.loadMe);
   const setProfile = useAuthStore((s) => s.setProfile);
+  const me = useAuthStore((s) => s.me);
   const store = useOnboardingStore();
+  const [authReady, setAuthReady] = React.useState(false);
 
   React.useEffect(() => {
-    if (!session || expired) router.replace("/login");
-  }, [session, expired, router]);
+    let cancelled = false;
+    (async () => {
+      const data = await loadMe();
+      if (cancelled) return;
+      if (!data || !data.authenticated) {
+        router.replace("/login");
+        return;
+      }
+      if (data.hasProfile) {
+        router.replace("/dashboard");
+        return;
+      }
+      setAuthReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadMe, router]);
+
+  const { hydrated } = useOnboardingServerSync({ authReady });
+
+  // Lock the practice-step contact field that matches the login identifier
+  // (me.email / me.phone). See the taxpayer page for the rationale: users.email
+  // and users.phone are the unique sign-in keys and must not be changed by the
+  // profile form, or the user can lock themselves out of their account.
+  const lockedEmail = me?.email ?? null;
+  const lockedMobile = me?.phone ?? null;
+  React.useEffect(() => {
+    if (!hydrated) return;
+    const patch: Partial<{ email: string; mobile: string }> = {};
+    if (lockedEmail && store.contact.email !== lockedEmail) patch.email = lockedEmail;
+    if (lockedMobile && store.contact.mobile !== lockedMobile) patch.mobile = lockedMobile;
+    if (patch.email || patch.mobile) store.patchContact(patch);
+  }, [hydrated, lockedEmail, lockedMobile, store]);
 
   const panRef = React.useRef<IdentityFieldHandle>(null);
   const aadhaarRef = React.useRef<IdentityFieldHandle>(null);
@@ -160,7 +194,7 @@ function Inner() {
     }
     try {
       setSubmitting(true);
-      const profile = await createConsultantProfile({
+      const { profile, next } = await createConsultantProfile({
         displayName: sanitizeText(store.personal.displayName, 80),
         email: sanitizeEmail(store.contact.email),
         mobile: sanitizeMobile(store.contact.mobile),
@@ -195,7 +229,8 @@ function Inner() {
       store.reset();
       panRef.current?.reset();
       aadhaarRef.current?.reset();
-      router.push("/dashboard");
+      await loadMe();
+      router.push(next);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Submission failed.";
       setSubmitError(msg);
@@ -551,6 +586,11 @@ function Inner() {
                   required
                   error={emailErr}
                   htmlFor="email"
+                  hint={
+                    lockedEmail
+                      ? "This is the email you signed in with. To change it, contact support."
+                      : undefined
+                  }
                 >
                   <Input
                     id="email"
@@ -563,6 +603,8 @@ function Inner() {
                       })
                     }
                     invalid={Boolean(emailErr)}
+                    disabled={Boolean(lockedEmail)}
+                    readOnly={Boolean(lockedEmail)}
                   />
                 </Field>
                 <Field
@@ -570,6 +612,11 @@ function Inner() {
                   required
                   error={mobileErr}
                   htmlFor="mobile"
+                  hint={
+                    lockedMobile
+                      ? "This is the number you signed in with. To change it, contact support."
+                      : undefined
+                  }
                 >
                   <Input
                     id="mobile"
@@ -585,6 +632,8 @@ function Inner() {
                       })
                     }
                     invalid={Boolean(mobileErr)}
+                    disabled={Boolean(lockedMobile)}
+                    readOnly={Boolean(lockedMobile)}
                   />
                 </Field>
               </FormGrid>

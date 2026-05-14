@@ -4,26 +4,30 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 
+/**
+ * Server-driven routing: ask /api/auth/me where this user should be.
+ * If profile is complete → /dashboard. If no role yet → /role-select.
+ * Otherwise → onboarding/{taxpayer|consultant}?step=N.
+ */
 export default function OnboardingIndex() {
   const router = useRouter();
-  const role = useAuthStore((s) => s.role);
-  const session = useAuthStore((s) => s.session);
+  const loadMe = useAuthStore((s) => s.loadMe);
 
   useEffect(() => {
-    if (!session) {
-      router.replace("/login");
-      return;
-    }
-    if (!role) {
-      router.replace("/role-select");
-      return;
-    }
-    router.replace(
-      role === "consultant"
-        ? "/onboarding/consultant"
-        : "/onboarding/taxpayer",
-    );
-  }, [role, session, router]);
+    let cancelled = false;
+    (async () => {
+      const me = await loadMe();
+      if (cancelled) return;
+      if (!me || !me.authenticated) {
+        router.replace("/login");
+        return;
+      }
+      router.replace(me.next || "/dashboard");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loadMe, router]);
 
   return null;
 }

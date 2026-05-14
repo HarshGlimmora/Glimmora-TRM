@@ -230,13 +230,18 @@ export async function sendOtpEmail(args: OtpEmailArgs): Promise<SendResult> {
     if (!result.ok) result = await sendViaResend(args);
   }
 
+  // Dev-mode visibility: even on successful delivery we echo the OTP to the
+  // server console so tests and local dev don't have to round-trip through
+  // a real mailbox. This branch is guarded by NODE_ENV and is gone in prod.
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[email.dev] OTP for ${args.to}: ${args.code} (via ${result.via})`);
+  }
+
   if (!result.ok) {
-    // Dev fallback — never log in production
     if (process.env.NODE_ENV !== "production") {
       console.warn(
         `[email] Could not deliver to ${args.to} (${result.via}: ${result.error}).`,
       );
-      console.warn(`[email] OTP for ${args.to}: ${args.code}`);
       return { ok: true, via: "console" };
     }
   }

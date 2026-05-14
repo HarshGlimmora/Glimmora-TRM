@@ -3,84 +3,68 @@
 import * as React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
-import { getProfile } from "@/lib/api";
 import type { Role } from "@/lib/types";
 
 /**
- * Client-side route guard.
+ * Server-driven route guard.
  *
- * Responsibilities:
- *   - Block access if there is no live session.
- *   - Block access if the session has expired (TTL).
- *   - Restrict by role when `requireRole` is provided.
- *   - Hydrate the in-memory profile from the API when we only have a profileId.
+ * On mount we call `/api/auth/me`. The server:
+ *   - returns 401 if the cookie is missing/expired/revoked → we redirect to /login
+ *   - returns 200 with `{ next }` telling us where this user is supposed to be
+ *
+ * If the user is on the wrong route for their state (e.g. a profile-complete
+ * user landing on /onboarding/...), the server-recommended `next` URL wins.
+ * This keeps routing decisions in one place (lib/server/services/auth.ts).
  */
 export function AuthGuard({
   children,
   requireRole,
-  requireProfile = true,
 }: {
   children: React.ReactNode;
   requireRole?: Role;
-  requireProfile?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const bootstrapped = useAuthStore((s) => s.bootstrapped);
+  const loadMe = useAuthStore((s) => s.loadMe);
+  const me = useAuthStore((s) => s.me);
   const session = useAuthStore((s) => s.session);
-  const role = useAuthStore((s) => s.role);
   const profile = useAuthStore((s) => s.profile);
-  const profileId = useAuthStore((s) => s.profileId);
-  const isExpired = useAuthStore((s) => s.isExpired);
-  const setProfile = useAuthStore((s) => s.setProfile);
-  const signOut = useAuthStore((s) => s.signOut);
+  const next = useAuthStore((s) => s.next);
+  const bootstrapped = useAuthStore((s) => s.bootstrapped);
 
   const [checking, setChecking] = React.useState(true);
 
   React.useEffect(() => {
-    if (!bootstrapped) return;
-    const expired = isExpired();
-    if (!session || expired) {
-      if (expired && session) signOut();
-      router.replace(`/login?from=${encodeURIComponent(pathname)}`);
-      return;
-    }
-    if (requireRole && role && role !== requireRole) {
-      router.replace("/dashboard");
-      return;
-    }
-    if (requireProfile && !profile) {
-      // Try to rehydrate from sample data
-      if (profileId) {
-        getProfile(profileId).then((p) => {
-          if (p) setProfile(p);
-          setChecking(false);
-        });
-      } else {
-        // No profile and no id — send to onboarding
-        router.replace(
-          role === "consultant"
-            ? "/onboarding/consultant"
-            : "/onboarding/taxpayer",
-        );
+    let cancelled = false;
+    (async () => {
+      const data = await loadMe();
+      if (cancelled) return;
+      if (!data || !data.authenticated) {
+        router.replace(`/login?from=${encodeURIComponent(pathname)}`);
+        return;
       }
-    } else {
+      // Role gate (e.g. CA-only pages)
+      if (requireRole && data.user.role && data.user.role !== requireRole) {
+        router.replace("/dashboard");
+        return;
+      }
+      // If the server says we belong somewhere else, defer to it — but only
+      // when the suggested route isn't the page we're already on.
+      const suggested = stripQuery(data.next);
+      const current = stripQuery(pathname);
+      if (data.next && suggested !== current && !sameFamily(suggested, current)) {
+        router.replace(data.next);
+        return;
+      }
       setChecking(false);
-    }
-  }, [
-    bootstrapped,
-    session,
-    pathname,
-    requireRole,
-    requireProfile,
-    role,
-    profile,
-    profileId,
-    router,
-    isExpired,
-    setProfile,
-    signOut,
-  ]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // We only want this effect to run once on mount per page navigation.
+    // pathname dep lets us re-check when navigating between guarded pages.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   if (!bootstrapped || checking) {
     return (
@@ -93,5 +77,29 @@ export function AuthGuard({
     );
   }
 
+  // After bootstrap, if we still have nothing, something went sideways.
+  if (!session || !me) return null;
+
+  // For pages that need a finished profile, ensure we have one.
+  if (!profile && me.profileCompletedAt) {
+    // Profile is complete server-side but our cache hasn't synthesized it
+    // yet — show the skeleton briefly.
+    return null;
+  }
+
+  // Suppress unused-warning for `next` — read at top of effect.
+  void next;
+
   return <>{children}</>;
+}
+
+function stripQuery(href: string): string {
+  const i = href.indexOf("?");
+  return i === -1 ? href : href.slice(0, i);
+}
+
+/** Treat /onboarding/taxpayer vs /onboarding/consultant as the same family
+ *  as the suggested route when stepping inside onboarding. */
+function sameFamily(a: string, b: string): boolean {
+  return a.startsWith("/onboarding/") && b.startsWith("/onboarding/");
 }

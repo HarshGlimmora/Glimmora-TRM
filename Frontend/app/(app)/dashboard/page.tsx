@@ -24,7 +24,7 @@ export default function DashboardPage() {
     let cancelled = false;
     if (!profile) return;
     setLoading(true);
-    fetchDashboard(profile.id).then((d) => {
+    fetchDashboard(profile).then((d) => {
       if (!cancelled) {
         setData(d);
         setLoading(false);
