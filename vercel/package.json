@@ -1,0 +1,42 @@
+{
+  "name": "glimmora-trm-vercel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Vercel deployment shell that wraps Frontend (Next.js) and Backend (FastAPI). Source lives in ../Frontend and ../Backend; this folder only contains config + symlinks + the Python ASGI wrapper.",
+  "scripts": {
+    "mirror": "node scripts/mirror-frontend.mjs",
+    "predev": "node scripts/mirror-frontend.mjs",
+    "prebuild": "node scripts/mirror-frontend.mjs",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.4.5",
+    "@types/pg": "^8.20.0",
+    "clsx": "2.1.1",
+    "next": "14.2.18",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "2.5.4",
+    "zod": "^3.25.76",
+    "zustand": "4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.10",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.18",
+    "postcss": "8.4.47",
+    "tailwindcss": "3.4.13",
+    "typescript": "5.6.2"
+  }
+}

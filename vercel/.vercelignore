@@ -1,0 +1,12 @@
+# Vercel-specific ignores (in addition to .gitignore).
+# Tests and IDE artifacts never need to be uploaded to the build runner.
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+../Frontend/node_modules
+../Frontend/.next
+../Frontend/test-results
+../Frontend/playwright-report
+../Backend/data/uploads
+../Backend/data/app.db
