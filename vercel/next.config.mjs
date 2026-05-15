@@ -25,6 +25,14 @@ const nextConfig = {
   poweredByHeader: false,
   experimental: {
     serverComponentsExternalPackages: ["@electric-sql/pglite", "pg"],
+    // Bundle the Postgres migration SQL files into every Next.js serverless
+    // function. Vercel's Output File Tracing can't infer them otherwise:
+    // lib/server/db/migrate.ts builds the paths at runtime via
+    // `path.resolve(cwd, "..", "Backend", ...)`, so the static analyzer
+    // misses them and the function bundle ships without the .sql files.
+    outputFileTracingIncludes: {
+      "/**/*": ["../Backend/app/db/migrations/sql/postgres/*.sql"],
+    },
   },
   // The app/, lib/, components/ tree is a mirror of ../Frontend built out of
   // real dirs + per-file symlinks (see scripts/mirror-frontend.mjs). Webpack's
