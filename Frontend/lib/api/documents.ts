@@ -10,10 +10,23 @@ export type DocumentType =
   | "salary_slip"
   | "bank_csv"
   | "bank_pdf"
-  | "unknown_pdf";
+  | "unknown_pdf"
+  | "capital_gains_statement"
+  | "broker_pnl";
 
 export type DocumentStatus = "uploaded" | "processing" | "completed" | "failed";
 export type RoutingStatus = "pending" | "routed" | "partially_routed" | "unresolved" | "overridden";
+
+export interface ExtractionPayload {
+  version: string;
+  model_used: string;
+  doc_type: string;
+  extracted_at: string;
+  confidence: number;
+  raw: Record<string, unknown>;
+  user_overrides?: Record<string, unknown>;
+  override_reasons?: { reason: string; at: string; fields: string[] }[];
+}
 
 export interface DocumentDTO {
   id: string;
@@ -27,6 +40,10 @@ export interface DocumentDTO {
   status: DocumentStatus;
   routing_status: RoutingStatus;
   routing_report: RoutingReportShape | null;
+  extraction_payload: ExtractionPayload | null;
+  extraction_started_at: string | null;
+  extraction_finished_at: string | null;
+  extraction_error: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -135,6 +152,29 @@ export async function reassignDocument(
     credentials: "same-origin",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  return readJsonOrError<DocumentDTO>(res);
+}
+
+export async function patchExtraction(
+  id: string,
+  body: { fields: Record<string, unknown>; reason?: string },
+): Promise<DocumentDTO> {
+  const res = await fetch(`/api/documents/${encodeURIComponent(id)}/extraction`, {
+    method: "PATCH",
+    credentials: "same-origin",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  return readJsonOrError<DocumentDTO>(res);
+}
+
+export async function reextractDocument(id: string): Promise<DocumentDTO> {
+  const res = await fetch(`/api/documents/${encodeURIComponent(id)}/reextract`, {
+    method: "POST",
+    credentials: "same-origin",
     cache: "no-store",
   });
   return readJsonOrError<DocumentDTO>(res);

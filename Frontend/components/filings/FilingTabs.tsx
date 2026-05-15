@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 
 // `enabled: false` tabs are placeholders until their owning step ships
-// (Transactions = Step 4, Regime = Step 5, Summary = Step 6, Submit = Step 7).
+// (Submit = Step 7).
 const TABS = [
   { key: "documents", label: "Documents", enabled: true },
-  { key: "transactions", label: "Transactions", enabled: false },
-  { key: "regime", label: "Regime", enabled: false },
-  { key: "summary", label: "Summary", enabled: false },
+  { key: "transactions", label: "Transactions", enabled: true },
+  { key: "regime", label: "Regime", enabled: true },
+  { key: "summary", label: "Summary", enabled: true },
   { key: "submit", label: "Submit", enabled: false },
 ] as const;
 

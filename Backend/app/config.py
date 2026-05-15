@@ -50,6 +50,28 @@ class Settings(BaseSettings):
     # Must match the value Next.js loads from process.env.AUTH_SHARED_SECRET.
     auth_shared_secret: str | None = Field(default=None)
 
+    # ------------------------------------------------------------------
+    # Vertex AI Gemini — Layer 3 of the extraction pipeline.
+    #
+    # Credentials can be supplied in EITHER of two ways:
+    #   1. GOOGLE_APPLICATION_CREDENTIALS=path/to/vertex-sa.json
+    #      (the standard SDK convention; recommended for filesystem deploys)
+    #   2. VERTEX_API_KEY=<base64-encoded service-account JSON>
+    #      (useful when the host has no writable filesystem — Vercel etc.)
+    #
+    # When option 2 is set, the bootstrap decodes the JSON, extracts the
+    # `project_id` from it (so GCP_PROJECT_ID becomes optional), builds a
+    # Credentials object, and hands it to vertexai.init() directly.
+    #
+    # `VERTEX_GEMINI_MODEL=stub` (default) short-circuits with mock payloads.
+    # ------------------------------------------------------------------
+    vertex_gemini_model: str = Field(default="stub")
+    vertex_api_key: str | None = Field(default=None)
+    gcp_project_id: str | None = Field(default=None)
+    gcp_region: str = Field(default="asia-south1")
+    # Confidence below which Layer 2 escalates to Layer 3 (the LLM).
+    extraction_llm_threshold: float = Field(default=0.9)
+
     @model_validator(mode="after")
     def _check_backend_config(self) -> "Settings":
         if self.database_backend is DatabaseBackend.supabase and not self.supabase_db_url:

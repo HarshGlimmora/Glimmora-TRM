@@ -17,9 +17,13 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy.orm import Session
 
+from app.api.deps import CurrentUser, get_current_user
+from app.api.v1.workspace import _ensure_shadow_user, _now_iso
 from app.db.session import get_db
+from app.models.cross import AuditLog
 from app.models.filing import TaxReturn
 from app.schemas.taxation import CalculateRequest, CalculateResponse, RegimeResult
+from app.services.regime import ack_text_hash, evaluate_regime
 from app.services.taxation import RuleNotFoundError, compute_tax
 from app.services.taxation.engine import TaxResult
 from app.services.taxation.statute import resolve_statute
@@ -36,10 +40,16 @@ def calculate(
     payload: CalculateRequest,
     filing_id: str = Path(..., min_length=1),
     db: Session = Depends(get_db),
+    current: CurrentUser = Depends(get_current_user),
 ) -> CalculateResponse:
     filing = db.get(TaxReturn, filing_id)
-    if filing is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "filing_not_found")
+    if filing is None or filing.deleted_at is not None or filing.user_id != current.id:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail={"code": "filing_not_found", "message": "Filing not found."},
+        )
+
+    user = _ensure_shadow_user(db, current)
 
     # Optional inline declarations are stashed onto the filing's summary_json so
     # the engine sees a single source of truth.
@@ -60,18 +70,49 @@ def calculate(
         ["old", "new"] if payload.regime == "both" else [payload.regime]
     )
 
-    if not payload.acknowledged_regime_switch and filing.regime_switch_acknowledged == 0:
-        if filing.regime_used and filing.regime_used != payload.regime and payload.regime != "both":
+    # Section 115BAC gate (per ARCH §6.4 / API_CONTRACTS §6.2):
+    #   - BLOCK            → 422 regime_switch_blocked   (no override path)
+    #   - WARN_HIGH + no ack → 409 regime_acknowledgment_required
+    #   - WARN_HIGH + ack  → require matching hash; proceed and commit
+    evaluation = evaluate_regime(db, user, filing, payload.regime)
+
+    if evaluation.level == "BLOCK":
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "code": "regime_switch_blocked",
+                "message": evaluation.message,
+                "section_referenced": evaluation.section_referenced,
+            },
+        )
+
+    if evaluation.level == "WARN_HIGH":
+        if not payload.acknowledged_regime_switch:
             raise HTTPException(
                 status.HTTP_409_CONFLICT,
                 detail={
                     "code": "regime_acknowledgment_required",
                     "message": (
                         "Switching regime requires an explicit acknowledgement. "
-                        "Run /precheck-regime and re-submit with "
-                        "`acknowledged_regime_switch: true`."
+                        "Run /precheck-regime, show the modal, and re-submit "
+                        "with `acknowledged_regime_switch: true` and "
+                        "`acknowledgment_text_hash` equal to sha256 of the "
+                        "displayed text."
                     ),
-                    "section_ref": "115BAC(6)",
+                    "section_ref": evaluation.section_referenced,
+                },
+            )
+        expected = ack_text_hash()
+        if (payload.acknowledgment_text_hash or "").lower() != expected:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "code": "regime_acknowledgment_hash_mismatch",
+                    "message": (
+                        "Provided acknowledgment_text_hash does not match the "
+                        "canonical Section 115BAC(6) text. Re-display the text "
+                        "from /precheck-regime exactly and re-hash."
+                    ),
                 },
             )
 
@@ -115,6 +156,71 @@ def calculate(
     elif len(results) == 1:
         only = next(iter(results))
         filing.balance_payable = float(results[only].balance_payable)
+
+    # Commit the regime choice when a single regime was calculated. Per
+    # FILING_FLOW.md §3.5, /calculate is the regime commit point: it sets
+    # regime_used + ack metadata + (if applicable) increments the lifetime
+    # switch-back counter. The "both" path is a preview only.
+    if payload.regime in ("old", "new"):
+        prev_regime_used = filing.regime_used
+        filing.regime_used = payload.regime
+        filing.updated_at = _now_iso()
+
+        if evaluation.level == "WARN_HIGH":
+            filing.regime_switch_acknowledged = 1
+            filing.regime_switch_acknowledged_at = _now_iso()
+            filing.regime_switch_section_referenced = evaluation.section_referenced
+            filing.regime_acknowledgment_text_hash = ack_text_hash()
+            filing.form_10iea_required = 1 if evaluation.form_10iea_required else 0
+
+            # Increment the lifetime counter only when this is the one-time
+            # business-income switch back from old → new. Other WARN_HIGH cases
+            # (cat-B opt-out new → old) do not consume the lifetime quota.
+            if (
+                evaluation.code == "115bac_one_time_switch_back"
+                and prev_regime_used != "new"
+            ):
+                user.lifetime_switch_backs_to_new = (
+                    int(user.lifetime_switch_backs_to_new or 0) + 1
+                )
+
+            db.add(
+                AuditLog(
+                    actor_user_id=current.id,
+                    actor_role=current.role or "taxpayer",
+                    action="regime_switch_acknowledged",
+                    entity_type="tax_returns",
+                    entity_id=filing.id,
+                    tax_year=filing.tax_year,
+                    before_state={"regime_used": prev_regime_used},
+                    after_state={"regime_used": payload.regime},
+                    metadata_={
+                        "previous_regime": evaluation.previous_regime,
+                        "requested_regime": evaluation.requested_regime,
+                        "code": evaluation.code,
+                        "section_referenced": evaluation.section_referenced,
+                        "form_10iea_required": evaluation.form_10iea_required,
+                        "lifetime_switch_backs_after": int(
+                            user.lifetime_switch_backs_to_new or 0
+                        ),
+                        "acknowledged_text_hash": ack_text_hash(),
+                    },
+                )
+            )
+        elif prev_regime_used != payload.regime:
+            db.add(
+                AuditLog(
+                    actor_user_id=current.id,
+                    actor_role=current.role or "taxpayer",
+                    action="regime_selected",
+                    entity_type="tax_returns",
+                    entity_id=filing.id,
+                    tax_year=filing.tax_year,
+                    before_state={"regime_used": prev_regime_used},
+                    after_state={"regime_used": payload.regime},
+                    metadata_={"level": evaluation.level, "code": evaluation.code},
+                )
+            )
 
     db.commit()
     return CalculateResponse(**response_kwargs)

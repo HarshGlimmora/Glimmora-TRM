@@ -74,8 +74,14 @@ COLUMN_ALIASES: dict[str, set[str]] = {
 
 def parse_bank_csv(content: bytes, *, hint_dd_first: bool = True) -> list[ParsedRow]:
     text = _decode(content)
-    reader = csv.reader(io.StringIO(text))
-    rows = [r for r in reader if any(c.strip() for c in r)]
+    delimiter = _sniff_delimiter(text)
+    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
+    rows = [
+        r for r in reader
+        if any(c.strip() for c in r)
+        # Skip xlsx→csv sheet markers and human comments.
+        and not (r and r[0].strip().startswith("#"))
+    ]
     if not rows:
         raise CsvParseError("CSV is empty.")
 
@@ -123,24 +129,81 @@ def _decode(content: bytes) -> str:
     raise CsvParseError("Could not decode CSV bytes as utf-8 or latin-1.")
 
 
+_DELIMITERS = (",", "\t", ";", "|")
+
+
+def _sniff_delimiter(text: str) -> str:
+    """Pick the delimiter that produces the most consistent column count over
+    the first few non-empty lines. csv.Sniffer is too eager to declare commas
+    on free-form text; this counter-based approach is more reliable for the
+    tabular exports we see in practice (HDFC CSV = comma, Zerodha TSV = tab,
+    European banks = semicolon)."""
+    sample_lines = [
+        ln for ln in text.splitlines()[:40]
+        if ln.strip() and not ln.strip().startswith("#")
+    ]
+    if not sample_lines:
+        return ","
+
+    best_delim = ","
+    best_score = -1
+    for delim in _DELIMITERS:
+        # Count occurrences per line, ignoring lines that have zero of this
+        # delimiter (free-text / blank-ish lines). Stability = how often the
+        # modal count appears across the sample.
+        counts = [ln.count(delim) for ln in sample_lines if delim in ln]
+        if not counts:
+            continue
+        from collections import Counter
+        modal_count, modal_freq = Counter(counts).most_common(1)[0]
+        if modal_count == 0:
+            continue
+        # Score favours both: high modal count (lots of columns) and high
+        # stability (most lines agree on the count).
+        score = modal_count * modal_freq
+        if score > best_score:
+            best_score = score
+            best_delim = delim
+    return best_delim
+
+
 def _find_header(rows: list[list[str]]) -> tuple[int, list[str]]:
-    """Scan the first ~10 rows for a header line with a date column AND
-    either debit/credit pair or amount. Bank exports often prepend account
-    metadata rows before the actual header.
+    """Scan the first ~50 rows for a header line with a date column AND
+    either debit/credit pair or amount. Real bank exports often prepend
+    10-20 metadata rows (account info, period, opening balance, blank
+    separators) before the transaction table. Substring matching tolerates
+    decorated column names like 'Date (DD/MM/YYYY)' or 'Withdrawal Amt.'.
     """
-    for i, row in enumerate(rows[:15]):
+    for i, row in enumerate(rows[:50]):
         normalised = [_norm(c) for c in row]
         if not normalised:
             continue
-        has_date = any(c in COLUMN_ALIASES["txn_date"] for c in normalised)
+        has_date = any(_cell_matches(c, COLUMN_ALIASES["txn_date"]) for c in normalised)
         has_amount = (
-            (any(c in COLUMN_ALIASES["debit"] for c in normalised)
-             and any(c in COLUMN_ALIASES["credit"] for c in normalised))
-            or any(c in COLUMN_ALIASES["amount"] for c in normalised)
+            (any(_cell_matches(c, COLUMN_ALIASES["debit"]) for c in normalised)
+             and any(_cell_matches(c, COLUMN_ALIASES["credit"]) for c in normalised))
+            or any(_cell_matches(c, COLUMN_ALIASES["amount"]) for c in normalised)
         )
         if has_date and has_amount:
             return i, [c.strip() for c in row]
     raise CsvParseError("Could not locate a header row.")
+
+
+def _cell_matches(normalised_cell: str, aliases: set[str]) -> bool:
+    """Substring-aware alias match. Header cells in the wild come decorated:
+    `Date (DD/MM/YYYY)`, `Withdrawal Amt.`, `Particulars / Narration`. We
+    treat any alias appearing inside the cell as a match. Short aliases
+    (length 1-2) require exact match to avoid false positives like `dr` in
+    `drug`."""
+    if not normalised_cell:
+        return False
+    for alias in aliases:
+        if len(alias) <= 2:
+            if normalised_cell == alias:
+                return True
+        elif alias in normalised_cell:
+            return True
+    return False
 
 
 def _norm(s: str) -> str:
@@ -152,7 +215,9 @@ def _map_columns(header: list[str]) -> dict[str, int]:
     for idx, col in enumerate(header):
         n = _norm(col)
         for canonical, aliases in COLUMN_ALIASES.items():
-            if n in aliases and canonical not in out:
+            if canonical in out:
+                continue
+            if _cell_matches(n, aliases):
                 out[canonical] = idx
                 break
     return out

@@ -6,6 +6,7 @@ import { UploadDropzone } from "@/components/filings/UploadDropzone";
 import { DocumentRow } from "@/components/filings/DocumentRow";
 import { RoutingReportPanel } from "@/components/filings/RoutingReportPanel";
 import { ReassignFyDialog } from "@/components/filings/ReassignFyDialog";
+import { ExtractionEditor } from "@/components/filings/ExtractionEditor";
 import { useFiling } from "@/lib/filings/context";
 import { listFilingDocuments, type DocumentDTO } from "@/lib/api/documents";
 
@@ -15,6 +16,7 @@ export default function FilingDocumentsPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [focusDoc, setFocusDoc] = React.useState<DocumentDTO | null>(null);
   const [reassignDoc, setReassignDoc] = React.useState<DocumentDTO | null>(null);
+  const [extractionDoc, setExtractionDoc] = React.useState<DocumentDTO | null>(null);
 
   const refresh = React.useCallback(async () => {
     try {
@@ -45,6 +47,15 @@ export default function FilingDocumentsPage() {
   const handleDeleted = (id: string) => {
     setDocs((prev) => (prev ? prev.filter((d) => d.id !== id) : prev));
     if (focusDoc?.id === id) setFocusDoc(null);
+    if (extractionDoc?.id === id) setExtractionDoc(null);
+  };
+
+  const handleExtractionUpdated = (updated: DocumentDTO) => {
+    setDocs((prev) =>
+      prev ? prev.map((d) => (d.id === updated.id ? updated : d)) : prev,
+    );
+    setExtractionDoc(updated);
+    if (focusDoc?.id === updated.id) setFocusDoc(updated);
   };
 
   return (
@@ -65,6 +76,13 @@ export default function FilingDocumentsPage() {
       </Card>
 
       {focusDoc && <RoutingReportPanel doc={focusDoc} />}
+
+      {extractionDoc && (
+        <ExtractionEditor
+          doc={extractionDoc}
+          onUpdated={handleExtractionUpdated}
+        />
+      )}
 
       <Card>
         <CardHeader>
@@ -99,6 +117,7 @@ export default function FilingDocumentsPage() {
                   onDeleted={handleDeleted}
                   onViewRouting={() => setFocusDoc(d)}
                   onReassign={() => setReassignDoc(d)}
+                  onViewExtraction={() => setExtractionDoc(d)}
                 />
               ))}
             </ul>

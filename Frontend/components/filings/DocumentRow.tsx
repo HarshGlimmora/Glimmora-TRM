@@ -20,6 +20,8 @@ const DOC_TYPE_LABELS: Record<DocumentType, string> = {
   bank_csv: "Bank statement (CSV)",
   bank_pdf: "Bank statement (PDF)",
   unknown_pdf: "PDF — pending classification",
+  capital_gains_statement: "Capital gains statement",
+  broker_pnl: "Broker P&L statement",
 };
 
 const ROUTING_TONE: Record<
@@ -44,11 +46,13 @@ export function DocumentRow({
   onDeleted,
   onViewRouting,
   onReassign,
+  onViewExtraction,
 }: {
   doc: DocumentDTO;
   onDeleted: (id: string) => void;
   onViewRouting?: (doc: DocumentDTO) => void;
   onReassign?: (doc: DocumentDTO) => void;
+  onViewExtraction?: (doc: DocumentDTO) => void;
 }) {
   const [busy, setBusy] = React.useState(false);
   const routing = ROUTING_TONE[doc.routing_status];
@@ -108,6 +112,16 @@ export function DocumentRow({
             onClick={() => onViewRouting(doc)}
           >
             Routing
+          </Button>
+        )}
+        {onViewExtraction && (doc.mime_type === "application/pdf" || doc.extraction_payload) && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onViewExtraction(doc)}
+          >
+            Extraction
           </Button>
         )}
         {onReassign && (

@@ -19,6 +19,7 @@ class HousePropertyDeclaration(BaseModel):
 class CalculateRequest(BaseModel):
     regime: Literal["old", "new", "both"] = "both"
     acknowledged_regime_switch: bool = False
+    acknowledgment_text_hash: str | None = None  # sha256 hex of canonical 115BAC(6) text
 
     # Overrides used when User row lacks fields (MVP: residency / DOB columns deferred).
     residency_override: Literal["resident", "non_resident", "rn_or"] | None = None

@@ -35,9 +35,9 @@
 This is the master checklist. Tick the box when both backend AND frontend for that step are merged AND manually verified.
 
 - [x] **Step 1** — Auth proxy + filing CRUD (`POST/GET /filings`, `GET /filings/{id}`, `PATCH /filings/{id}`) + wire `Begin filing` button
-- [ ] **Step 2** — CSV upload + rule-based categorization + FY router + documents list
-- [ ] **Step 3** — PDF upload + Vertex AI Gemini extraction + editable extracted fields + re-extract
-- [ ] **Step 4** — Transactions review (filters, single + bulk verify, edit drawer, progress)
+- [x] **Step 2** — CSV upload + rule-based categorization + FY router + documents list
+- [x] **Step 3** — PDF upload + Vertex AI Gemini extraction + editable extracted fields + re-extract
+- [x] **Step 4** — Transactions review (filters, single + bulk verify, edit drawer, progress)
 - [ ] **Step 5** — Regime precheck + commit + Section 115BAC(6) modal with hashed ack
 - [ ] **Step 6** — Summary page + calculation trace accordion + PDF download
 - [ ] **Step 7** — Submit flow with phone OTP gate + preconditions checklist
@@ -893,19 +893,42 @@ Steps are designed so each one is independently testable and visible. Each row m
 - **Frontend:** `proxyToBackend` helper at `Frontend/lib/server/backendProxy.ts`; Next route handlers under `Frontend/app/api/workspace/years/[fy]/...` and `/api/filings/[id]/...`; wire `Begin filing` ([PrimaryCta.tsx:65](../Frontend/components/dashboard/PrimaryCta.tsx#L65)) → `/filings/new` page that POSTs to `/api/workspace/years/{activeFY}/filing` → redirects to `/filings/{id}/documents`. Skeleton `[id]/layout.tsx` + `FilingStepper` + `FilingTabs`.
 - **Verify:** clicking Begin creates (or returns) a draft filing for the active FY and lands on Documents tab with empty state. Idempotent — clicking again returns the same filing id, not a duplicate.
 
-### Step 2 — CSV upload + rule categorization &nbsp;`[ ]`
+### Step 2 — CSV upload + rule categorization &nbsp;`[x]` ✅ Done — 2026-05-15
+
+> Includes the Step 2 addendum (PUT `/documents/{id}` for FY reassignment) and
+> the broker-/capital-gains-statement support added on top of the original
+> bank-CSV scope. CSV → PDF in-memory conversion routes every CSV upload
+> through Vertex AI Gemini when the deterministic parser abstains or the
+> document type isn't `bank_csv`.
 
 - **Backend:** `POST /documents/upload` for CSV; `category_rules` table + seed; rule engine; FY router; `GET /filings/{id}/documents`; `DELETE /documents/{doc_id}`.
 - **Frontend:** `UploadDropzone`; uploaded-docs list; `RoutingReportPanel`.
 - **Verify:** upload a CSV, see rows routed to the right FY, see the routing report.
 
-### Step 3 — PDF upload + Gemini extraction &nbsp;`[ ]`
+### Step 3 — PDF upload + Gemini extraction &nbsp;`[x]` ✅ Done — 2026-05-15
+
+> Real Vertex AI Gemini 2.5 Pro extraction wired end-to-end. Three-layer
+> pipeline: deterministic CSV parser (Layer 1+2) → CSV/xlsx → in-memory PDF
+> conversion → Gemini multimodal extract (Layer 3) gated by
+> `EXTRACTION_LLM_THRESHOLD` (default 0.9). Schemas: form16, form_26as,
+> ais_tis, salary_slip, bank_pdf, capital_gains_statement, broker_pnl.
+> xlsx ingestion via openpyxl. Stale-failed dedup auto-recovers on
+> re-upload. ExtractionEditor surfaces every field as editable.
 
 - **Backend:** Vertex AI integration in `services/extraction/gemini.py`; per-doc-type Pydantic schemas; `extraction_payload` column populated; `PATCH /documents/{doc_id}/extraction` for edits; `POST /documents/{doc_id}/reextract`.
 - **Frontend:** PDF accepted in dropzone; "Extracting…" state; `ExtractionEditor` form; save → reflects in transactions.
 - **Verify:** upload Form 16 PDF, edit one extracted number, save, see it flow into transactions.
 
-### Step 4 — Transactions review &nbsp;`[ ]`
+### Step 4 — Transactions review &nbsp;`[x]` ✅ Done — 2026-05-15
+
+> Eight endpoints in `app/api/v1/transactions.py` (list with status/method/head
+> filters + pagination, progress tally, single GET/PUT/DELETE, single verify,
+> bulk verify-all, manual create). Frontend: `TxnTable` + `TxnRow` with
+> RULE/AI/MANUAL source badges and Indian-grouping ₹ amounts, `TxnEditDrawer`
+> for cell-level edits, `VerifyProgressBar` for the verified-% gate. Any user
+> edit demotes the row to `manual` / `manual_override`. Transactions tab
+> enabled on `FilingTabs`. Also: ExtractionEditor rebuilt with structured
+> per-section tables (was a flat dotted-path list).
 
 - **Backend:** `GET /filings/{id}/transactions` (+filters), `/progress`, `PATCH /transactions/{id}`, `/verify`, `/verify-all`, `POST` (manual row).
 - **Frontend:** `TxnTable` + badges + `TxnEditDrawer` + `VerifyProgressBar` + bulk-verify.
