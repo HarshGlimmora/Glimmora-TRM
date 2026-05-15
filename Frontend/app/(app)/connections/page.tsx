@@ -37,6 +37,7 @@ import { validatePan } from "@/lib/validation/identity";
 import { formatDate, formatRelative } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { BrowseConsultants } from "@/components/connections/BrowseConsultants";
+import { ConnectViaCodeModal } from "@/components/connections/ConnectViaCode";
 import { MyInviteCode } from "@/components/connections/MyInviteCode";
 import { ActiveChats } from "@/components/connections/ActiveChats";
 import { ActiveConnections } from "@/components/connections/ActiveConnections";
@@ -76,6 +77,7 @@ export default function ConnectionsPage() {
   const [links, setLinks] = React.useState<LinkGrant[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [openNew, setOpenNew] = React.useState(false);
+  const [openCode, setOpenCode] = React.useState(false);
   const [modalGrant, setModalGrant] = React.useState<LinkGrant | null>(null);
   const [notice, setNotice] = React.useState<{ kind: "success" | "error" | "info"; msg: string } | null>(null);
   // Chat drawer state — owned at the page level so both the ActiveChats and
@@ -187,6 +189,16 @@ export default function ConnectionsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {isTaxpayer && (
+            <Button
+              size="md"
+              variant="outline"
+              leftIcon={<Icon.Link size={14} />}
+              onClick={() => setOpenCode(true)}
+            >
+              Connect with code
+            </Button>
+          )}
           <Button
             size="md"
             variant="outline"
@@ -421,6 +433,19 @@ export default function ConnectionsPage() {
       <GrantDetailModal
         grant={modalGrant}
         onClose={() => setModalGrant(null)}
+      />
+
+      <ConnectViaCodeModal
+        open={openCode}
+        onClose={() => setOpenCode(false)}
+        onConnected={() => {
+          setNotice({
+            kind: "success",
+            msg: "Linked. Your consultant now has the agreed scope of access.",
+          });
+          void refresh();
+          setChatRefreshKey((k) => k + 1);
+        }}
       />
 
       <ChatDrawer

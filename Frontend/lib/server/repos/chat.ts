@@ -49,8 +49,11 @@ export interface ChatAttachmentRow {
   file_name: string;
   mime_type: string;
   byte_size: number;
-  storage_key: string;
   created_at: string;
+}
+
+export interface ChatAttachmentBytesRow extends ChatAttachmentRow {
+  bytes: Buffer;
 }
 
 export interface ChatReactionRow {
@@ -225,19 +228,19 @@ export const chatRepo = {
       fileName: string;
       mimeType: string;
       byteSize: number;
-      storageKey: string;
+      bytes: Buffer;
     },
     client?: DbClient,
   ): Promise<ChatAttachmentRow> {
-    const text = `INSERT INTO chat_attachments(message_id, file_name, mime_type, byte_size, storage_key)
+    const text = `INSERT INTO chat_attachments(message_id, file_name, mime_type, byte_size, bytes)
        VALUES($1, $2, $3, $4, $5)
-       RETURNING id, message_id, file_name, mime_type, byte_size, storage_key, created_at`;
+       RETURNING id, message_id, file_name, mime_type, byte_size, created_at`;
     const params = [
       args.messageId,
       args.fileName,
       args.mimeType,
       args.byteSize,
-      args.storageKey,
+      args.bytes,
     ];
     const r = client
       ? await client.query<ChatAttachmentRow>(text, params)
@@ -249,8 +252,11 @@ export const chatRepo = {
 
   async listAttachmentsForMessages(messageIds: string[]): Promise<ChatAttachmentRow[]> {
     if (messageIds.length === 0) return [];
+    // Skip the bytea column here — listing thread messages must not pull
+    // megabytes of file bytes back per row. Bytes are streamed lazily by
+    // the download endpoint via findAttachmentBytesById.
     const r = await query<ChatAttachmentRow>(
-      `SELECT id, message_id, file_name, mime_type, byte_size, storage_key, created_at
+      `SELECT id, message_id, file_name, mime_type, byte_size, created_at
          FROM chat_attachments
         WHERE message_id = ANY($1::uuid[])
         ORDER BY created_at ASC`,
@@ -259,13 +265,30 @@ export const chatRepo = {
     return r.rows;
   },
 
-  async findAttachmentById(id: string): Promise<ChatAttachmentRow | null> {
-    const r = await query<ChatAttachmentRow>(
-      `SELECT id, message_id, file_name, mime_type, byte_size, storage_key, created_at
+  async findAttachmentBytesById(
+    id: string,
+  ): Promise<{ row: ChatAttachmentRow; messageId: string; bytes: Buffer } | null> {
+    const r = await query<ChatAttachmentBytesRow>(
+      `SELECT id, message_id, file_name, mime_type, byte_size, bytes, created_at
          FROM chat_attachments WHERE id = $1`,
       [id],
     );
-    return r.rows[0] ?? null;
+    const row = r.rows[0];
+    if (!row) return null;
+    // PGlite returns bytea as Uint8Array, pg returns Buffer. Normalise.
+    const bytes = Buffer.isBuffer(row.bytes) ? row.bytes : Buffer.from(row.bytes);
+    return {
+      row: {
+        id: row.id,
+        message_id: row.message_id,
+        file_name: row.file_name,
+        mime_type: row.mime_type,
+        byte_size: row.byte_size,
+        created_at: row.created_at,
+      },
+      messageId: row.message_id,
+      bytes,
+    };
   },
 
   async listReactionsForMessages(messageIds: string[]): Promise<ChatReactionRow[]> {

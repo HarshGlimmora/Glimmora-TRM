@@ -12,9 +12,6 @@
  * later without touching the schema.
  */
 import "server-only";
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
 import { withTransaction } from "@/lib/server/db/client";
 import { caGrantsRepo } from "@/lib/server/repos/links";
 import {
@@ -93,10 +90,6 @@ export interface ReactionAggregateDTO {
   userIds: string[];
 }
 
-function storageRoot(): string {
-  return path.resolve(process.cwd(), ".data", "chat-attachments");
-}
-
 /** Defence in depth — strip path separators and trim to a safe length. */
 function safeBaseName(name: string): string {
   const cleaned = name
@@ -105,25 +98,6 @@ function safeBaseName(name: string): string {
     .trim();
   const out = cleaned.length > 0 ? cleaned : "file";
   return out.length > 200 ? out.slice(0, 200) : out;
-}
-
-async function writeAttachmentToDisk(args: {
-  storageKey: string;
-  fileName: string;
-  bytes: Buffer;
-}): Promise<void> {
-  const dir = path.join(storageRoot(), args.storageKey);
-  await fs.mkdir(dir, { recursive: true });
-  const target = path.join(dir, safeBaseName(args.fileName));
-  await fs.writeFile(target, args.bytes);
-}
-
-async function readAttachmentFromDisk(args: {
-  storageKey: string;
-  fileName: string;
-}): Promise<Buffer> {
-  const target = path.join(storageRoot(), args.storageKey, safeBaseName(args.fileName));
-  return fs.readFile(target);
 }
 
 function aggregateReactions(
@@ -371,19 +345,13 @@ export const chatService = {
       );
       const attachments: ChatAttachmentRow[] = [];
       for (const f of args.files) {
-        const storageKey = crypto.randomUUID();
-        await writeAttachmentToDisk({
-          storageKey,
-          fileName: f.fileName,
-          bytes: f.bytes,
-        });
         const row = await chatRepo.insertAttachment(
           {
             messageId: msg.id,
             fileName: safeBaseName(f.fileName),
             mimeType: f.mimeType,
             byteSize: f.bytes.length,
-            storageKey,
+            bytes: f.bytes,
           },
           client,
         );
@@ -448,20 +416,20 @@ export const chatService = {
     mimeType: string;
     fileName: string;
   }> {
-    const att = await chatRepo.findAttachmentById(attachmentId);
-    if (!att) {
+    const fetched = await chatRepo.findAttachmentBytesById(attachmentId);
+    if (!fetched) {
       throw new NotFoundError("CHAT_FILE_NOT_FOUND", "File not found.");
     }
-    const msg = await chatRepo.findMessageById(att.message_id);
+    const msg = await chatRepo.findMessageById(fetched.messageId);
     if (!msg) {
       throw new NotFoundError("CHAT_FILE_NOT_FOUND", "File not found.");
     }
     await this.getThreadOr403(msg.thread_id, userId);
-    const bytes = await readAttachmentFromDisk({
-      storageKey: att.storage_key,
-      fileName: att.file_name,
-    });
-    return { bytes, mimeType: att.mime_type, fileName: att.file_name };
+    return {
+      bytes: fetched.bytes,
+      mimeType: fetched.row.mime_type,
+      fileName: fetched.row.file_name,
+    };
   },
 };
 

@@ -404,8 +404,14 @@ test.describe("Chat — taxpayer", () => {
       }
       return route.fulfill({ status: 405, body: "" });
     });
-    await page.route(`**/api/chat/threads/${THREAD_ID}/messages**`, (route) =>
-      route.fulfill({
+    // Pre-seed a heart from the counterparty so the always-visible
+    // reaction badge renders. Clicking it should add MY heart on top of
+    // theirs — stable to click because it's not behind hover.
+    await page.route(`**/api/chat/threads/${THREAD_ID}/messages**`, (route, req) => {
+      if (req.method() !== "GET") {
+        return route.fulfill({ status: 405, body: "" });
+      }
+      return route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
@@ -418,12 +424,19 @@ test.describe("Chat — taxpayer", () => {
               body: "Please review",
               createdAt: NOW,
               attachments: [],
-              reactions: [],
+              reactions: [
+                {
+                  emoji: "heart",
+                  count: 1,
+                  mine: false,
+                  userIds: [CONSULTANT_ID],
+                },
+              ],
             },
           ],
         }),
-      }),
-    );
+      });
+    });
     await page.route(`**/api/chat/threads/${THREAD_ID}/read`, (route) =>
       route.fulfill({
         status: 200,
@@ -450,11 +463,11 @@ test.describe("Chat — taxpayer", () => {
     const drawer = page.getByRole("dialog");
     await expect(drawer.getByText("Please review")).toBeVisible();
 
-    // The reaction row is hidden until hover/focus — `force` lets the test
-    // click it without simulating mouse movement.
-    await drawer.getByRole("button", { name: /react heart/i }).click({ force: true });
+    // The pre-seeded reaction badge is always visible — click it to add
+    // my own heart on top of the counterparty's.
+    await drawer.getByRole("button", { name: /^heart reaction$/i }).click();
 
-    await expect.poll(() => captured).not.toBeNull();
+    await expect.poll(() => captured, { timeout: 5000 }).not.toBeNull();
     expect(captured).toMatchObject({ emoji: "heart" });
   });
 });

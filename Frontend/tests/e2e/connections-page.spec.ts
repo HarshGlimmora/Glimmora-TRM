@@ -79,10 +79,13 @@ test.describe("/connections — taxpayer", () => {
       page.getByRole("heading", { name: /your consultants & access grants/i }),
     ).toBeVisible();
 
-    // Top-right action is still the PAN link entrypoint.
+    // Header actions: "Connect with code" sits next to "Link by PAN".
+    await expect(
+      page.getByRole("button", { name: /connect with code/i }),
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: /link by pan/i })).toBeVisible();
 
-    // Right-side panel now hosts both chat cards.
+    // Right-side panel hosts both chat cards.
     await expect(
       page.getByRole("region", { name: /^active chats$/i }),
     ).toBeVisible();
@@ -90,18 +93,80 @@ test.describe("/connections — taxpayer", () => {
       page.getByRole("region", { name: /^active connections$/i }),
     ).toBeVisible();
 
-    // Browse consultants (left panel) is unchanged.
+    // Browse consultants is in the left column.
     await expect(
       page.getByRole("region", { name: /browse consultants/i }),
     ).toBeVisible();
 
-    // The legacy "Connect via code" panel must be gone.
+    // The inline "Connect via code" panel should NOT be in the main layout —
+    // it lives behind the header button now.
     await expect(
       page.getByRole("region", { name: /connect via code/i }),
     ).toHaveCount(0);
 
     // Empty-state copy for server-driven and pending lists still renders.
     await expect(page.getByText(/no pending requests/i)).toBeVisible();
+  });
+
+  test("'Connect with code' button opens a modal that POSTs the 5-digit code", async ({
+    page,
+  }) => {
+    await mockBaseTaxpayer(page);
+
+    let postedBody: Record<string, unknown> | null = null;
+    await page.route("**/api/ca-link/by-code", async (route, req) => {
+      postedBody = JSON.parse(req.postData() ?? "{}");
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          grant: {
+            id: "grant_pw_code",
+            consultantId: "ca_002",
+            taxpayerId: TAXPAYER_ME.user.id,
+            counterpartyName: "CA Grace Hopper",
+            counterpartyPan: null,
+            myRoleInGrant: "taxpayer",
+            accessMode: "review_edit",
+            status: "active",
+            taxYears: ["FY 2024-25"],
+            origin: "invite_code",
+            requestedBy: "taxpayer",
+            requestedAt: new Date().toISOString(),
+            respondedAt: new Date().toISOString(),
+            expiresAt: null,
+            revokedAt: null,
+            message: null,
+          },
+          consultantId: "ca_002",
+        }),
+      });
+    });
+
+    await page.goto("/connections");
+    await page.waitForURL(/\/connections$/);
+
+    // Opening the modal.
+    await page.getByRole("button", { name: /connect with code/i }).click();
+    const codeModal = page.getByRole("dialog");
+    await expect(codeModal).toBeVisible();
+    await expect(
+      codeModal.getByRole("heading", { name: /connect with a 5-digit code/i }),
+    ).toBeVisible();
+
+    // The Connect button stays disabled until 5 digits are typed.
+    const submit = codeModal.getByRole("button", { name: /^connect$/i });
+    await expect(submit).toBeDisabled();
+    await codeModal.getByLabel(/invite code/i).fill("12345");
+    await expect(submit).toBeEnabled();
+    await submit.click();
+
+    // Parent shows the success toast and the modal closes.
+    await expect(
+      page.getByText(/Your consultant now has the agreed scope/i),
+    ).toBeVisible({ timeout: 5000 });
+    await expect(codeModal).toBeHidden();
+    expect(postedBody).toMatchObject({ code: "12345" });
   });
 
   test("Browse consultants → clicking Connect POSTs to /api/ca-link/by-id", async ({

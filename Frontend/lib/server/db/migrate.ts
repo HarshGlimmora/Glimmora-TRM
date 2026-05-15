@@ -19,11 +19,24 @@ const ADVISORY_LOCK_KEY = 8131347612n;
 
 async function migrationsDir(): Promise<string> {
   const cwd = process.cwd();
+  // We try multiple roots because the relative position of the SQL files
+  // depends on how the code is run:
+  //   - local dev from Frontend/        → ../Backend/...
+  //   - local dev from vercel/ shell    → ../Backend/...
+  //   - Vercel serverless function      → /var/task/Backend/... (when
+  //     outputFileTracingIncludes copies them under the function root)
+  //   - Vercel build step / pg fallback → process.env.MIGRATIONS_DIR
+  const rel = path.join("Backend", "app", "db", "migrations", "sql", "postgres");
   const candidates = [
-    path.resolve(cwd, "..", "Backend", "app", "db", "migrations", "sql", "postgres"),
-    path.resolve(cwd, "Backend", "app", "db", "migrations", "sql", "postgres"),
-    process.env.MIGRATIONS_DIR ?? "",
-  ].filter(Boolean);
+    process.env.MIGRATIONS_DIR,
+    path.resolve(cwd, "..", rel),
+    path.resolve(cwd, rel),
+    // Vercel mounts the function bundle at /var/task. Output-File-Tracing
+    // copies included files at their original relative location, so the
+    // Backend tree ends up at /var/task/Backend/... regardless of project root.
+    path.resolve("/var/task", rel),
+    path.resolve("/var/task", "..", rel),
+  ].filter((c): c is string => Boolean(c));
   for (const c of candidates) {
     try {
       await fs.stat(c);
