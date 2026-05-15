@@ -20,9 +20,15 @@ from fastapi.middleware.cors import CORSMiddleware
 # Useful for tests and tooling. The SQL migrations remain the source of truth.
 import app.models  # noqa: F401
 from app.api.health import router as health_router
+from app.api.v1.documents import router as documents_router
 from app.api.v1.filings import router as filings_router
+from app.api.v1.workspace import (
+    filings_patch_router as workspace_filings_patch_router,
+    router as workspace_router,
+)
 from app.config import get_settings
 from app.db.init_db import init_database
+from app.db.seed import run_seed
 
 
 logging.basicConfig(
@@ -35,6 +41,7 @@ logger = logging.getLogger("glimmora.backend")
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     init_database()
+    run_seed()
     logger.info("Backend ready.")
     yield
 
@@ -58,6 +65,9 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(filings_router)
+app.include_router(workspace_router)
+app.include_router(workspace_filings_patch_router)
+app.include_router(documents_router)
 
 
 @app.get("/")

@@ -56,7 +56,7 @@ export function PrimaryCta({
                 {role === "taxpayer" ? "Link a consultant" : "Open requests"}
               </Button>
             </Link>
-            <Link href="#">
+            <Link href={role === "taxpayer" ? "/filings/new" : "#"}>
               <Button
                 variant="ghost"
                 size="lg"

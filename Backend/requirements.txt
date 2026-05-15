@@ -4,6 +4,9 @@ sqlalchemy==2.0.35
 pydantic==2.9.2
 pydantic-settings==2.5.2
 
+# Needed for FastAPI's UploadFile / multipart parsing (POST /documents/upload).
+python-multipart==0.0.12
+
 # Supabase / Postgres driver — only used when DATABASE_BACKEND=supabase.
 # Safe to leave installed when running on SQLite.
 psycopg[binary]==3.2.3

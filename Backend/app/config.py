@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     port: int = Field(default=8000)
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
+    # Shared HS256 secret used by the Next.js proxy to sign short-lived JWTs.
+    # Must match the value Next.js loads from process.env.AUTH_SHARED_SECRET.
+    auth_shared_secret: str | None = Field(default=None)
+
     @model_validator(mode="after")
     def _check_backend_config(self) -> "Settings":
         if self.database_backend is DatabaseBackend.supabase and not self.supabase_db_url:

@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "description": "Deterministic CSV categorization rules for Indian retail bank statements. Highest priority wins on first regex/keyword/amount match.",
+  "rules": [
+    {
+      "id": "salary-neft",
+      "label": "Salary credit (NEFT/IMPS/RTGS)",
+      "priority": 100,
+      "txn_direction": "credit",
+      "pattern_regex": "(?i)\\b(sal(?:ary)?|salar?y\\s+cr|pay)\\b",
+      "keyword_any": ["NEFT-SAL", "IMPS-SAL", "RTGS-SAL", "SALARY", "PAYROLL"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "salary",
+      "head": "salary"
+    },
+    {
+      "id": "interest-fd",
+      "label": "Fixed deposit interest",
+      "priority": 95,
+      "txn_direction": "credit",
+      "pattern_regex": "(?i)\\b(int(?:erest)?|fd\\s*int|tdr\\s*int|td\\s*int)\\b",
+      "keyword_any": ["INT.PD", "INT PD", "INTEREST", "FD INT", "TDR INT"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "interest_fd",
+      "head": "other_sources"
+    },
+    {
+      "id": "interest-savings",
+      "label": "Savings account interest",
+      "priority": 90,
+      "txn_direction": "credit",
+      "pattern_regex": "(?i)\\b(s(?:avings|b)?\\s*int|qly\\s*int|quarterly\\s*int)\\b",
+      "keyword_any": ["SB INT", "SAVINGS INT", "QTRLY INT"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "interest_savings",
+      "head": "other_sources"
+    },
+    {
+      "id": "tds-deducted",
+      "label": "TDS deducted by bank / payer",
+      "priority": 110,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(tds|194a|194i|194c|194j|194h)\\b",
+      "keyword_any": ["TDS DED", "TDS RECOVERY", "194A", "194I", "TDS DEDUCTED"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "tds_deducted",
+      "head": "tds_paid"
+    },
+    {
+      "id": "rent-received",
+      "label": "Rent received",
+      "priority": 80,
+      "txn_direction": "credit",
+      "pattern_regex": "(?i)\\b(rent|tenant)\\b",
+      "keyword_any": ["RENT", "TENANT"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "rent_received",
+      "head": "house_property"
+    },
+    {
+      "id": "dividend",
+      "label": "Dividend credit",
+      "priority": 75,
+      "txn_direction": "credit",
+      "pattern_regex": "(?i)\\b(div(idend)?|dvd)\\b",
+      "keyword_any": ["DIVIDEND", "DIV.PD"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "dividend",
+      "head": "other_sources"
+    },
+    {
+      "id": "investment-mf",
+      "label": "Mutual fund / SIP outflow",
+      "priority": 50,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(sip|mf|mutual\\s*fund|grow|zerodha|kuvera|coin)\\b",
+      "keyword_any": ["SIP", "MF", "MUTUAL FUND", "ZERODHA", "GROW"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "investment_mf",
+      "head": "investment"
+    },
+    {
+      "id": "ppf-contribution",
+      "label": "PPF / EPF / NPS contribution (80C / 80CCD)",
+      "priority": 55,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(ppf|epf|nps|elss)\\b",
+      "keyword_any": ["PPF", "EPF", "NPS", "ELSS"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "section_80c",
+      "head": "deduction"
+    },
+    {
+      "id": "insurance-premium",
+      "label": "Insurance premium (life / health)",
+      "priority": 53,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(lic|insurance|premium|term\\s*plan|mediclaim|hdfc\\s*life|max\\s*life)\\b",
+      "keyword_any": ["LIC", "INSURANCE", "PREMIUM", "MEDICLAIM"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "insurance_premium",
+      "head": "deduction"
+    },
+    {
+      "id": "utilities",
+      "label": "Utility bills (electricity / gas / water / telecom)",
+      "priority": 30,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(electricity|bescom|tneb|tnpdcl|gas|jio|airtel|vi|bsnl|broadband)\\b",
+      "keyword_any": ["ELECTRICITY", "JIO", "AIRTEL", "BROADBAND", "GAS"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "utilities",
+      "head": "expense"
+    },
+    {
+      "id": "rent-paid",
+      "label": "Rent paid (for HRA exemption)",
+      "priority": 32,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(rent\\s*paid|to\\s*landlord|hra)\\b",
+      "keyword_any": ["RENT PAID", "LANDLORD", "HRA"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "rent_paid",
+      "head": "expense"
+    },
+    {
+      "id": "atm-cash",
+      "label": "ATM cash withdrawal",
+      "priority": 20,
+      "txn_direction": "debit",
+      "pattern_regex": "(?i)\\b(atm|cash\\s*w(?:ithdrawal|d)|nfs)\\b",
+      "keyword_any": ["ATM", "CASH WD", "NFS"],
+      "amount_min": null,
+      "amount_max": null,
+      "category": "atm_cash",
+      "head": "expense"
+    }
+  ]
+}
