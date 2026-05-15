@@ -1,19 +1,15 @@
 /**
- * /connections page — taxpayer flow.
+ * /connections page — taxpayer view.
  *
- * Reproduces the bug where /connections redirected to /dashboard, then
- * verifies the page now renders for an authenticated taxpayer and that the
- * three "Link a consultant" sub-flows are present and wired up:
+ * Covers:
+ *   1. The page renders for an authenticated taxpayer (regression guard for
+ *      the AuthGuard bug that bounced everyone back to /dashboard).
+ *   2. The right-side area shows BOTH Active Chats and Active Connections
+ *      cards (the Connect-via-code block was replaced).
+ *   3. Browse Consultants → Connect still wires to /api/ca-link/by-id.
+ *   4. Link by PAN modal opens and validates PAN format.
  *
- *   1. Browse consultants  (directory + 1-click connect)
- *   2. Connect via 5-digit invite code
- *   3. Link by PAN modal
- *
- * Auth is mocked at /api/auth/me — same pattern used by full-flow.spec.ts.
- * The connections-specific APIs (/api/ca-link/*, /api/consultants/*) are
- * intercepted with deterministic payloads so the test doesn't need a live
- * DB. The intent is to lock in the rendering + click contracts; deeper API
- * coverage already lives in api-auth.spec.ts.
+ * Auth is mocked at /api/auth/me — same pattern as full-flow.spec.ts.
  */
 import { expect, test, type Page } from "@playwright/test";
 
@@ -36,7 +32,7 @@ const TAXPAYER_ME = {
   onboarding: null,
 };
 
-async function mockAuthAndEmptyConnections(page: Page) {
+async function mockBaseTaxpayer(page: Page) {
   await page.route("**/api/auth/me", (route) =>
     route.fulfill({
       status: 200,
@@ -58,17 +54,24 @@ async function mockAuthAndEmptyConnections(page: Page) {
       body: JSON.stringify({ consultants: [] }),
     }),
   );
+  await page.route("**/api/chat/threads", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ threads: [] }),
+    }),
+  );
 }
 
 test.describe("/connections — taxpayer", () => {
   test("renders for an authenticated taxpayer (does NOT redirect to /dashboard)", async ({
     page,
   }) => {
-    await mockAuthAndEmptyConnections(page);
+    await mockBaseTaxpayer(page);
     await page.goto("/connections");
 
-    // The bug we just fixed: AuthGuard would bounce us to /dashboard because
-    // the server's "next" hint is always /dashboard for completed profiles.
+    // Regression guard: AuthGuard used to redirect any completed-profile
+    // user back to /dashboard regardless of intent.
     await page.waitForURL(/\/connections$/, { timeout: 8000 });
     expect(page.url()).toMatch(/\/connections$/);
 
@@ -76,33 +79,36 @@ test.describe("/connections — taxpayer", () => {
       page.getByRole("heading", { name: /your consultants & access grants/i }),
     ).toBeVisible();
 
-    // The three "link a consultant" entry points must all be present.
-    await expect(page.getByRole("region", { name: /browse consultants/i })).toBeVisible();
-    await expect(page.getByRole("region", { name: /connect via code/i })).toBeVisible();
+    // Top-right action is still the PAN link entrypoint.
     await expect(page.getByRole("button", { name: /link by pan/i })).toBeVisible();
 
-    // Empty-state copy for both server-driven and pending lists.
+    // Right-side panel now hosts both chat cards.
+    await expect(
+      page.getByRole("region", { name: /^active chats$/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("region", { name: /^active connections$/i }),
+    ).toBeVisible();
+
+    // Browse consultants (left panel) is unchanged.
+    await expect(
+      page.getByRole("region", { name: /browse consultants/i }),
+    ).toBeVisible();
+
+    // The legacy "Connect via code" panel must be gone.
+    await expect(
+      page.getByRole("region", { name: /connect via code/i }),
+    ).toHaveCount(0);
+
+    // Empty-state copy for server-driven and pending lists still renders.
     await expect(page.getByText(/no pending requests/i)).toBeVisible();
-    await expect(page.getByText(/no active connections yet/i)).toBeVisible();
   });
 
   test("Browse consultants → clicking Connect POSTs to /api/ca-link/by-id", async ({
     page,
   }) => {
-    await page.route("**/api/auth/me", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(TAXPAYER_ME),
-      }),
-    );
-    await page.route("**/api/ca-link", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ grants: [] }),
-      }),
-    );
+    await mockBaseTaxpayer(page);
+    await page.unroute("**/api/consultants/directory");
     await page.route("**/api/consultants/directory", (route) =>
       route.fulfill({
         status: 200,
@@ -158,15 +164,11 @@ test.describe("/connections — taxpayer", () => {
     await page.goto("/connections");
     await page.waitForURL(/\/connections$/);
 
-    // Card renders.
     await expect(page.getByText("CA Ada Lovelace")).toBeVisible();
 
-    // Click the Connect button inside the Browse panel (the Code panel
-    // also has a "Connect" button, so we scope to the right region).
     const browsePanel = page.getByRole("region", { name: /browse consultants/i });
     await browsePanel.getByRole("button", { name: /^connect$/i }).click();
 
-    // Success toast (Alert) from the parent's onConnected callback.
     await expect(page.getByText(/Request sent to CA Ada Lovelace/i)).toBeVisible({
       timeout: 5000,
     });
@@ -175,61 +177,8 @@ test.describe("/connections — taxpayer", () => {
     expect(postedBody).toMatchObject({ consultantId: "ca_001" });
   });
 
-  test("Connect via code → submits to /api/ca-link/by-code and shows success", async ({
-    page,
-  }) => {
-    await mockAuthAndEmptyConnections(page);
-
-    let postedBody: Record<string, unknown> | null = null;
-    await page.route("**/api/ca-link/by-code", async (route, req) => {
-      postedBody = JSON.parse(req.postData() ?? "{}");
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          grant: {
-            id: "grant_pw_code",
-            consultantId: "ca_002",
-            taxpayerId: TAXPAYER_ME.user.id,
-            counterpartyName: "CA Grace Hopper",
-            counterpartyPan: null,
-            myRoleInGrant: "taxpayer",
-            accessMode: "review_edit",
-            status: "active",
-            taxYears: ["FY 2024-25"],
-            origin: "invite_code",
-            requestedBy: "taxpayer",
-            requestedAt: new Date().toISOString(),
-            respondedAt: new Date().toISOString(),
-            expiresAt: null,
-            revokedAt: null,
-            message: null,
-          },
-          consultantId: "ca_002",
-        }),
-      });
-    });
-
-    await page.goto("/connections");
-    await page.waitForURL(/\/connections$/);
-
-    const code = page.getByLabel(/invite code/i);
-    await code.fill("12345");
-
-    // The Connect button inside the code panel.
-    const codePanel = page.getByRole("region", { name: /connect via code/i });
-    await codePanel.getByRole("button", { name: /^connect$/i }).click();
-
-    // Parent page raises its own toast — match the parent's wording so we
-    // don't collide with the panel's local success copy.
-    await expect(
-      page.getByText(/Your consultant now has the agreed scope/i),
-    ).toBeVisible({ timeout: 5000 });
-    expect(postedBody).toMatchObject({ code: "12345" });
-  });
-
   test("Link by PAN modal opens and validates the PAN format", async ({ page }) => {
-    await mockAuthAndEmptyConnections(page);
+    await mockBaseTaxpayer(page);
     await page.goto("/connections");
     await page.waitForURL(/\/connections$/);
 
@@ -242,7 +191,6 @@ test.describe("/connections — taxpayer", () => {
     const send = page.getByRole("button", { name: /send request/i });
     await expect(send).toBeDisabled();
 
-    // Type a complete, well-formed PAN — Send becomes enabled.
     // 4th char must be a recognised entity code (P = Individual).
     await page.getByLabel(/consultant pan/i).fill("ABCPE1234F");
     await expect(send).toBeEnabled();

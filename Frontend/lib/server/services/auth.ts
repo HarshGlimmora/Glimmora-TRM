@@ -432,6 +432,11 @@ export class ForbiddenError extends HttpError {
     super(403, code, message);
   }
 }
+export class NotFoundError extends HttpError {
+  constructor(code: string, message: string) {
+    super(404, code, message);
+  }
+}
 export class GoneError extends HttpError {
   constructor(code: string, message: string) {
     super(410, code, message);

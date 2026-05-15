@@ -192,4 +192,40 @@ export const Icon = {
       <path d="M8 13h8M8 17h5" />
     </Base>
   ),
+  Chat: (p: IconProps) => (
+    <Base {...p}>
+      <path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12Z" />
+    </Base>
+  ),
+  Send: (p: IconProps) => (
+    <Base {...p}>
+      <path d="M22 2 11 13" />
+      <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+    </Base>
+  ),
+  Paperclip: (p: IconProps) => (
+    <Base {...p}>
+      <path d="m21 12-8.5 8.5a5 5 0 1 1-7-7L14 5a3.5 3.5 0 1 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 8" />
+    </Base>
+  ),
+  Heart: (p: IconProps) => (
+    <Base {...p}>
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6Z" />
+    </Base>
+  ),
+  ThumbsUp: (p: IconProps) => (
+    <Base {...p}>
+      <path d="M7 22V11" />
+      <path d="M3 11h4v11H3z" />
+      <path d="M7 11h9.3a2.7 2.7 0 0 1 2.7 3.2l-1.2 6.2a2 2 0 0 1-2 1.6H7" />
+      <path d="M11 11V6a3 3 0 0 1 3-3l1 4-4 4" />
+    </Base>
+  ),
+  Download: (p: IconProps) => (
+    <Base {...p}>
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 21h14" />
+    </Base>
+  ),
 };

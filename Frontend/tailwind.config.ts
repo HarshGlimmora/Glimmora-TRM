@@ -118,6 +118,10 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.55" },
         },
+        "slide-in-right": {
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 240ms ease-out",
@@ -125,6 +129,7 @@ const config: Config = {
         "scale-in": "scale-in 220ms cubic-bezier(0.22, 0.61, 0.36, 1)",
         shimmer: "shimmer 2s linear infinite",
         "soft-pulse": "soft-pulse 1.8s ease-in-out infinite",
+        "slide-in-right": "slide-in-right 240ms cubic-bezier(0.22, 0.61, 0.36, 1)",
       },
       backgroundImage: {
         "grid-lines":

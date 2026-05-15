@@ -37,8 +37,10 @@ import { validatePan } from "@/lib/validation/identity";
 import { formatDate, formatRelative } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { BrowseConsultants } from "@/components/connections/BrowseConsultants";
-import { ConnectViaCode } from "@/components/connections/ConnectViaCode";
 import { MyInviteCode } from "@/components/connections/MyInviteCode";
+import { ActiveChats } from "@/components/connections/ActiveChats";
+import { ActiveConnections } from "@/components/connections/ActiveConnections";
+import { ChatDrawer, type ChatPeer } from "@/components/chat/ChatDrawer";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isServerGrantId = (id: string): boolean => UUID_RE.test(id);
@@ -76,6 +78,11 @@ export default function ConnectionsPage() {
   const [openNew, setOpenNew] = React.useState(false);
   const [modalGrant, setModalGrant] = React.useState<LinkGrant | null>(null);
   const [notice, setNotice] = React.useState<{ kind: "success" | "error" | "info"; msg: string } | null>(null);
+  // Chat drawer state — owned at the page level so both the ActiveChats and
+  // ActiveConnections cards can request that it open.
+  const [chatThreadId, setChatThreadId] = React.useState<string | null>(null);
+  const [chatPeer, setChatPeer] = React.useState<ChatPeer | null>(null);
+  const [chatRefreshKey, setChatRefreshKey] = React.useState(0);
 
   const refresh = React.useCallback(async () => {
     if (!profile) return;
@@ -205,19 +212,69 @@ export default function ConnectionsPage() {
               void refresh();
             }}
           />
-          <ConnectViaCode
-            onConnected={() => {
-              setNotice({
-                kind: "success",
-                msg: "Linked. Your consultant now has the agreed scope of access.",
-              });
-              void refresh();
-            }}
-          />
+          <div className="flex flex-col gap-4">
+            <ActiveChats
+              refreshKey={chatRefreshKey}
+              onOpen={(args) => {
+                setChatThreadId(args.threadId);
+                setChatPeer({
+                  id: args.counterpartyId,
+                  name: args.counterpartyName,
+                  role: args.counterpartyRole,
+                });
+              }}
+            />
+            <ActiveConnections
+              links={links}
+              myRole="taxpayer"
+              onOpen={(args) => {
+                setChatThreadId(args.threadId);
+                setChatPeer({
+                  id: args.counterpartyId,
+                  name: args.counterpartyName,
+                  role: args.counterpartyRole,
+                });
+                setChatRefreshKey((k) => k + 1);
+              }}
+            />
+          </div>
         </div>
       )}
 
-      {!isTaxpayer && <MyInviteCode />}
+      {!isTaxpayer && (
+        <>
+          <MyInviteCode />
+          <div
+            aria-label="Conversations"
+            className="grid grid-cols-1 gap-4 lg:grid-cols-2"
+          >
+            <ActiveChats
+              refreshKey={chatRefreshKey}
+              onOpen={(args) => {
+                setChatThreadId(args.threadId);
+                setChatPeer({
+                  id: args.counterpartyId,
+                  name: args.counterpartyName,
+                  role: args.counterpartyRole,
+                });
+              }}
+            />
+            <ActiveConnections
+              links={links}
+              myRole="consultant"
+              onOpen={(args) => {
+                setChatThreadId(args.threadId);
+                setChatPeer({
+                  id: args.counterpartyId,
+                  name: args.counterpartyName,
+                  role: args.counterpartyRole,
+                });
+                setChatRefreshKey((k) => k + 1);
+              }}
+            />
+          </div>
+        </>
+      )}
 
       {notice && (
         <Alert
@@ -364,6 +421,14 @@ export default function ConnectionsPage() {
       <GrantDetailModal
         grant={modalGrant}
         onClose={() => setModalGrant(null)}
+      />
+
+      <ChatDrawer
+        open={chatThreadId !== null}
+        onClose={() => setChatThreadId(null)}
+        threadId={chatThreadId}
+        peer={chatPeer}
+        onActivity={() => setChatRefreshKey((k) => k + 1)}
       />
     </div>
   );

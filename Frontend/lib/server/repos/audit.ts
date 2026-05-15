@@ -14,7 +14,8 @@ export type AuditAction =
   | "profile_completed"
   | "ca_link_requested"
   | "ca_link_responded"
-  | "ca_link_revoked";
+  | "ca_link_revoked"
+  | "chat_attachment_shared";
 
 export interface AuditInput {
   actorUserId: string | null;
