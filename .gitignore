@@ -13,3 +13,4 @@ next-env.d.ts
 # Local embedded Postgres data (PGlite) — used when DATABASE_URL is unset.
 .data/
 
+/Backend/data/uploads
