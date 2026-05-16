@@ -14,3 +14,11 @@ next-env.d.ts
 .data/
 
 /Backend/data/uploads
+
+# Secrets — root centralized env (never commit; use Vercel dashboard for cloud).
+.env
+.env.production
+
+# Playwright test artifacts.
+test-results/
+playwright-report/

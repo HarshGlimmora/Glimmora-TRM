@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = BACKEND_ROOT.parent
 DEFAULT_DB_PATH = BACKEND_ROOT / "data" / "app.db"
 
 
@@ -16,7 +17,20 @@ class DatabaseBackend(StrEnum):
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    # Load order (later files override earlier ones):
+    #   1. <repo-root>/.env   -- centralized, shared with Frontend
+    #   2. Backend/.env       -- optional per-app override (kept for back-compat)
+    #   3. ./.env             -- cwd fallback (legacy)
+    # OS env vars (e.g. Vercel-injected) still take precedence over all files.
+    model_config = SettingsConfigDict(
+        env_file=(
+            str(REPO_ROOT / ".env"),
+            str(BACKEND_ROOT / ".env"),
+            ".env",
+        ),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     app_name: str = "GlimmoraTax"
     env: str = Field(default="dev")

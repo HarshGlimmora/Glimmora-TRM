@@ -19,14 +19,19 @@ const DEFAULT_BACKEND_URL = "http://127.0.0.1:8000";
 const TOKEN_TTL_SECONDS = 300; // 5 minutes
 
 function backendBaseUrl(): string {
-  return process.env.BACKEND_BASE_URL ?? DEFAULT_BACKEND_URL;
+  if (process.env.BACKEND_BASE_URL) return process.env.BACKEND_BASE_URL;
+  // On Vercel, the FastAPI serverless function lives at the same origin
+  // as Next.js (mounted via vercel.json rewrites). VERCEL_URL is the
+  // deployment-specific hostname injected automatically by Vercel.
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return DEFAULT_BACKEND_URL;
 }
 
 function sharedSecret(): string {
   const secret = process.env.AUTH_SHARED_SECRET;
   if (!secret) {
     throw new Error(
-      "AUTH_SHARED_SECRET is not set. Configure it in Frontend/.env.local and Backend/.env (identical value).",
+      "AUTH_SHARED_SECRET is not set. Add it to the centralized .env at the repo root (or to Vercel env vars for cloud).",
     );
   }
   return secret;
