@@ -17,25 +17,17 @@ class DatabaseBackend(StrEnum):
 
 
 class Settings(BaseSettings):
-<<<<<<< Updated upstream
     # Load order (later files override earlier ones):
     #   1. <repo-root>/.env   -- centralized, shared with Frontend
-    #   2. Backend/.env       -- optional per-app override (kept for back-compat)
+    #   2. Backend/.env       -- optional per-app overrides (Vertex secrets, etc.)
     #   3. ./.env             -- cwd fallback (legacy)
-    # OS env vars (e.g. Vercel-injected) still take precedence over all files.
+    # OS env vars (e.g. Render-injected) still take precedence over all files.
     model_config = SettingsConfigDict(
         env_file=(
             str(REPO_ROOT / ".env"),
             str(BACKEND_ROOT / ".env"),
             ".env",
         ),
-=======
-    # Load env vars from BOTH the repo root .env (shared with the Next.js side —
-    # one source of truth for SMTP, Vertex, etc.) and Backend/.env (Python-only
-    # overrides). When a key appears in both, the later file wins.
-    model_config = SettingsConfigDict(
-        env_file=(str(REPO_ROOT / ".env"), str(BACKEND_ROOT / ".env")),
->>>>>>> Stashed changes
         env_file_encoding="utf-8",
         extra="ignore",
     )

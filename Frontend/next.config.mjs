@@ -1,16 +1,9 @@
-import nextEnv from "@next/env";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
-// Load the centralized .env at the repo root (one level above Frontend/) so
-// Next.js sees the same values as Backend/app/config.py. On Vercel this is
-// a no-op — process.env already has every value injected from the dashboard,
-// and loadEnvConfig won't overwrite pre-existing keys.
-//
-// @next/env ships as CommonJS, so we import the default and destructure.
-const { loadEnvConfig } = nextEnv;
-const __dirname = dirname(fileURLToPath(import.meta.url));
-loadEnvConfig(resolve(__dirname, ".."));
+// The centralized .env lives at the repo root. `scripts/link-env.mjs`
+// (wired as `predev`/`prebuild` in package.json) symlinks it into Frontend/
+// so Next.js's dev request workers pick it up via the standard project-root
+// .env discovery. Calling loadEnvConfig() here would only set process.env
+// on the config-loader process — Next's forked workers re-discover env from
+// .env files in the project root and would not inherit those vars.
 
 /** @type {import('next').NextConfig} */
 const isDev = process.env.NODE_ENV !== "production";
