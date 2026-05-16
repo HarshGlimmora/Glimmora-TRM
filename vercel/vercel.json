@@ -7,7 +7,7 @@
       "runtime": "@vercel/python@4.3.1",
       "memory": 1024,
       "maxDuration": 30,
-      "includeFiles": "../Backend/app/**"
+      "includeFiles": "../Backend/**"
     }
   },
   "rewrites": [
