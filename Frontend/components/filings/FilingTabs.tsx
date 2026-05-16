@@ -5,14 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 
-// `enabled: false` tabs are placeholders until their owning step ships
-// (Submit = Step 7).
 const TABS = [
   { key: "documents", label: "Documents", enabled: true },
   { key: "transactions", label: "Transactions", enabled: true },
   { key: "regime", label: "Regime", enabled: true },
   { key: "summary", label: "Summary", enabled: true },
-  { key: "submit", label: "Submit", enabled: false },
+  { key: "submit", label: "Submit", enabled: true },
 ] as const;
 
 export function FilingTabs({ filingId }: { filingId: string }) {

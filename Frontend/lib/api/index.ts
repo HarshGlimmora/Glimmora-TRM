@@ -671,7 +671,7 @@ export async function fetchDashboard(
           {
             id: "al_filing",
             level: "info",
-            title: "FY 2024-25 return window is open",
+            title: "FY 2025-26 return window is open",
             body: "You're eligible to begin filing once your linked consultant accepts the access request.",
             cta: { label: "Review connections", href: "/connections" },
             createdAt: new Date().toISOString(),
@@ -689,7 +689,7 @@ export async function fetchDashboard(
             id: "al_client",
             level: "info",
             title: "1 new taxpayer request",
-            body: "Aanya R. Kothari has requested review_edit access for FY 2024-25.",
+            body: "Aanya R. Kothari has requested review_edit access for FY 2025-26.",
             cta: { label: "Open requests", href: "/connections" },
             createdAt: new Date().toISOString(),
           },
@@ -709,7 +709,7 @@ export async function fetchDashboard(
             id: "ac2",
             at: "2026-04-21T17:42:00Z",
             title: "CA Vikram Iyer accepted access",
-            description: "Mode: review_edit · FY 2024-25 · Expires 2026-08-31",
+            description: "Mode: review_edit · FY 2025-26 · Expires 2026-08-31",
             kind: "linking",
           },
           {
@@ -738,7 +738,7 @@ export async function fetchDashboard(
             id: "ac2",
             at: "2026-04-21T17:42:00Z",
             title: "Accepted access for Aanya R. Kothari",
-            description: "Mode: review_edit · FY 2024-25",
+            description: "Mode: review_edit · FY 2025-26",
             kind: "linking",
           },
           {
@@ -783,7 +783,7 @@ export async function fetchDashboard(
             helper: "Awaiting your decision",
             tone: "warning" as const,
           },
-          { label: "FY 2024-25", value: 4, helper: "Filings underway" },
+          { label: "FY 2025-26", value: 4, helper: "Filings underway" },
           {
             label: "ICAI",
             value: (profile as ConsultantProfile).credentials.icaiMembership,
@@ -813,7 +813,7 @@ export async function fetchDashboard(
           ]
         : [
             {
-              title: "Aanya Kothari — FY 2024-25",
+              title: "Aanya Kothari — FY 2025-26",
               dueOn: "2026-06-30",
               note: "Capital gains review",
             },

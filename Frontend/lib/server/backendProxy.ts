@@ -167,6 +167,12 @@ export async function proxyAsNextResponse(
   init: RequestInit = {},
 ): Promise<NextResponse> {
   const { status, body } = await proxyToBackend(path, init);
+  // 204 / 205 / 304 forbid a response body per RFC 9110 §15. Returning a JSON
+  // payload here makes Node's response writer crash with a generic 500 — most
+  // commonly seen on DELETE endpoints. Send an empty NextResponse instead.
+  if (status === 204 || status === 205 || status === 304) {
+    return new NextResponse(null, { status });
+  }
   return NextResponse.json(body as object, { status });
 }
 

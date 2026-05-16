@@ -160,11 +160,7 @@ export default function FilingSummaryPage() {
         >
           ← Back to regime
         </Button>
-        <Button
-          onClick={() => router.push(`/filings/${filing.id}/submit`)}
-          disabled
-          title="Submission ships in Step 7."
-        >
+        <Button onClick={() => router.push(`/filings/${filing.id}/submit`)}>
           Continue to submit →
         </Button>
       </div>

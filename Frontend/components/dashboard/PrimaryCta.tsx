@@ -33,7 +33,7 @@ export function PrimaryCta({
             className="border-white/20 bg-white/10 text-white"
             withDot
           >
-            {role === "taxpayer" ? "FY 2024-25" : "Consultant"}
+            {role === "taxpayer" ? "FY 2025-26" : "Consultant"}
           </Badge>
           <h1 className="mt-4 font-display text-5xl leading-[1.05] text-white">
             Welcome back,
@@ -42,7 +42,7 @@ export function PrimaryCta({
           </h1>
           <p className="mt-3 max-w-prose text-pretty text-base/relaxed text-white/75">
             {role === "taxpayer"
-              ? "Your verified profile is ready. Begin assembling your FY 2024-25 return — or invite a chartered accountant to help."
+              ? "Your verified profile is ready. Begin assembling your FY 2025-26 return — or invite a chartered accountant to help."
               : "Open client requests and active engagements appear below. Every action you take here is recorded in the taxpayer's audit trail."}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">

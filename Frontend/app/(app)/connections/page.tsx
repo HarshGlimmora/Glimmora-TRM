@@ -46,7 +46,7 @@ import { ChatDrawer, type ChatPeer } from "@/components/chat/ChatDrawer";
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isServerGrantId = (id: string): boolean => UUID_RE.test(id);
 
-const TAX_YEARS = ["FY 2024-25", "FY 2023-24", "FY 2022-23"];
+const TAX_YEARS = ["FY 2025-26", "FY 2024-25", "FY 2023-24"];
 
 const STATUS_META: Record<
   GrantStatus,

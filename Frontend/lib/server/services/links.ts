@@ -13,7 +13,7 @@ import {
 } from "@/lib/server/services/auth";
 
 /** Default tax year applied to grants when the user doesn't pick one. */
-const DEFAULT_TAX_YEAR = "FY 2024-25";
+const DEFAULT_TAX_YEAR = "FY 2025-26";
 
 export interface DirectoryConsultant {
   id: string;

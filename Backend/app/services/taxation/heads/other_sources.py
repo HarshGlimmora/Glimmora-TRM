@@ -49,15 +49,21 @@ def compute_head_other_sources(
             lottery_total = quantize(lottery_total + amount)
         elif cat in _SLAB_OS_CATEGORIES:
             slab_total = quantize(slab_total + amount)
+            # Surface the bank / payer name (from 26AS Part A1 or bank
+            # statement) rather than the bare category string.
             slab_breakdown.append({
-                "label": cat, "amount": str(amount), "txn_id": tx.id,
+                "label": tx.description or tx.counterparty or cat,
+                "counterparty": tx.counterparty,
+                "category": cat,
+                "amount": str(amount),
+                "txn_id": tx.id,
             })
 
     if slab_total > ZERO:
         trace.step(
             op="sum_head_other_sources_slab",
             section_ref="56-59",
-            input={"transactions": [b["txn_id"] for b in slab_breakdown]},
+            input={"transaction_count": len(slab_breakdown)},
             breakdown=slab_breakdown,
             result=slab_total,
             human_explanation=(

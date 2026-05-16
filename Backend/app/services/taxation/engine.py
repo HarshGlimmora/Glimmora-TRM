@@ -182,8 +182,15 @@ def compute_tax(
         by_head.setdefault(head, []).append(tx)
         if head == "salary":
             salary_income = quantize(salary_income + amt)
+            # Carry description + counterparty so the user-facing breakdown
+            # shows real employer names (from Form 16 / 26AS) rather than
+            # opaque category strings or transaction UUIDs.
             salary_breakdown.append({
-                "label": tx.category or "salary", "amount": str(amt), "txn_id": tx.id,
+                "label": tx.description or tx.counterparty or tx.category or "salary",
+                "counterparty": tx.counterparty,
+                "category": tx.category or "salary",
+                "amount": str(amt),
+                "txn_id": tx.id,  # internal traceability; explainer drops this from UI
             })
         elif head == "pgbp":
             pgbp_total = quantize(pgbp_total + amt)
@@ -192,7 +199,7 @@ def compute_tax(
         trace.step(
             op="sum_head_salary",
             section_ref="15-17",
-            input={"transactions": [b["txn_id"] for b in salary_breakdown]},
+            input={"transaction_count": len(salary_breakdown)},
             breakdown=salary_breakdown,
             result=salary_income,
             human_explanation=(

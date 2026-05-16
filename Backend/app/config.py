@@ -17,6 +17,7 @@ class DatabaseBackend(StrEnum):
 
 
 class Settings(BaseSettings):
+<<<<<<< Updated upstream
     # Load order (later files override earlier ones):
     #   1. <repo-root>/.env   -- centralized, shared with Frontend
     #   2. Backend/.env       -- optional per-app override (kept for back-compat)
@@ -28,6 +29,13 @@ class Settings(BaseSettings):
             str(BACKEND_ROOT / ".env"),
             ".env",
         ),
+=======
+    # Load env vars from BOTH the repo root .env (shared with the Next.js side —
+    # one source of truth for SMTP, Vertex, etc.) and Backend/.env (Python-only
+    # overrides). When a key appears in both, the later file wins.
+    model_config = SettingsConfigDict(
+        env_file=(str(REPO_ROOT / ".env"), str(BACKEND_ROOT / ".env")),
+>>>>>>> Stashed changes
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -85,6 +93,43 @@ class Settings(BaseSettings):
     gcp_region: str = Field(default="asia-south1")
     # Confidence below which Layer 2 escalates to Layer 3 (the LLM).
     extraction_llm_threshold: float = Field(default=0.9)
+
+    # ------------------------------------------------------------------
+    # Submit-time OTP. Delivery is over email (channel='email' on
+    # user_verifications). Set `dev_reveal_otp=True` (DEV_REVEAL_OTP=1) to
+    # also return the plain code in the request-submit-otp response — only
+    # safe for dev / smoke tests. Production deploys leave it False and
+    # rely on the email provider below to actually deliver.
+    # ------------------------------------------------------------------
+    dev_reveal_otp: bool = Field(default=False)
+    submit_otp_ttl_seconds: int = Field(default=600)
+    submit_otp_max_attempts: int = Field(default=5)
+
+    # ------------------------------------------------------------------
+    # Email provider (reused from the Next.js side — same env var names so
+    # one .env entry serves both apps). Today the Backend uses email only
+    # for the submit OTP, but the same transport is reusable for filing
+    # notifications later.
+    #
+    # `email_provider`:
+    #   - "smtp"    → use the SMTP_* vars below; default for Gmail / Workspace
+    #                  (port 587 + STARTTLS) and providers like SES, Mailgun.
+    #   - "console" → log-only fallback. Useful in CI / dev when no
+    #                  outbound mail is configured.
+    #
+    # If `email_provider="smtp"` but SMTP_HOST/USER/PASS are missing, the
+    # mailer logs a warning and falls back to console behaviour so the OTP
+    # flow doesn't 500.
+    # ------------------------------------------------------------------
+    email_provider: str = Field(default="console")
+    email_from: str | None = Field(default=None)
+    email_from_name: str = Field(default="Glimmora TRM")
+
+    smtp_host: str | None = Field(default=None)
+    smtp_port: int = Field(default=587)
+    smtp_user: str | None = Field(default=None)
+    smtp_pass: str | None = Field(default=None)
+    smtp_use_tls: bool = Field(default=True)
 
     @model_validator(mode="after")
     def _check_backend_config(self) -> "Settings":

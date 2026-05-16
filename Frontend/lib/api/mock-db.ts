@@ -117,7 +117,7 @@ const sampleGrant: LinkGrant = {
   taxpayerPanMasked: "ABK•••••2C",
   accessMode: "review_edit",
   status: "active",
-  taxYears: ["FY 2024-25"],
+  taxYears: ["FY 2025-26"],
   message: "Reviewing capital gains schedule and 80C deductions for this FY.",
   requestedBy: "taxpayer",
   requestedAt: "2026-04-21T12:08:00Z",

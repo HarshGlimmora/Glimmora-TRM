@@ -151,14 +151,24 @@ def _ensure_shadow_user(db: Session, current: CurrentUser) -> User:
     return user
 
 
-def _find_open_draft(db: Session, user_id: str, tax_year: str) -> TaxReturn | None:
+def _find_active_filing(db: Session, user_id: str, tax_year: str) -> TaxReturn | None:
+    """Most-recent non-terminal, non-deleted filing for this user + FY.
+
+    Covers everything the SCHEMA's `uq_tax_returns_open` partial unique
+    index treats as "live" — i.e. every status EXCEPT 'accepted' and
+    'rejected'. Returning a `submitted` or `in_review_by_ca` row from the
+    idempotent POST is the right behaviour: the caller already has a
+    filing for this FY and cannot have two, so the UI should show its
+    summary instead of trying to insert a duplicate (which is what was
+    raising IntegrityError → 500 before this fix).
+    """
     stmt = (
         select(TaxReturn)
         .where(
             TaxReturn.user_id == user_id,
             TaxReturn.tax_year == tax_year,
             TaxReturn.deleted_at.is_(None),
-            TaxReturn.status == "draft",
+            TaxReturn.status.not_in(("accepted", "rejected")),
         )
         .order_by(TaxReturn.created_at.desc())
         .limit(1)
@@ -184,7 +194,7 @@ def create_or_get_filing(
 ) -> FilingOut:
     user_row = _ensure_shadow_user(db, current)
 
-    existing = _find_open_draft(db, current.id, tax_year)
+    existing = _find_active_filing(db, current.id, tax_year)
     if existing is not None:
         response.status_code = status.HTTP_200_OK
         return _to_out(existing)

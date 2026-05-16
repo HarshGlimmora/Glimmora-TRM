@@ -914,20 +914,29 @@ def _process_pdf_upload(
 
     doc.extraction_finished_at = _now_iso()
 
-    # ---- Bank PDFs: route extracted transactions through the FY router ---
+    # ---- Route extracted rows through the FY router per doc type ---------
     routed_by_fy: dict[str, int] = {}
-    if (
-        used_doc_type == "bank_pdf"
-        and extraction_payload is not None
-        and not extraction_failed
-    ):
-        routed_by_fy = _route_bank_pdf_transactions(
-            db,
-            doc=doc,
-            current=current,
-            extracted_payload=extraction_payload["raw"],
-            notes=notes,
-        )
+    if extraction_payload is not None and not extraction_failed:
+        raw = extraction_payload["raw"]
+        if used_doc_type == "bank_pdf":
+            routed_by_fy = _route_bank_pdf_transactions(
+                db, doc=doc, current=current, extracted_payload=raw, notes=notes,
+            )
+        elif used_doc_type == "form_26as":
+            from app.services.routing.form_materializers import route_form_26as
+            routed_by_fy = route_form_26as(
+                db, doc=doc, user_id=current.id, payload=raw, notes=notes,
+            )
+        elif used_doc_type == "form16":
+            from app.services.routing.form_materializers import route_form_16
+            routed_by_fy = route_form_16(
+                db, doc=doc, user_id=current.id, payload=raw, notes=notes,
+            )
+        elif used_doc_type == "salary_slip":
+            from app.services.routing.form_materializers import route_salary_slip
+            routed_by_fy = route_salary_slip(
+                db, doc=doc, user_id=current.id, payload=raw, notes=notes,
+            )
 
     # ---- Persist routing report + final statuses -------------------------
     if extraction_failed and not routed_by_fy:
@@ -940,7 +949,7 @@ def _process_pdf_upload(
         # rescue it; this is not a hard failure.
         doc.status = "uploaded"
         doc.routing_status = "pending"
-    elif used_doc_type == "bank_pdf":
+    elif used_doc_type in ("bank_pdf", "form_26as", "form16", "salary_slip"):
         spans = len(routed_by_fy)
         if spans == 0:
             doc.routing_status = "unresolved"
@@ -951,10 +960,9 @@ def _process_pdf_upload(
         doc.routed_at = _now_iso()
         doc.status = "completed"
     else:
-        # Non-transactional documents (Form 16, 26AS, AIS, salary slip).
-        # They produce summaries, not rows — nothing for the FY router to do.
-        # Status flips to completed; routing_status='overridden' indicates we
-        # bypassed the router by design.
+        # Other non-transactional documents (AIS / TIS today). They produce
+        # summary information rather than per-row income; we keep the
+        # extraction payload but bypass the FY router by design.
         doc.routing_status = "overridden"
         doc.routed_at = _now_iso()
         doc.status = "completed"

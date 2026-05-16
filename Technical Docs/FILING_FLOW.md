@@ -38,9 +38,9 @@ This is the master checklist. Tick the box when both backend AND frontend for th
 - [x] **Step 2** — CSV upload + rule-based categorization + FY router + documents list
 - [x] **Step 3** — PDF upload + Vertex AI Gemini extraction + editable extracted fields + re-extract
 - [x] **Step 4** — Transactions review (filters, single + bulk verify, edit drawer, progress)
-- [ ] **Step 5** — Regime precheck + commit + Section 115BAC(6) modal with hashed ack
-- [ ] **Step 6** — Summary page + calculation trace accordion + PDF download
-- [ ] **Step 7** — Submit flow with phone OTP gate + preconditions checklist
+- [x] **Step 5** — Regime precheck + commit + Section 115BAC(6) modal with hashed ack
+- [x] **Step 6** — Summary page + calculation trace accordion + PDF download
+- [x] **Step 7** — Submit flow with email OTP gate + preconditions checklist
 - [ ] **Step 8** — Notifications (list, mark-read, badge counter)
 - [ ] **Step 9** — Consultant access Path A — directory + grant request
 - [ ] **Step 10** — Consultant access Path B — invite code redeem
@@ -439,13 +439,18 @@ GET    /api/v1/filings/{id}/summary.pdf
        # PDF rendered via ReportLab / WeasyPrint.
 ```
 
-### 3.7 Submit (with phone OTP gate, per API_CONTRACTS §2.9 + §6.7)
+### 3.7 Submit (with email OTP gate, per API_CONTRACTS §2.9 + §6.7)
+
+> **Channel note:** the OTP is delivered to the user's email address.
+> Internally the `user_verifications.purpose` value remains `submit_phone`
+> for SCHEMA compatibility (the CHECK constraint enum predates the email
+> switch); the actual delivery path is driven by `channel='email'`.
 
 ```
 POST   /api/v1/auth/request-submit-otp
        # body: { filing_id }
-       # Sends a 6-digit code to the user's verified phone. Bound to filing_id, 10-min TTL, single-use.
-       # Resp: { verification_id, filing_id, sent_to (masked, e.g. "+91 99000-*0000"), expires_at }
+       # Sends a 6-digit code to the user's verified email. Bound to filing_id, 10-min TTL, single-use.
+       # Resp: { verification_id, filing_id, sent_to (masked, e.g. "as***@example.com"), expires_at }
 
 POST   /api/v1/filings/{id}/submit
        # body: { acknowledgment: true, verification_id, otp }
@@ -934,21 +939,65 @@ Steps are designed so each one is independently testable and visible. Each row m
 - **Frontend:** `TxnTable` + badges + `TxnEditDrawer` + `VerifyProgressBar` + bulk-verify.
 - **Verify:** bulk-verify all rule rows, edit one AI row, progress reaches 100%.
 
-### Step 5 — Regime precheck + 115BAC modal &nbsp;`[ ]`
+### Step 5 — Regime precheck + 115BAC modal &nbsp;`[x]` ✅ Done — 2026-05-16
 
-- **Backend:** `POST /filings/{id}/precheck-regime`, `POST /filings/{id}/regime` (hashed ack).
+> `POST /filings/{id}/precheck-regime` runs the §6.3 state machine
+> (Category A/B × prior regime × lifetime counter) and returns one of
+> `OK | INFO | WARN_HIGH | BLOCK`. The regime is **committed via
+> `/calculate`** (no separate `POST /regime` exists — see §3.5): a single-
+> regime call sets `regime_used`, ack timestamp, section ref, and on
+> WARN_HIGH validates `acknowledgment_text_hash == sha256(canonical text)`
+> before flipping the bit. `users.lifetime_switch_backs_to_new` is bumped
+> on the one-time business-income old→new switch; `audit_logs` records
+> every transition. Frontend: `RegimeCards` (preview via `/calculate?regime=both`),
+> `Section115BACModal` (server-supplied text, hashed in `crypto.subtle`).
+
+- **Backend:** `POST /filings/{id}/precheck-regime`, regime gate + commit folded into existing `POST /filings/{id}/calculate` (hashed ack).
 - **Frontend:** `RegimeCards` (uses existing `/calculate` with `regime: "both"`), `Section115BACModal`.
 - **Verify:** choose new when prior was old → modal appears → ack → regime persists.
 
-### Step 6 — Summary + calculation trace &nbsp;`[ ]`
+### Step 6 — Summary + calculation trace &nbsp;`[x]` ✅ Done — 2026-05-16
 
-- **Backend:** `GET /filings/{id}/summary`, `GET /filings/{id}/summary.pdf`. (`/calculate` exists.)
+> `GET /filings/{id}/summary` re-runs `compute_tax` for the committed
+> regime and returns `{user, tax_year, statute, regime_used,
+> income_breakdown (aggregated from verified transactions, with interest
+> and dividend split out of other_sources), deductions (standard from
+> trace + Chapter VI-A from declared_deductions), tax_computation, tds_paid,
+> balance_payable, calculation_trace}`. 409 `filing_not_ready_for_summary`
+> when no regime is committed; the page handles that by redirecting to
+> the Regime tab. `GET /summary.pdf` renders ReportLab A4 with the same
+> numbers, Indian-grouped INR, and an `attachment; filename="..."` header.
+> Bonus: `GET /calculation-trace/explain` produces a Gemini-batched
+> plain-English paragraph per step (deterministic fallback when LLM is
+> unavailable) so the accordion shows prose + labeled field rows instead
+> of raw JSON.
+
+- **Backend:** `GET /filings/{id}/summary`, `GET /filings/{id}/summary.pdf`. (`/calculate` exists.) Also added `GET /filings/{id}/calculation-trace/explain` (Gemini-powered).
 - **Frontend:** `SummaryPanel`, `CalculationTraceAccordion`, PDF download button.
 - **Verify:** numbers match `/calculate`; trace expands; PDF downloads.
 
-### Step 7 — Submit + OTP &nbsp;`[ ]`
+### Step 7 — Submit + OTP &nbsp;`[x]` ✅ Done — 2026-05-16
 
-- **Backend:** `POST /filings/{id}/submit/request-otp`, `POST /filings/{id}/submit`.
+> Canonical paths are `POST /api/v1/auth/request-submit-otp` and
+> `POST /api/v1/filings/{id}/submit` (per API_CONTRACTS §2.9 + §6.7).
+> The OTP service mints a sha256-hashed 6-digit code in
+> `user_verifications` with `channel='email'` (delivered to the user's
+> email address), `purpose='submit_phone'` — the historical SCHEMA-enum
+> value kept to avoid a migration; the code is filing-scoped via
+> `filing_id`. The service invalidates any prior outstanding row and
+> consumes atomically with the status flip. The submit endpoint re-checks
+> every precondition — 100% verified, regime committed, email present,
+> regime ack coherent — then sets `submitted_at` +
+> `submit_otp_verification_id` and writes the
+> `filing_submitted` audit row. Bad / expired / cross-filing OTPs map to
+> the canonical 422 codes; the attempts counter ratchets up before
+> raising so the lockout sticks even on the error path. Frontend:
+> precondition checklist with deep-links to fix each blocker, accuracy
+> declaration checkbox, `OtpEntry` 6-box input with auto-advance / paste /
+> backspace step-back, live expiry countdown, success card with filing
+> id + OTP verification id.
+
+- **Backend:** `POST /api/v1/auth/request-submit-otp`, `POST /api/v1/filings/{id}/submit`.
 - **Frontend:** precondition checklist; `OtpEntry`; submit CTA + success screen.
 - **Verify:** submit blocked until prereqs met; OTP gate works; status flips to `submitted`.
 

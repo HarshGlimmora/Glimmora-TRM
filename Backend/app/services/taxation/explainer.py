@@ -186,6 +186,59 @@ def _render_value(key: str, value: Any) -> str:
     return str(value)
 
 
+def _label_and_amount(b: dict, i: int) -> tuple[str, Any]:
+    """Pick the right label + amount columns for a breakdown row.
+
+    Different engine steps emit different shapes:
+
+    - Slab band:        {band, rate, amount_in_band, tax}
+                        → "₹4L – ₹8L @ 5%" / amount = tax
+    - Surcharge bucket: {section, flat_tax, applied_rate, surcharge, capped}
+                        → "§111A (capped)" / amount = surcharge
+    - Chapter VI-A:     {section, amount, cap, claimed, allowed}
+                        → "§80C" / amount = allowed (or amount)
+    - Income line:      {description, counterparty, label, category, amount}
+                        → employer / bank name / category / amount
+
+    Internal identifiers (txn_id etc.) are intentionally never surfaced.
+    """
+    keys = set(b.keys())
+
+    # ---- Slab band ---------------------------------------------------------
+    if "band" in keys and ("tax" in keys or "amount_in_band" in keys):
+        rate_pct = ""
+        if "rate" in keys:
+            try:
+                pct = Decimal(str(b["rate"])) * 100
+                rate_pct = f" @ {pct.normalize():f}%".replace(".0%", "%")
+            except Exception:
+                rate_pct = ""
+        label = f"{b['band']}{rate_pct}"
+        return label, b.get("tax") if "tax" in keys else b.get("amount_in_band")
+
+    # ---- Surcharge flat-rate bucket ---------------------------------------
+    if "section" in keys and "surcharge" in keys:
+        capped = bool(b.get("capped"))
+        label = f"§{b['section']}" + (" (rate capped)" if capped else "")
+        return label, b.get("surcharge")
+
+    # ---- Chapter VI-A allowance ------------------------------------------
+    if "section" in keys and ("allowed" in keys or "claimed" in keys):
+        return f"§{b['section']}", b.get("allowed", b.get("claimed", b.get("amount")))
+
+    # ---- Generic income line ---------------------------------------------
+    label = (
+        b.get("description")
+        or b.get("counterparty")
+        or b.get("label")
+        or b.get("name")
+        or b.get("category")
+        or (f"§{b['section']}" if "section" in keys else None)
+        or f"Item {i}"
+    )
+    return str(label), b.get("amount")
+
+
 def _to_rows(step_input: Any) -> list[FieldRow]:
     if step_input is None:
         return []
@@ -216,8 +269,26 @@ EXPLAIN_SYSTEM = (
     "result. Refer to the relevant section of the Income Tax Act if it is "
     "supplied in the step's section_ref. Use Indian rupee grouping (e.g. "
     "₹12,34,567). Never invent numbers — only restate values that appear in "
-    "the step. Never give tax advice. Return ONLY JSON matching the schema."
+    "the step. NEVER include UUIDs, transaction IDs, internal identifiers, "
+    "or hex strings in your prose; refer to sources by their employer / "
+    "deductor / counterparty name (or generically as 'salary credit', "
+    "'interest payment', etc.) instead. Never give tax advice. Return ONLY "
+    "JSON matching the schema."
 )
+
+
+# Internal-only fields that must never leak into user-facing prose or
+# field rows. Scrubbed from the Gemini prompt and from breakdown labels.
+_INTERNAL_FIELDS = frozenset({"txn_id", "tx_id", "transaction_id", "id"})
+
+
+def _strip_internal(value: Any) -> Any:
+    """Recursively strip internal-only keys from a JSON-like structure."""
+    if isinstance(value, dict):
+        return {k: _strip_internal(v) for k, v in value.items() if k not in _INTERNAL_FIELDS}
+    if isinstance(value, list):
+        return [_strip_internal(v) for v in value]
+    return value
 
 
 def _build_explain_prompt(steps: list[dict[str, Any]], regime: str, fy: str) -> str:
@@ -231,8 +302,10 @@ def _build_explain_prompt(steps: list[dict[str, Any]], regime: str, fy: str) -> 
                 "section_ref": s.get("section_ref"),
                 "rule_id": s.get("rule_id"),
                 "rule_version": s.get("rule_version"),
-                "input": s.get("input"),
-                "breakdown": s.get("breakdown"),
+                # Strip txn_ids / internal ids from input + breakdown so the
+                # model can't echo UUIDs back into its prose.
+                "input": _strip_internal(s.get("input")),
+                "breakdown": _strip_internal(s.get("breakdown")),
                 "result": s.get("result"),
                 "human_explanation": s.get("human_explanation"),
             }
@@ -329,19 +402,15 @@ def explain_trace(
         op = str(s.get("op", "")) or "(unnamed)"
         rows = _to_rows(s.get("input"))
 
-        # Breakdown rows — append after input rows when present.
+        # Breakdown rows — append after input rows when present. Different
+        # engine steps emit different breakdown shapes; pick the right
+        # label + amount columns for each so the user sees the band names,
+        # employer names, or section refs that actually carry meaning.
         breakdown = s.get("breakdown")
         if isinstance(breakdown, list) and breakdown:
             for i, b in enumerate(breakdown, 1):
                 if isinstance(b, dict):
-                    label_parts: list[str] = []
-                    amt_value: Any = None
-                    for k, v in b.items():
-                        if k == "amount":
-                            amt_value = v
-                        elif k in ("label", "name", "category", "txn_id", "section"):
-                            label_parts.append(str(v))
-                    label = " · ".join(label_parts) if label_parts else f"Item {i}"
+                    label, amt_value = _label_and_amount(b, i)
                     raw = "" if amt_value is None else str(amt_value)
                     value = _inr(amt_value) if amt_value is not None else ""
                     rows.append(FieldRow(label=label, value=value, raw=raw))

@@ -22,7 +22,9 @@ import app.models  # noqa: F401
 from app.api.health import router as health_router
 from app.api.v1.documents import router as documents_router
 from app.api.v1.filings import router as filings_router
+from app.api.v1.auth_submit import router as auth_submit_router
 from app.api.v1.regime import router as regime_router
+from app.api.v1.submit import router as submit_router
 from app.api.v1.summary import router as summary_router
 from app.api.v1.transactions import router as transactions_router
 from app.api.v1.workspace import (
@@ -74,6 +76,8 @@ app.include_router(documents_router)
 app.include_router(transactions_router)
 app.include_router(regime_router)
 app.include_router(summary_router)
+app.include_router(auth_submit_router)
+app.include_router(submit_router)
 
 
 @app.get("/")
