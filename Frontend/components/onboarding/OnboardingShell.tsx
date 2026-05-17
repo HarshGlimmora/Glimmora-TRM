@@ -34,7 +34,7 @@ export function OnboardingShell({
   return (
     <div className="min-h-dvh bg-vellum">
       <header className="sticky top-0 z-30 border-b border-line bg-surface-raised/85 backdrop-blur supports-[backdrop-filter]:bg-surface-raised/65">
-        <div className="container flex h-14 items-center justify-between">
+        <div className="container flex h-24 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" aria-label="Glimmora home">
               <Logo size="sm" />

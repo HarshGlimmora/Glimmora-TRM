@@ -58,7 +58,7 @@ send_and_grab() {
 }
 
 echo "=================================================================="
-echo "  Glimmora TRM auth/onboarding e2e probe"
+echo "  Glimmora Tax auth/onboarding e2e probe"
 echo "  base : $BASE"
 echo "  log  : $DEV_LOG"
 echo "  email-A: $EMAIL_A"

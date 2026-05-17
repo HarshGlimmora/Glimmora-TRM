@@ -93,7 +93,7 @@ export default function RoleSelectPage() {
         <h2 className="mt-4 font-display text-4xl leading-tight text-ink">
           How do you use
           <br />
-          Glimmora TRM?
+          Glimmora Tax?
         </h2>
         <p className="mt-3 text-pretty text-sm text-ink-muted">
           This selection determines your onboarding flow and what your dashboard

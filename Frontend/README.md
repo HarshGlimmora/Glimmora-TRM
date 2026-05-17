@@ -1,4 +1,4 @@
-# Glimmora TRM — Frontend
+# Glimmora Tax — Frontend
 
 A premium, trust-first frontend for the **Glimmora Tax Resource Management** platform.
 Built as a Next.js 14 (App Router) + TypeScript + TailwindCSS application, ready to be wired up to a real backend.

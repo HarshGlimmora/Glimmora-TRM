@@ -25,12 +25,12 @@ const display = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: "Glimmora TRM — Sovereign Tax Resource Management",
-    template: "%s · Glimmora TRM",
+    default: "Glimmora Tax — Sovereign Tax Resource Management",
+    template: "%s · Glimmora Tax",
   },
   description:
     "A trust-first tax administration platform. Verified identity, audited access, and deterministic rules — built for India.",
-  applicationName: "Glimmora TRM",
+  applicationName: "Glimmora Tax",
   referrer: "strict-origin-when-cross-origin",
   formatDetection: { telephone: false, email: false, address: false },
   robots: { index: false, follow: false },

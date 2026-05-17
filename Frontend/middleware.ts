@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * Adds defensive headers and reroutes obviously bad requests.
  *
- * Note: this is intentionally narrow because Glimmora TRM's frontend
+ * Note: this is intentionally narrow because Glimmora Tax's frontend
  * runs as a static client-side application for now — there is no live
  * session cookie. Route protection is handled client-side via AuthGuard.
  */

@@ -45,7 +45,9 @@ export function AuthShell({ children, step }: AuthShellProps) {
           />
 
           <header className="relative z-10 flex items-center justify-between">
-            <Logo size="md" inverse />
+            <span className="inline-flex items-center rounded-lg bg-[#faf3e0] px-3 py-1.5 shadow-elevated ring-1 ring-[#e8dcb8]/40">
+              <Logo size="md" />
+            </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-2xs font-medium uppercase tracking-widest text-white/75">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-soft-pulse rounded-full bg-emerald-300" />
@@ -88,7 +90,7 @@ export function AuthShell({ children, step }: AuthShellProps) {
           </ul>
 
           <footer className="relative z-10 mt-auto flex items-center justify-between pt-12 text-2xs uppercase tracking-widest text-white/55">
-            <span>© Glimmora TRM · India</span>
+            <span>© Glimmora Tax · India</span>
             <span>v0.1 Demo · Frontend preview</span>
           </footer>
         </aside>

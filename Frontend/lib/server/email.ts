@@ -1,5 +1,5 @@
 /**
- * Email transport for Glimmora TRM.
+ * Email transport for Glimmora Tax.
  *
  * Resolves the provider from EMAIL_PROVIDER (smtp | resend), falls back
  * across providers, and falls back to console-logging the OTP in dev so
@@ -46,13 +46,13 @@ export interface OtpEmailArgs {
   ttlMinutes: number;
 }
 
-const FROM_NAME = process.env.EMAIL_FROM_NAME ?? "Glimmora TRM";
+const FROM_NAME = process.env.EMAIL_FROM_NAME ?? "Glimmora Tax";
 const FROM_EMAIL = process.env.EMAIL_FROM ?? "noreply@glimmora.local";
 
 function buildSubject(code: string, args: OtpEmailArgs): string {
   return args.channel === "mobile"
-    ? `Glimmora TRM verification code ${code} (for +91 ${args.forwardForMobile})`
-    : `Glimmora TRM verification code ${code}`;
+    ? `Glimmora Tax verification code ${code} (for +91 ${args.forwardForMobile})`
+    : `Glimmora Tax verification code ${code}`;
 }
 
 function buildText(code: string, args: OtpEmailArgs): string {
@@ -60,12 +60,12 @@ function buildText(code: string, args: OtpEmailArgs): string {
     args.channel === "mobile"
       ? `mobile +91 ${args.forwardForMobile}`
       : "this email";
-  return `Your Glimmora TRM verification code is ${code}.
+  return `Your Glimmora Tax verification code is ${code}.
 
 This code expires in ${args.ttlMinutes} minutes and is for ${target}.
 If you didn't request it, you can safely ignore this email.
 
-— Glimmora TRM
+— Glimmora Tax
 `;
 }
 
@@ -83,11 +83,11 @@ function buildHtml(code: string, args: OtpEmailArgs): string {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
-    <title>Glimmora TRM verification</title>
+    <title>Glimmora Tax verification</title>
   </head>
   <body style="margin:0;padding:0;background:#f3f5f9;font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#101a2b;-webkit-font-smoothing:antialiased;">
     <span style="display:none!important;opacity:0;visibility:hidden;mso-hide:all;font-size:1px;line-height:1px;max-height:0;max-width:0;overflow:hidden;">
-      Your Glimmora TRM verification code is ${code}. It expires in ${args.ttlMinutes} minutes.
+      Your Glimmora Tax verification code is ${code}. It expires in ${args.ttlMinutes} minutes.
     </span>
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f3f5f9;padding:32px 16px;">
       <tr>
@@ -100,7 +100,7 @@ function buildHtml(code: string, args: OtpEmailArgs): string {
                     <td>
                       <div style="display:inline-flex;align-items:center;gap:10px;">
                         <span style="display:inline-block;width:28px;height:28px;border-radius:6px;background:#ffffff;color:#0e1c34;text-align:center;line-height:28px;font-weight:700;font-size:14px;letter-spacing:-0.02em;">G</span>
-                        <span style="font-weight:600;letter-spacing:-0.01em;font-size:15px;">Glimmora <span style="border:1px solid rgba(255,255,255,0.3);padding:1px 5px;border-radius:3px;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;margin-left:4px;">TRM</span></span>
+                        <span style="font-weight:600;letter-spacing:-0.01em;font-size:15px;">Glimmora <span style="color:#7cc4e8;font-weight:600;font-size:14px;letter-spacing:-0.01em;margin-left:2px;">Tax</span></span>
                       </div>
                     </td>
                     <td align="right" style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.65);">
@@ -112,7 +112,7 @@ function buildHtml(code: string, args: OtpEmailArgs): string {
                   Verify it&rsquo;s you.
                 </h1>
                 <p style="margin:0;color:rgba(255,255,255,0.78);font-size:14px;line-height:1.5;">
-                  Use the code below to continue signing in to your Glimmora TRM account.
+                  Use the code below to continue signing in to your Glimmora Tax account.
                 </p>
               </td>
             </tr>
@@ -147,7 +147,7 @@ function buildHtml(code: string, args: OtpEmailArgs): string {
             <tr>
               <td style="padding:14px 32px 22px 32px;border-top:1px solid #eef0f4;background:#fbfbfd;">
                 <p style="margin:0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#9aa3b2;">
-                  Glimmora TRM &middot; Sovereign Tax Resource Management &middot; India
+                  Glimmora Tax &middot; Sovereign Tax Resource Management &middot; India
                 </p>
               </td>
             </tr>

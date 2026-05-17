@@ -1,5 +1,5 @@
 /**
- * Core domain types for Glimmora TRM frontend.
+ * Core domain types for Glimmora Tax frontend.
  * Sensitive fields are marked with `Sensitive<T>` (a brand) so we can grep
  * for any place they cross the persistence boundary.
  */
