@@ -31,7 +31,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const VERCEL_ROOT = resolve(__dirname, "..");
 const FRONTEND_ROOT = resolve(VERCEL_ROOT, "..", "Frontend");
 
-const TREE_MIRRORS = ["app", "components", "lib"];
+const TREE_MIRRORS = ["app", "components", "lib", "public"];
 const FILE_MIRRORS = ["middleware.ts", "postcss.config.mjs", "tailwind.config.ts"];
 
 // Centralized env lives at the REPO ROOT (one level above Frontend/), not
@@ -99,4 +99,4 @@ for (const name of REPO_ROOT_ENV_LINKS) {
   mirrorRepoRootFile(name);
 }
 
-console.log("[mirror-frontend] Mirror refreshed: app/, components/, lib/, middleware.ts, postcss.config.mjs, tailwind.config.ts, .env*");
+console.log("[mirror-frontend] Mirror refreshed: app/, components/, lib/, public/, middleware.ts, postcss.config.mjs, tailwind.config.ts, .env*");

@@ -45,7 +45,7 @@ export function AuthShell({ children, step }: AuthShellProps) {
           />
 
           <header className="relative z-10 flex items-center justify-between">
-            <span className="inline-flex items-center rounded-lg bg-[#faf3e0] px-3 py-1.5 shadow-elevated ring-1 ring-[#e8dcb8]/40">
+            <span className="inline-flex items-center rounded-lg bg-[#f5ead0] px-3 py-1.5 shadow-elevated ring-1 ring-[#e8dcb8]/40">
               <Logo size="md" />
             </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-2xs font-medium uppercase tracking-widest text-white/75">
