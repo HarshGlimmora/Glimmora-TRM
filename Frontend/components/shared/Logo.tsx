@@ -11,9 +11,9 @@ interface LogoProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const SIZE_MAP = {
-  sm: "h-16",
-  md: "h-24",
-  lg: "h-32",
+  sm: "h-10",
+  md: "h-14",
+  lg: "h-20",
 };
 
 export function Logo({
