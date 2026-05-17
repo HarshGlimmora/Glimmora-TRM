@@ -14,6 +14,7 @@ out
 /app/
 /components/
 /lib/
+/public/
 /middleware.ts
 /postcss.config.mjs
 /tailwind.config.ts

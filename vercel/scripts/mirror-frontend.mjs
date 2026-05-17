@@ -23,7 +23,7 @@
  *   - postcss.config.mjs
  *   - tailwind.config.ts
  */
-import { mkdirSync, readdirSync, lstatSync, symlinkSync, rmSync, existsSync } from "node:fs";
+import { mkdirSync, readdirSync, lstatSync, symlinkSync, copyFileSync, rmSync, existsSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,6 +33,11 @@ const FRONTEND_ROOT = resolve(VERCEL_ROOT, "..", "Frontend");
 
 const TREE_MIRRORS = ["app", "components", "lib", "public"];
 const FILE_MIRRORS = ["middleware.ts", "postcss.config.mjs", "tailwind.config.ts"];
+// Trees that must be real file copies, not symlinks. Vercel's static asset
+// pipeline does not follow symlinks pointing outside the project root when
+// packaging public/, so the PNG/SVG/etc. would 404 in production. Code trees
+// stay as symlinks (faster iteration, no stale copies).
+const COPY_TREES = new Set(["public"]);
 
 // Centralized env lives at the REPO ROOT (one level above Frontend/), not
 // inside Frontend/. Next.js auto-loads `.env*` from its project root, so we
@@ -41,7 +46,7 @@ const FILE_MIRRORS = ["middleware.ts", "postcss.config.mjs", "tailwind.config.ts
 // request workers — only files in the project root do.
 const REPO_ROOT_ENV_LINKS = [".env", ".env.local", ".env.development", ".env.production"];
 
-function mirrorTree(srcDir, destDir) {
+function mirrorTree(srcDir, destDir, useCopy = false) {
   if (existsSync(destDir)) {
     rmSync(destDir, { recursive: true, force: true });
   }
@@ -50,11 +55,15 @@ function mirrorTree(srcDir, destDir) {
     const srcPath = join(srcDir, entry.name);
     const destPath = join(destDir, entry.name);
     if (entry.isDirectory()) {
-      mirrorTree(srcPath, destPath);
+      mirrorTree(srcPath, destPath, useCopy);
     } else if (entry.isFile() || entry.isSymbolicLink()) {
-      // Relative symlink so it resolves the same on local + Vercel build runners.
-      const linkTarget = relative(dirname(destPath), srcPath);
-      symlinkSync(linkTarget, destPath);
+      if (useCopy) {
+        copyFileSync(srcPath, destPath);
+      } else {
+        // Relative symlink so it resolves the same on local + Vercel build runners.
+        const linkTarget = relative(dirname(destPath), srcPath);
+        symlinkSync(linkTarget, destPath);
+      }
     }
   }
 }
@@ -90,7 +99,7 @@ for (const name of TREE_MIRRORS) {
   const src = join(FRONTEND_ROOT, name);
   const dest = join(VERCEL_ROOT, name);
   if (!existsSync(src)) continue;
-  mirrorTree(src, dest);
+  mirrorTree(src, dest, COPY_TREES.has(name));
 }
 for (const name of FILE_MIRRORS) {
   mirrorFile(name);
