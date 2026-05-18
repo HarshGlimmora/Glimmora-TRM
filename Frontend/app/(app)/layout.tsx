@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AuthGuard } from "@/components/shared/AuthGuard";
 import { TopBar } from "@/components/dashboard/TopBar";
+import { Assistant } from "@/components/assistant";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function AppLayout({
@@ -26,6 +27,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <main id="main" className="container pt-8 pb-20">
         {children}
       </main>
+      <Assistant />
     </div>
   );
 }

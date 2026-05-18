@@ -31,6 +31,7 @@ from app.api.v1.workspace import (
     filings_patch_router as workspace_filings_patch_router,
     router as workspace_router,
 )
+from app.chatbot import router as chatbot_router
 from app.config import get_settings
 from app.db.init_db import init_database
 from app.db.seed import run_seed
@@ -78,6 +79,7 @@ app.include_router(regime_router)
 app.include_router(summary_router)
 app.include_router(auth_submit_router)
 app.include_router(submit_router)
+app.include_router(chatbot_router)
 
 
 @app.get("/")
