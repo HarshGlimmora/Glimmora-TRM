@@ -20,13 +20,15 @@ export default function AppLayout({
 
 function Shell({ children }: { children: React.ReactNode }) {
   const profile = useAuthStore((s) => s.profile);
-  if (!profile) return null;
   return (
     <div className="min-h-dvh bg-vellum">
-      <TopBar profile={profile} />
+      {profile && <TopBar profile={profile} />}
       <main id="main" className="container pt-8 pb-20">
-        {children}
+        {profile ? children : null}
       </main>
+      {/* Assistant lives outside the profile gate so it doesn't blink off
+          during zustand rehydration / route transitions. It self-suppresses
+          on sensitive screens via its page registry. */}
       <Assistant />
     </div>
   );

@@ -122,6 +122,15 @@ const config: Config = {
           from: { transform: "translateX(100%)" },
           to: { transform: "translateX(0)" },
         },
+        "fab-ripple": {
+          "0%":   { transform: "scale(1)",    opacity: "0.55" },
+          "70%":  { transform: "scale(1.9)",  opacity: "0" },
+          "100%": { transform: "scale(1.9)",  opacity: "0" },
+        },
+        "fab-glow": {
+          "0%, 100%": { boxShadow: "0 10px 30px -10px hsl(var(--shadow) / 0.55), 0 0 0 0 hsl(var(--accent) / 0.0)" },
+          "50%":      { boxShadow: "0 12px 36px -10px hsl(var(--shadow) / 0.65), 0 0 0 8px hsl(var(--accent) / 0.12)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 240ms ease-out",
@@ -130,6 +139,8 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         "soft-pulse": "soft-pulse 1.8s ease-in-out infinite",
         "slide-in-right": "slide-in-right 240ms cubic-bezier(0.22, 0.61, 0.36, 1)",
+        "fab-ripple": "fab-ripple 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite",
+        "fab-glow":   "fab-glow 3.2s ease-in-out infinite",
       },
       backgroundImage: {
         "grid-lines":

@@ -11,8 +11,10 @@ import { usePageContext } from "@/components/assistant/usePageContext";
  * Lives at the bottom-right of every authenticated screen, except those
  * the page registry marks as `suppressed` (auth, OTP verify, onboarding
  * with PAN/Aadhaar entry, and the filing submit step). On suppressed
- * screens, the assistant renders nothing — neither launcher nor panel —
- * to stay out of the way of sensitive flows.
+ * screens the FAB is hidden via opacity — the component stays mounted
+ * so that returning to an allowed screen does NOT replay the entrance
+ * animation, which previously made the button appear to "flash" during
+ * route transitions.
  */
 export function Assistant() {
   const page = usePageContext();
@@ -24,17 +26,19 @@ export function Assistant() {
     if (page.suppressed && open) setOpen(false);
   }, [page.suppressed, open]);
 
-  if (page.suppressed) return null;
+  const allowed = !page.suppressed;
 
   return (
     <>
-      <AssistantFab onOpen={() => setOpen(true)} visible={!open} />
-      <AssistantPanel
-        open={open}
-        page={page}
-        onMinimize={() => setOpen(false)}
-        onClose={() => setOpen(false)}
-      />
+      <AssistantFab onOpen={() => setOpen(true)} visible={allowed && !open} />
+      {allowed && (
+        <AssistantPanel
+          open={open}
+          page={page}
+          onMinimize={() => setOpen(false)}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }

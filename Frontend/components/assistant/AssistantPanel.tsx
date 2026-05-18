@@ -134,8 +134,15 @@ export function AssistantPanel({ open, onClose, onMinimize, page }: AssistantPan
       role="dialog"
       aria-modal="false"
       aria-labelledby="glimmora-assistant-title"
+      data-testid="assistant-panel"
+      style={{
+        position: "fixed",
+        right: "1.5rem",
+        bottom: "1.5rem",
+        zIndex: 50,
+      }}
       className={cn(
-        "fixed bottom-6 right-6 z-50 flex w-[min(380px,calc(100vw-2rem))] flex-col",
+        "flex w-[min(380px,calc(100vw-2rem))] flex-col",
         "max-h-[min(600px,calc(100dvh-6rem))] overflow-hidden",
         "rounded-2xl border border-line-strong bg-surface-raised shadow-elevated",
         "animate-scale-in",
